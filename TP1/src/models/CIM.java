@@ -1,11 +1,18 @@
-package TP1;
+package models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+/**
+ * TODO:
+ * creo que deberíamos cambiar esta clase. Cambié la logica para que cada particula
+ * tenga definida su propias coordenadas, y a partir de la misma la grilla sabra en qué
+ * celda ubicarla.
+ */
 public class CIM {
     public static void setNeighbours(Cell cell, Grid grid) {
-        List<Particle> particles = cell.getParticles();
+        Set<Particle> particles = cell.getParticles();
 
         // Handle particles of the same cell separately so as to make sure they are not added twice
         for (Particle particle : particles) {
