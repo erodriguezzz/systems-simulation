@@ -23,8 +23,8 @@ public class Simulation {
         Set<Particle> particles = new HashSet<>();
         Random random = new Random();
         for (int i = 1; i <= particleQty; i++) {
-            int particleX = random.nextInt(rows);
-            int particleY = random.nextInt(cols);
+            float particleX = random.nextFloat() * cols;
+            float particleY = random.nextFloat() * cols;
             particles.add(new Particle(i, particleX, particleY, 0.1f));
         }
         grid.addParticles(particles);
@@ -36,11 +36,12 @@ public class Simulation {
         Grid grid = populateRandomGrid(M, M, N);
 
         System.out.println(grid);
-
+        CIM.setAllNeighbours(grid);
         // Print each particle's neighbors
         for (int row = 0; row < M; row++) {
             for (int column = 0; column < M; column++) {
                 grid.getCell(row, column).getParticles().forEach(particle -> {
+                    System.out.println("Particle " + particle + " neighbors: " + particle.getNeighbours());
                     // TODO: imprimir vecinos de la celda
                 });
             }

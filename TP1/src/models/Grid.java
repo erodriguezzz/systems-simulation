@@ -13,7 +13,12 @@ public class Grid {
         this.M = M;
         this.cellSize = L/ (float) M;
         this.cells = new Cell[M][M];
-        Arrays.stream(cells).forEach(row -> Arrays.fill(row, new Cell()));
+        for (int row = 0; row < M; row++) {
+            for (int col = 0; col < M; col++) {
+                cells[row][col] = new Cell(row, col);
+            }
+        }
+        // Arrays.stream(cells).forEach(row -> Arrays.fill(row, new Cell()));
     }
 
     /**
@@ -35,6 +40,10 @@ public class Grid {
 
     public Cell getCell(int row, int col) {
         return cells[row][col];
+    }
+
+    public int getGridSize() {
+        return M;
     }
 
 }

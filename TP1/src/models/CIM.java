@@ -29,8 +29,8 @@ public class CIM {
         List<Particle> neighbours = new ArrayList<>();
         for (int dx = 0; dx <= 1; dx++){
             for(int dy = -1; dy <=1; dy++) {
-                if (y + dy >= 0 && !(dx == 0 && dy == 0) && !(dy == -1 && dx == 0) && x + dx < grid.getNumberOfRows() && y + dy < grid.getNumberOfColumns()) {
-                    neighbours.addAll(grid.getParticles(x + dx, y + dy));
+                if (y + dy >= 0 && !(dx == 0 && dy == 0) && !(dy == -1 && dx == 0) && x + dx < grid.getGridSize() && y + dy < grid.getGridSize()) {
+                    neighbours.addAll(grid.getCell(x + dx, y + dy).getParticles());
                 }
             }
         }
@@ -44,8 +44,8 @@ public class CIM {
 
     // Sets the neighbors for all particles in a grid using the Cell Index Method
     public static void setAllNeighbours(Grid grid) {
-        for (int row = 0; row < grid.getNumberOfRows(); row++) {
-            for (int col = 0; col < grid.getNumberOfColumns(); col++) {
+        for (int row = 0; row < grid.getGridSize(); row++) {
+            for (int col = 0; col < grid.getGridSize(); col++) {
                 Cell cell = grid.getCell(row, col);
                 setNeighbours(cell, grid);
             }
