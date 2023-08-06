@@ -1,4 +1,7 @@
 import models.*;
+
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class Simulation {
@@ -31,10 +34,36 @@ public class Simulation {
         return grid;
     }
 
+    public static void gridToCSV(Grid grid) {
+        try (FileWriter writer = new FileWriter("C:\\Users\\Gaspar\\Desktop\\ITBA\\2023-2Q\\SS\\systems-simulation\\TP1\\data\\output\\particles.xyz")) {
+            writer.append(N + "\n\n"); // Write the total number of particles as the first line
+        
+            for (int row = 0; row < grid.getGridSize(); row++) {
+                for (int col = 0; col < grid.getGridSize(); col++) {
+                    grid.getCell(row, col).getParticles().forEach(particle -> {
+                        try {
+                            // Write the particle element symbol, and the x, y, and z coordinates separated by space
+                            String line = String.format("%.4f %.4f 255 255 0 0.2\n", particle.getX(), particle.getY());
+                            writer.append(line);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        
+        
+    }
+
+
     public static void main(String[] args) {
         // Grid grid = populateDefaultGrid();
         Grid grid = populateRandomGrid(M, M, N);
-
+        gridToCSV(grid);
         System.out.println(grid);
         CIM.setAllNeighbours(grid, rc);
         // Print each particle's neighbors
