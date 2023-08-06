@@ -36,7 +36,7 @@ public class Simulation {
         Grid grid = populateRandomGrid(M, M, N);
 
         System.out.println(grid);
-        CIM.setAllNeighbours(grid);
+        CIM.setAllNeighbours(grid, rc);
         // Print each particle's neighbors
         for (int row = 0; row < M; row++) {
             for (int column = 0; column < M; column++) {
