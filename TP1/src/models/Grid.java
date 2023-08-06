@@ -32,8 +32,8 @@ public class Grid {
             if (particle.getX() >= L || particle.getY() >= L) {
                 throw new IllegalArgumentException("Particle out of bounds");
             }
-            int row = (int) Math.floor(particle.getX()/cellSize);
-            int col = (int) Math.floor(particle.getY()/cellSize);
+            int row = (int) Math.floor(particle.getX());
+            int col = (int) Math.floor(particle.getY());
             cells[row][col].getParticles().add(particle);
         });
     }
