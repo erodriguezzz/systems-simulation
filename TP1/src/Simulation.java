@@ -8,11 +8,11 @@ public class Simulation {
     private static final int L = 15;
     private static final int M = 15;
     private static final int N = 50;
-    private static final double rc= 0.25;
+    private static final double rc= 1;
 
 
     public static Grid populateDefaultGrid() {
-        Grid grid = new PeriodicGrid(9, 9);
+        Grid grid = new NonPeriodicGrid(9, 9);
         Particle p1 = new Particle(1, 2.4f, 2.4f, 0.1f);
         Particle p2 = new Particle(2, 1.2f, 2, 0.1f);
         Particle p3 = new Particle(3, 0.55f, 0.55f, 0.1f);
@@ -21,14 +21,18 @@ public class Simulation {
         return grid;
     }
 
-    public static Grid populateRandomGrid(float size, int cells, int particleQty) {
-        Grid grid = new PeriodicGrid(size, cells);
+    public static Grid populateRandomGrid(float size, int cells, int particleQty, boolean isPeriodic) {
+        Grid grid;
+        if (isPeriodic)
+            grid = new PeriodicGrid(size, cells);
+        else
+            grid = new NonPeriodicGrid(size, cells);
         Set<Particle> particles = new HashSet<>();
         Random random = new Random();
         for (int i = 1; i <= particleQty; i++) {
             float particleX = random.nextFloat() * cells;
             float particleY = random.nextFloat() * cells;
-            particles.add(new Particle(i, particleX, particleY, 0.1f));
+            particles.add(new Particle(i, particleX, particleY, 1f));
         }
         grid.addParticles(particles);
         return grid;
@@ -38,8 +42,8 @@ public class Simulation {
         try (FileWriter writer = new FileWriter("C:\\Users\\Gaspar\\Desktop\\ITBA\\2023-2Q\\SS\\systems-simulation\\TP1\\data\\output\\particles.xyz")) {
             writer.append(N + "\n\n"); // Write the total number of particles as the first line
         
-            for (int row = 0; row < grid.getGridSize(); row++) {
-                for (int col = 0; col < grid.getGridSize(); col++) {
+            for (int row = 0; row < grid.getNumberOfRows(); row++) {
+                for (int col = 0; col < grid.getNumberOfRows(); col++) {
                     grid.getCell(row, col).getParticles().forEach(particle -> {
                         try {
                             // Write the particle element symbol, and the x, y, and z coordinates separated by space
@@ -62,10 +66,10 @@ public class Simulation {
 
     public static void main(String[] args) {
         // Grid grid = populateDefaultGrid();
-        Grid grid = populateRandomGrid(M, M, N);
+        Grid grid = populateRandomGrid(L, M, N, true);
         gridToCSV(grid);
         System.out.println(grid);
-        CIM.setAllNeighbours(grid, rc);
+        grid.setAllNeighbours(rc, true);
         // Print each particle's neighbors
         for (int row = 0; row < M; row++) {
             for (int column = 0; column < M; column++) {

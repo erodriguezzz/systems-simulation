@@ -9,8 +9,10 @@ public class Cell {
     private int col;
     private Set<Particle> particles;
 
-    public Cell(int x, int y) {
+    public Cell(int row, int col) {
         this.particles = new HashSet<>();
+        this.row = row;
+        this.col = col;
     }
 
     public Set<Particle> getParticles() {

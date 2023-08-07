@@ -39,13 +39,21 @@ public abstract class Grid {
         });
     }
 
+    public abstract void setAllNeighbours(double rc, boolean cim);
+
     public Cell getCell(int row, int col) {
         return cells[row][col];
     }
 
-    public float getGridSize() {
+    public double getDistance(Particle p1, Particle p2) {
+        return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2)) - p1.getRadius() - p2.getRadius() ;
+    }
+
+    public float getNumberOfRows() {
         return M;
     }
+
+    public float getSize() {return L;}
 
     @Override
     public String toString() {
