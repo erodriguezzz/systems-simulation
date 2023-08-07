@@ -12,7 +12,7 @@ public class Simulation {
 
 
     public static Grid populateDefaultGrid() {
-        Grid grid = new Grid(9, 9);
+        Grid grid = new PeriodicGrid(9, 9);
         Particle p1 = new Particle(1, 2.4f, 2.4f, 0.1f);
         Particle p2 = new Particle(2, 1.2f, 2, 0.1f);
         Particle p3 = new Particle(3, 0.55f, 0.55f, 0.1f);
@@ -21,13 +21,13 @@ public class Simulation {
         return grid;
     }
 
-    public static Grid populateRandomGrid(int rows, int cols, int particleQty) {
-        Grid grid = new Grid(rows, cols);
+    public static Grid populateRandomGrid(float size, int cells, int particleQty) {
+        Grid grid = new PeriodicGrid(size, cells);
         Set<Particle> particles = new HashSet<>();
         Random random = new Random();
         for (int i = 1; i <= particleQty; i++) {
-            float particleX = random.nextFloat() * cols;
-            float particleY = random.nextFloat() * cols;
+            float particleX = random.nextFloat() * cells;
+            float particleY = random.nextFloat() * cells;
             particles.add(new Particle(i, particleX, particleY, 0.1f));
         }
         grid.addParticles(particles);

@@ -1,17 +1,18 @@
 package models;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
-public class Grid {
+public abstract class Grid {
 
-    private int L;
+    private float L;
     private int M;
     private Cell[][] cells;
     private float cellSize;
 
-    public Grid(int L, int M) {
+    public Grid(float L, int M) {
         this.L = L;
         this.M = M;
-        this.cellSize = L/ (float) M;
+        this.cellSize = L/M;
         this.cells = new Cell[M][M];
         for (int row = 0; row < M; row++) {
             for (int col = 0; col < M; col++) {
@@ -42,8 +43,58 @@ public class Grid {
         return cells[row][col];
     }
 
-    public int getGridSize() {
+    public float getGridSize() {
         return M;
+    }
+
+    @Override
+    public String toString() {
+        String[][] strGrid = new String[this.M][this.M];
+
+        for (int row = 0; row < this.M; row++) {
+            for (int col = 0; col < this.M; col++) {
+                Set<Particle> cellValues = cells[row][col].getParticles();
+                if (!cellValues.isEmpty()) {
+                    strGrid[row][col] = "[" + String.join(", ", cellValues.toString()) + "]";
+                } else {
+                    strGrid[row][col] = "";
+                }
+            }
+        }
+
+        int[] colWidths = new int[this.M];
+        for (int col = 0; col < this.M; col++) {
+            for (int row = 0; row < this.M; row++) {
+                colWidths[col] = Math.max(colWidths[col], strGrid[row][col].length());
+            }
+        }
+
+        StringBuilder gridStr = new StringBuilder();
+        for (int row = 0; row < this.M; row++) {
+            gridStr.append("+").append(String.join("+", generateLine('-', colWidths))).append("+\n");
+            gridStr.append("| ").append(String.join(" | ", generatePaddedValues(strGrid[row], colWidths))).append(" |\n");
+        }
+        gridStr.append("+").append(String.join("+", generateLine('-', colWidths))).append("+");
+
+        return gridStr.toString();
+    }
+
+    private List<String> generateLine(char ch, int[] colWidths) {
+        List<String> line = new ArrayList<>();
+        for (int colWidth : colWidths) {
+            line.add(new String(new char[colWidth + 2]).replace('\0', ch));
+        }
+        return line;
+    }
+
+    private List<String> generatePaddedValues(String[] values, int[] colWidths) {
+        List<String> paddedValues = new ArrayList<>();
+        for (int col = 0; col < colWidths.length; col++) {
+            int paddingLength = colWidths[col] - values[col].length();
+            String paddedValue = values[col] + new String(new char[paddingLength]).replace('\0', ' ');
+            paddedValues.add(paddedValue);
+        }
+        return paddedValues;
     }
 
 }

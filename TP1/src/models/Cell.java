@@ -7,8 +7,6 @@ public class Cell {
 
     private int row;
     private int col;
-
-    // TODO: podría ser útil tener una referencia a las celdas adjacentes para visitar los vecinos
     private Set<Particle> particles;
 
     public Cell(int x, int y) {

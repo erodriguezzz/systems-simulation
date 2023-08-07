@@ -1,7 +1,5 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -14,7 +12,7 @@ public class CIM {
     public static void setNeighbours(Cell cell, Grid grid, double rc) {
         Set<Particle> particles = cell.getParticles();
 
-        // Handle particles of the same cell separately so as to make sure they are not added twice
+        // Handle particles of the same cell separately to make sure they are not added twice
         for (Particle particle : particles) {
             for (Particle part : particles) {
                 if (!part.equals(particle)) {
