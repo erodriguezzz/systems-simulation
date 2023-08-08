@@ -1,13 +1,12 @@
 import models.*;
+import services.DataManager;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
 public class Simulation {
-    private static final int L = 15;
     private static final int M = 15;
-    private static final int N = 50;
     private static final double rc= 1;
 
 
@@ -38,7 +37,7 @@ public class Simulation {
         return grid;
     }
 
-    public static void gridToCSV(Grid grid) {
+    public static void gridToCSV(Grid grid, int N) {
         try (FileWriter writer = new FileWriter("C:\\Users\\Gaspar\\Desktop\\ITBA\\2023-2Q\\SS\\systems-simulation\\TP1\\data\\output\\particles.xyz")) {
             writer.append(N + "\n\n"); // Write the total number of particles as the first line
         
@@ -66,8 +65,10 @@ public class Simulation {
 
     public static void main(String[] args) {
         // Grid grid = populateDefaultGrid();
-        Grid grid = populateRandomGrid(L, M, N, true);
-        gridToCSV(grid);
+        DataManager dm = new DataManager("./data/input/Static100.txt", "./data/input/Dynamic100.txt");
+        Grid grid = populateRandomGrid(dm.getL(), M, dm.getN(), true);
+
+        gridToCSV(grid, dm.getN());
         System.out.println(grid);
         grid.setAllNeighbours(rc, true);
         // Print each particle's neighbors
