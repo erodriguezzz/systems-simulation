@@ -76,7 +76,7 @@ public abstract class Grid {
         return M;
     }
 
-    public float getSize() {return L;}
+    public float getSize() {return M;}
 
     public Cell[][] getCells() {
         return cells;
