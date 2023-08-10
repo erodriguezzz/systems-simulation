@@ -56,4 +56,8 @@ public class DataManager {
         return N;
     }
 
+    public Set<Particle> getParticles() {
+        return particles;
+    }
+
 }

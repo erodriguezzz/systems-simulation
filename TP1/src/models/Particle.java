@@ -49,4 +49,8 @@ public class Particle {
     public double distance(Particle particle) {
         return Math.sqrt(Math.pow(this.x - particle.x, 2) + Math.pow(this.y - particle.y, 2));
     }
+
+    public void setNeighbours(List<Particle> neighbours) {
+        this.neighbours = neighbours;
+    }
 }
