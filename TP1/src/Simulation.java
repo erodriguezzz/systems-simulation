@@ -4,11 +4,11 @@ import services.DataManager;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Simulation {
     private static final int M = 15;
-    private static final double rc= 1;
-
+    private static final double rc = 2;
 
     public static Grid populateDefaultGrid() {
         Grid grid = new NonPeriodicGrid(9, 9);
@@ -37,16 +37,21 @@ public class Simulation {
         return grid;
     }
 
-    public static void gridToCSV(Grid grid, int N) {
-        try (FileWriter writer = new FileWriter("C:\\Users\\Gaspar\\Desktop\\ITBA\\2023-2Q\\SS\\systems-simulation\\TP1\\data\\output\\particles.xyz")) {
+    public static void gridToXYZ(Grid grid, int N, int particleId) {
+        try (FileWriter writer = new FileWriter("./data/output/particles.xyz")) {
             writer.append(N + "\n\n"); // Write the total number of particles as the first line
-        
+
             for (int row = 0; row < grid.getNumberOfRows(); row++) {
                 for (int col = 0; col < grid.getNumberOfRows(); col++) {
                     grid.getCell(row, col).getParticles().forEach(particle -> {
                         try {
-                            // Write the particle element symbol, and the x, y, and z coordinates separated by space
-                            String line = String.format("%.4f %.4f 255 255 0 0.2\n", particle.getX(), particle.getY());
+                            String line = null;
+                            if (particle.getId() == particleId) {
+                                line = String.format("%.4f %.4f 0 255 255 0.2\n", particle.getX(), particle.getY());
+                            }
+                            // Write the particle element symbol, and the x, y, and z coordinates separated
+                            // by space
+                            line = String.format("%.4f %.4f 255 255 0 0.2\n", particle.getX(), particle.getY());
                             writer.append(line);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -57,28 +62,40 @@ public class Simulation {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-        
-        
-    }
 
+    }
 
     public static void main(String[] args) {
         // Grid grid = populateDefaultGrid();
         DataManager dm = new DataManager("./data/input/Static100.txt", "./data/input/Dynamic100.txt");
         Grid grid = populateRandomGrid(dm.getL(), M, dm.getN(), true);
+        try {
+            FileWriter writer = new FileWriter("./data/output/vecinos.xyz");
 
-        gridToCSV(grid, dm.getN());
-        System.out.println(grid);
-        grid.setAllNeighbours(rc, true);
-        // Print each particle's neighbors
-        for (int row = 0; row < M; row++) {
-            for (int column = 0; column < M; column++) {
-                grid.getCell(row, column).getParticles().forEach(particle -> {
-                    System.out.println("Particle " + particle + " neighbors: " + particle.getNeighbours());
-                    // TODO: imprimir vecinos de la celda
-                });
+            System.out.println(grid);
+            grid.setAllNeighbours(rc, true);
+            // Print each particle's neighbors
+            for (int row = 0; row < M; row++) {
+                for (int column = 0; column < M; column++) {
+                    grid.getCell(row, column).getParticles().forEach(particle -> {
+                        // System.out.println("Particle " + particle + " neighbors: " + particle.getNeighbours());
+                        try {
+                            // writer.append("Particle " + particle.getId() + " neighbors: " + particle.getNeighbours().stream().collect(n -> n.getId()) + "\n");
+                            writer.append(particle.getId() + ";" + particle.getX() + ";" + particle.getY() + ";" +particle.getNeighbours().stream().map(neighbor -> String.valueOf(neighbor.getId())).collect(Collectors.joining(", ")) + "\n");
+
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    });
+                }
             }
+            writer.close();
+            gridToXYZ(grid, dm.getN(), 4);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+
     }
 }
