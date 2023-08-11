@@ -1,5 +1,6 @@
 package models;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class PeriodicGrid extends Grid{
@@ -7,19 +8,7 @@ public class PeriodicGrid extends Grid{
         super(rows, columns);
     }
 
-    public void setAllNeighbours(double rc, boolean cim) {
-        for (int row = 0; row < getNumberOfRows(); row++) {
-            for (int col = 0; col < getNumberOfRows(); col++) {
-                Cell cell = getCell(row, col);
-                if (cim)
-                    CIM(cell, rc);
-                else
-                    bruteForce(cell, rc);
-            }
-        }
-    }
-
-    private void CIM(Cell cell, double rc) {
+    protected void CIM(Cell cell, double rc) {
         Set<Particle> particles = cell.getParticles();
 
         // Handle particles of the same cell separately to make sure they are not added twice
@@ -81,8 +70,21 @@ public class PeriodicGrid extends Grid{
         return getDistance(p1, p2);
     }
 
-    private void bruteForce(Cell cell, double rc){
-        //TODO: implementar algoritmo. Puede que no sea necesario que reciba la Cell
+    private double getBruteDistance(Particle p1, Particle p2) {
+        return Math.min(Math.min(Math.min(getDistance(p1, p2, false, false), getDistance(p1, p2, false, true)), getDistance(p1, p2, true, false)), getDistance(p1, p2, true, true));
+    }
+
+    protected void bruteForce(Cell[][] cells, double rc){
+        Set<Particle> particles = new HashSet<>();
+        for (Cell[] row : cells)
+            for (Cell cell :row)
+                particles.addAll(cell.getParticles());
+        for (Particle particle : particles)
+            for (Particle part : particles)
+                if (!part.equals(particle) && getBruteDistance(particle, part) <= rc) {
+                    particle.addNeighbour(part);
+                    part.addNeighbour(particle);
+                }
     }
 
 

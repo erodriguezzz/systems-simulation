@@ -39,7 +39,30 @@ public abstract class Grid {
         });
     }
 
-    public abstract void setAllNeighbours(double rc, boolean cim);
+    protected abstract void CIM(Cell cell, double rc);
+
+    protected abstract void bruteForce(Cell[][] cells, double rc);
+
+    public void setAllNeighbours(double rc, boolean cim) {
+        for (int row = 0; row < getNumberOfRows(); row++) {
+            for (int col = 0; col < getNumberOfRows(); col++) {
+                Cell cell = getCell(row, col);
+                if(cim)
+                    CIM(cell, rc);
+                else
+                    bruteForce(this.cells, rc);
+            }
+        }
+    }
+
+    public void clearAllNeighbours() {
+        for (int row = 0; row < getNumberOfRows(); row++) {
+            for (int col = 0; col < getNumberOfRows(); col++) {
+                Cell cell = getCell(row, col);
+                cell.getParticles().forEach(particle -> particle.setNeighbours(new ArrayList<>()));
+            }
+        }
+    }
 
     public Cell getCell(int row, int col) {
         return cells[row][col];
@@ -53,7 +76,11 @@ public abstract class Grid {
         return M;
     }
 
-    public float getSize() {return L;}
+    public float getSize() {return M;}
+
+    public Cell[][] getCells() {
+        return cells;
+    }
 
     @Override
     public String toString() {

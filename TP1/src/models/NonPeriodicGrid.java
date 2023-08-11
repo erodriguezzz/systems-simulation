@@ -1,5 +1,8 @@
 package models;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class NonPeriodicGrid extends Grid{
@@ -8,19 +11,7 @@ public class NonPeriodicGrid extends Grid{
     }
 
     @Override
-    public void setAllNeighbours(double rc, boolean cim) {
-        for (int row = 0; row < getNumberOfRows(); row++) {
-            for (int col = 0; col < getNumberOfRows(); col++) {
-                Cell cell = getCell(row, col);
-                if(cim)
-                    CIM(cell, rc);
-                else
-                    bruteForce(cell, rc);
-            }
-        }
-    }
-
-    private void CIM(Cell cell, double rc) {
+    protected void CIM(Cell cell, double rc) {
         Set<Particle> particles = cell.getParticles();
 
         // Handle particles of the same cell separately to make sure they are not added twice
@@ -60,9 +51,19 @@ public class NonPeriodicGrid extends Grid{
         }
     }
 
-    private void bruteForce(Cell cell, double rc){
-        //TODO: implementar algoritmo. Puede que no sea necesario que reciba la Cell
+    protected void bruteForce(Cell[][] cells, double rc) {
+        Set<Particle> particles = new HashSet<>();
+        for (Cell[] row : cells)
+            for (Cell cell :row)
+                particles.addAll(cell.getParticles());
+        for (Particle particle : particles)
+            for (Particle part : particles)
+                if (!part.equals(particle) && getDistance(particle, part) <= rc) {
+                    particle.addNeighbour(part);
+                    part.addNeighbour(particle);
+                }
     }
+
 
 
 }
