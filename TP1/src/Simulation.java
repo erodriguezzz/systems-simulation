@@ -7,8 +7,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Simulation {
-    private static final int M = 15;
-    private static final double rc = 2;
+    // private static final int M = 15;
+    private static final double rc = 5;
 
     public static Grid populateDefaultGrid() {
         Grid grid = new NonPeriodicGrid(9, 9);
@@ -21,11 +21,6 @@ public class Simulation {
     }
 
     public static Grid populateRandomGrid(float size, int cells, int particleQty, boolean isPeriodic) {
-        Grid grid;
-        if (isPeriodic)
-            grid = new PeriodicGrid(size, cells);
-        else
-            grid = new NonPeriodicGrid(size, cells);
         Set<Particle> particles = new HashSet<>();
         Random random = new Random();
         for (int i = 1; i <= particleQty; i++) {
@@ -33,6 +28,15 @@ public class Simulation {
             float particleY = random.nextFloat() * cells;
             particles.add(new Particle(i, particleX, particleY, 1f));
         }
+        return populateGrid(size, cells, particles, isPeriodic);
+    }
+
+    public static Grid populateGrid(float size, int cells, Set<Particle> particles, boolean isPeriodic) {
+        Grid grid;
+        if (isPeriodic)
+            grid = new PeriodicGrid(size, cells);
+        else
+            grid = new NonPeriodicGrid(size, cells);
         grid.addParticles(particles);
         return grid;
     }
@@ -47,7 +51,7 @@ public class Simulation {
                         try {
                             String line = null;
                             if (particle.getId() == particleId) {
-                                line = String.format("%.4f %.4f 0 255 255 0.2\n", particle.getX(), particle.getY());
+                                line = String.format("%.4f %.4f 0 255 255 %.4f\n", particle.getX(), particle.getY(), particle.getRadius());
                             }
                             // Write the particle element symbol, and the x, y, and z coordinates separated
                             // by space
@@ -68,12 +72,21 @@ public class Simulation {
     public static void main(String[] args) {
         // Grid grid = populateDefaultGrid();
         DataManager dm = new DataManager("./data/input/Static100.txt", "./data/input/Dynamic100.txt");
-        Grid grid = populateRandomGrid(dm.getL(), M, dm.getN(), true);
+        int M = (int) Math.floor(dm.getL() / rc);
+        Grid grid = populateGrid(dm.getL(), M, dm.getParticles(), true);
         try {
             FileWriter writer = new FileWriter("./data/output/vecinos.xyz");
 
             System.out.println(grid);
+            long start = System.currentTimeMillis();
+            // grid.setAllNeighbours(rc, false);
+            long end = System.currentTimeMillis();
+            System.out.println("Time elapsed (brute force): " + (end - start) + " ms");
+            grid.clearAllNeighbours();
+            start = System.currentTimeMillis();
             grid.setAllNeighbours(rc, true);
+            end = System.currentTimeMillis();
+            System.out.println("Time elapsed (cell index): " + (end - start) + " ms");
             // Print each particle's neighbors
             for (int row = 0; row < M; row++) {
                 for (int column = 0; column < M; column++) {
@@ -81,7 +94,7 @@ public class Simulation {
                         // System.out.println("Particle " + particle + " neighbors: " + particle.getNeighbours());
                         try {
                             // writer.append("Particle " + particle.getId() + " neighbors: " + particle.getNeighbours().stream().collect(n -> n.getId()) + "\n");
-                            writer.append(particle.getId() + ";" + particle.getX() + ";" + particle.getY() + ";" +particle.getNeighbours().stream().map(neighbor -> String.valueOf(neighbor.getId())).collect(Collectors.joining(", ")) + "\n");
+                            writer.append(particle.getId() + ";" + particle.getRadius() + ";" + particle.getX() + ";" + particle.getY() + ";" +particle.getNeighbours().stream().map(neighbor -> String.valueOf(neighbor.getId())).collect(Collectors.joining(", ")) + "\n");
 
                         } catch (IOException e) {
                             // TODO Auto-generated catch block

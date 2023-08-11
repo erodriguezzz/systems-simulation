@@ -1,5 +1,6 @@
 package models;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -76,15 +77,13 @@ public class PeriodicGrid extends Grid{
 
     protected void bruteForce(Cell[][] cells, double rc){
         Set<Particle> particles = new HashSet<>();
-        for (Cell[] row : cells)
-            for (Cell cell :row)
-                particles.addAll(cell.getParticles());
-        for (Particle particle : particles)
-            for (Particle part : particles)
-                if (!part.equals(particle) && getBruteDistance(particle, part) <= rc) {
-                    particle.addNeighbour(part);
-                    part.addNeighbour(particle);
-                }
+        Arrays.stream(cells).forEach(row -> Arrays.stream(row).forEach(cell -> particles.addAll(cell.getParticles())));
+        particles.forEach(particle -> particles.forEach(part -> {
+            if (!part.equals(particle) && getBruteDistance(particle, part) <= rc) {
+                particle.addNeighbour(part);
+                part.addNeighbour(particle);
+            }
+        }));
     }
 
 
