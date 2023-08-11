@@ -77,14 +77,15 @@ public class Simulation {
         // Grid grid = populateDefaultGrid();
         DataManager dm = new DataManager("./data/input/Static100.txt", "./data/input/Dynamic100.txt");
 
-        int M = (int) Math.floor(dm.getL() / (rc + dm.getMaxRadius()));
+        int M = (int) Math.floor(dm.getL() / (rc + 2* dm.getMaxRadius()));
+        System.out.println("M: " + M);
         Grid grid = populateGrid(dm.getL(), M, dm.getParticles(), true);
         try {
             FileWriter writer = new FileWriter("./data/output/vecinos.xyz");
 
             System.out.println(grid);
             long start = System.currentTimeMillis();
-            grid.setAllNeighbours(rc, false);
+            // grid.setAllNeighbours(rc, false);
             long end = System.currentTimeMillis();
             System.out.println("Time elapsed (brute force): " + (end - start) + " ms");
             grid.clearAllNeighbours();
