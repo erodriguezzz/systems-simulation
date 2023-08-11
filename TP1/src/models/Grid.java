@@ -69,12 +69,6 @@ public abstract class Grid {
     }
 
     public double getDistance(Particle p1, Particle p2) {
-        // filter particle with id 72 and print it and p2 and distance
-        if (p1.getId() == 72 || p2.getId() == 72) {
-            System.out.println("p1: " + p1);
-            System.out.println("p2: " + p2);
-            System.out.println("distance: " + Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2)));
-        }
         return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2)) - p1.getRadius() - p2.getRadius() ;
     }
 

@@ -21,14 +21,18 @@ public class Simulation {
     }
 
     public static Grid populateRandomGrid(float size, int cells, int particleQty, boolean isPeriodic) {
+        // TODO: fix random generator
         Set<Particle> particles = new HashSet<>();
         Random random = new Random();
         for (int i = 1; i <= particleQty; i++) {
-            float particleX = random.nextFloat() * cells;
-            float particleY = random.nextFloat() * cells;
-            particles.add(new Particle(i, particleX, particleY, 1f));
+            float particleX = random.nextFloat() * size;
+            float particleY = random.nextFloat() * size;
+            float particleRadius = random.nextFloat() * 10 + 1.5f;
+            particles.add(new Particle(i, particleX, particleY, particleRadius));
         }
-        return populateGrid(size, cells, particles, isPeriodic);
+        // Get the max radius for the particles in particles
+        float maxRadius = particles.stream().map(Particle::getRadius).max(Float::compareTo).get();
+        return populateGrid(size, (int) Math.floor(size/(rc + maxRadius)), particles, isPeriodic);
     }
 
     public static Grid populateGrid(float size, int cells, Set<Particle> particles, boolean isPeriodic) {
@@ -72,14 +76,15 @@ public class Simulation {
     public static void main(String[] args) {
         // Grid grid = populateDefaultGrid();
         DataManager dm = new DataManager("./data/input/Static100.txt", "./data/input/Dynamic100.txt");
-        int M = (int) Math.floor(dm.getL() / rc);
+
+        int M = (int) Math.floor(dm.getL() / (rc + dm.getMaxRadius()));
         Grid grid = populateGrid(dm.getL(), M, dm.getParticles(), true);
         try {
             FileWriter writer = new FileWriter("./data/output/vecinos.xyz");
 
             System.out.println(grid);
             long start = System.currentTimeMillis();
-            // grid.setAllNeighbours(rc, false);
+            grid.setAllNeighbours(rc, false);
             long end = System.currentTimeMillis();
             System.out.println("Time elapsed (brute force): " + (end - start) + " ms");
             grid.clearAllNeighbours();
@@ -91,7 +96,7 @@ public class Simulation {
             for (int row = 0; row < M; row++) {
                 for (int column = 0; column < M; column++) {
                     grid.getCell(row, column).getParticles().forEach(particle -> {
-                        // System.out.println("Particle " + particle + " neighbors: " + particle.getNeighbours());
+                        System.out.println("Particle " + particle + " neighbors: " + particle.getNeighbours());
                         try {
                             // writer.append("Particle " + particle.getId() + " neighbors: " + particle.getNeighbours().stream().collect(n -> n.getId()) + "\n");
                             writer.append(particle.getId() + ";" + particle.getRadius() + ";" + particle.getX() + ";" + particle.getY() + ";" +particle.getNeighbours().stream().map(neighbor -> String.valueOf(neighbor.getId())).collect(Collectors.joining(", ")) + "\n");

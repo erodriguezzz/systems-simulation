@@ -5,7 +5,7 @@ import java.util.*;
 import models.Particle;
 
 public class DataManager {
-
+    private double max_radius = 0;
     private float L;
     private int N;
     private int time;
@@ -31,6 +31,9 @@ public class DataManager {
                 float x = dynamicScanner.nextFloat();
                 float y = dynamicScanner.nextFloat();
                 float radius = staticScanner.nextFloat();
+                if (radius > max_radius) {
+                    this.max_radius = radius;
+                }
                 float prop = staticScanner.nextFloat(); // TODO: check where this prop should be used
                 particles.add(new Particle(id, x, y, radius));
                 id++;
@@ -60,4 +63,7 @@ public class DataManager {
         return particles;
     }
 
+    public double getMaxRadius() {
+        return max_radius;
+    }
 }
