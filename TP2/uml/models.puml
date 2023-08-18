@@ -1,0 +1,22 @@
+@startuml models.puml
+
+class Particle {
+- double x
+- double y
+- Velocity v
++ Particle()
++ Particle(double x, double y, double z)
+}
+
+class Velocity {
+- double velocity
+- double theta
++ Velocity()
++ Velocity(double velocity, double theta)
+}
+
+class Grid {
+- Map<Particle, Set<Particle>> neighboursTree
+}
+
+@enduml
