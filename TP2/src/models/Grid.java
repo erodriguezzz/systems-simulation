@@ -40,7 +40,7 @@ public abstract class Grid {
      * This method relocates a particle according to its properties
      * @param p - Particle being relocated
      */
-    public abstract void updatePosition(Particle p);
+    public abstract void updatePositions(Particle p);
 
     /**
      * This formula corresponds to puntual particles only

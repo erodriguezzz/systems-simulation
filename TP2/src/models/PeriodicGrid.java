@@ -47,8 +47,8 @@ public class PeriodicGrid extends Grid{
     }
 
     @Override
-    public void updatePosition(Particle p) {
-//        TODO: set time interval value
+    public void updatePositions(Particle p) {
+        //TODO: Time interval should not be a problem.
 
     }
 }
