@@ -26,4 +26,9 @@ public class NonPeriodicGrid extends Grid{
             }
         }
     }
+
+    @Override
+    public void updatePosition(Particle p) {
+
+    }
 }

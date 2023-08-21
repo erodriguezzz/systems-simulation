@@ -42,7 +42,7 @@ public class Particle implements Comparable<Particle>{
     }
 
 
-    public void setTheta(double theta) {
+    public void setTheta(int theta) {
         this.velocity.setTheta(theta);
     }
 
