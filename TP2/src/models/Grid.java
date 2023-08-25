@@ -36,6 +36,15 @@ public abstract class Grid {
      */
     public abstract void CIM();
 
+    public void resetParticles(Set<Particle> particles){
+        cells = new Cell[getM()][getM()];
+        particles.forEach(particle -> {
+            int row = (int) Math.floor((particle.getX()%L)/rc);
+            int col = (int) Math.floor((particle.getY()%L)/rc);
+            cells[row][col].getParticles().add(particle);
+        });
+    }
+
     /**
      * This method relocates a particle according to its properties
      * @param p - Particle being relocated
@@ -125,6 +134,7 @@ public abstract class Grid {
         }
         return paddedValues;
     }
+    public abstract void setAdjacentNeighbours();
 
 }
 

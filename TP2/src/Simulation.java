@@ -11,6 +11,7 @@ public class Simulation {
     private static final double noise = 5;
     private static final boolean isPeriodic = true;
     private static final int totalSeconds = 16;
+    private static final long timeStepper = 1;
     private Grid grid;
     private DataManager dm;
     private Set<Particle> particles;
@@ -29,6 +30,8 @@ public class Simulation {
     public static void main(String[] args) {
         Simulation simulation= new Simulation();
         // simulation.visualization();
+        double va = simulation.run();
+        System.out.println("Va: " + va);
     }
 
     /**
@@ -48,28 +51,29 @@ public class Simulation {
         particle.setTheta(Math.atan2(dy, dx) + (Math.random()-0.5) * noise);
     }
 
-    public void moveParticles(){
+    public void moveParticles(double time){
         particles.forEach(p -> {
-            grid.updatePositions(p);
+            p.updatePosition(time);
             determineTheta(p);
         });
+        grid.resetParticles(particles);
     }
 
     /**
      * This method will simulate the transition of the particles between times
      */
-    public void simulate(){
+    public void simulate(double time){
         related.clear();
         findParticleNeighbours();
-        moveParticles();
+        moveParticles(time);
+        dm.writeDynamicFile(particles, "../../data/output/Dynamic10.txt", timeStepper);
     }
 
     public double run(){
-        int time = 0;
+        double time = 0;
         while(time <= totalSeconds){
-            simulate();
-
-            time++;
+            simulate(time);
+            time += timeStepper;
         }
         return findVa();
     }
@@ -85,7 +89,7 @@ public class Simulation {
             for (int j = 0; j < grid.getM(); j++) {
                 for (Particle p: grid.getCells()[i][j].getParticles()){
                     for (Particle q: grid.getCells()[i][j].getParticles()){
-                        if (!p.equals(q)){
+                        if (!p.equals(q) && grid.getDistance(p, q) < rc){
                             addNeighbourRelation(p, q);
                         }
                     }
@@ -109,10 +113,10 @@ public class Simulation {
 
     private double findVa(){
         double VX = 0, VY = 0;
-        for(Particle particle: dm.getParticles()){
+        for (Particle particle: dm.getParticles()) {
             VX += particle.getVelocity().getVX();
             VY += particle.getVelocity().getVY();
-        };
+        }
         return Math.sqrt(Math.pow(VX, 2)+Math.pow(VY, 2));
     }
 

@@ -31,4 +31,10 @@ public class NonPeriodicGrid extends Grid{
     public void updatePositions(Particle p) {
 
     }
+
+    @Override
+    public void setAdjacentNeighbours() {
+        // TODO: unnecesary method for off lattice simulation.
+    }
+
 }

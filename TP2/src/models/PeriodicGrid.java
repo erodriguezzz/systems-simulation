@@ -1,5 +1,6 @@
 package models;
 
+import java.sql.Array;
 import java.util.Set;
 
 public class PeriodicGrid extends Grid{
@@ -33,9 +34,10 @@ public class PeriodicGrid extends Grid{
      * and the 'L' shape for the CIM
      * For reference, go to TP2/img/neighbor_cell.png
      */
-    public void setAdjacentNeighbours(){
-        for (int i = 0; i<getM(); i++){
-            for (int j = 0; j<getM(); j++){
+    @Override
+    public void setAdjacentNeighbours() {
+        for (int i = 0; i<getM(); i++) {
+            for (int j = 0; j<getM(); j++) {
                 // using % M to return to the first column/row when the last one is reached
                 // or to go to the last when the first is reached
                 getCells()[i][j].getAdjacentNeighbours().add(getCells()[i][(j+1)%getM()]); //1
@@ -46,9 +48,9 @@ public class PeriodicGrid extends Grid{
         }
     }
 
+    // TODO: update particle position in grid considering neighbour cells
     @Override
     public void updatePositions(Particle p) {
-        //TODO: Time interval should not be a problem.
 
     }
 }

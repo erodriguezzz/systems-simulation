@@ -1,6 +1,7 @@
 package services;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.*;
 import models.Particle;
 import models.Velocity;
@@ -34,7 +35,7 @@ public class DataManager {
                 if (radius > max_radius) {
                     this.max_radius = radius;
                 }
-                float theta = staticScanner.nextFloat(); // TODO: check where this prop should be used
+                float theta = dynamicScanner.nextFloat(); // TODO: check where this prop should be used
                 float velocity = staticScanner.nextFloat();
                 particles.add(new Particle(radius, new Velocity(velocity, theta), x, y));
             }
@@ -47,9 +48,36 @@ public class DataManager {
 
     }
 
-    public int getTime() {
-        return time;
+    public void writeDynamicFile(Set<Particle> particles, String filePath, long time) {
+        try {
+            File file = new File(filePath);
+            FileWriter writer = new FileWriter(file, true);
+            if (file.createNewFile()) {
+                int id = 1;
+                File startingFile = new File("./TP2/data/input/dynamic.txt");
+                Scanner scanner = new Scanner(startingFile);
+                while (scanner.hasNext()) {
+                    String line = scanner.nextLine();
+                    writer.write(id + " " + line + "\n");
+                    id++;
+                }
+                scanner.close();
+                System.out.println("File created successfully");
+            } else {
+                StringBuilder data = new StringBuilder();
+                data.append(getN() + '\n');
+                data.append("Frame: " + time + '\n');
+                for (Particle p : particles) {
+                    data.append(p.getId() + " " + p.getX() + " " + p.getY() + " " + p.getVelocity().getVX() + " " + p.getVelocity().getVY() + " " + p.getTheta() +"\n");
+                }
+                writer.write(data.toString());
+            }
+            writer.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
+
 
     public float getL() {
         return L;
