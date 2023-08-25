@@ -19,8 +19,8 @@ public class Simulation {
 
     Simulation(){
         this.dm = new DataManager(
-                "./TP2/data/input/Static100.txt",
-                "./TP2/data/input/Dynamic100.txt");
+                "./data/input/Static100.txt",
+                "./data/input/Dynamic100.txt");
         this.particles = dm.getParticles();
         this.grid = isPeriodic ?
                 new PeriodicGrid(dm.getL(), dm.getParticles(), rc):
@@ -42,7 +42,7 @@ public class Simulation {
     public void determineTheta(Particle particle){
         double dx = Math.cos(particle.getVelocity().getTheta());
         double dy = Math.sin(particle.getVelocity().getTheta());
-        for (Particle p: related.get(particle)){
+        for (Particle p: related.get(particle)) {
             dx += Math.cos(p.getVelocity().getTheta());
             dy += Math.sin(p.getVelocity().getTheta());
         }
@@ -64,9 +64,12 @@ public class Simulation {
      */
     public void simulate(double time){
         related.clear();
+        for (Particle p : particles) {
+            related.putIfAbsent(p, new HashSet<>());
+        }
         findParticleNeighbours();
         moveParticles(time);
-        dm.writeDynamicFile(particles, "../../data/output/Dynamic10.txt", timeStepper);
+        dm.writeDynamicFile(particles, "./data/output/Dynamic10.txt", timeStepper);
     }
 
     public double run(){

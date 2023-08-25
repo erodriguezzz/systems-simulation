@@ -16,6 +16,11 @@ public abstract class Grid {
         this.rc = rc;
         this.M = getM(L, rc);
         this.cells = new Cell[M][M];
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < M; j++){
+                cells[i][j] = new Cell();
+            }
+        }
     }
 
     /**
@@ -38,6 +43,11 @@ public abstract class Grid {
 
     public void resetParticles(Set<Particle> particles){
         cells = new Cell[getM()][getM()];
+        for (int i = 0; i < getM(); i++) {
+            for (int j = 0; j < getM(); j++){
+                cells[i][j] = new Cell();
+            }
+        }
         particles.forEach(particle -> {
             int row = (int) Math.floor((particle.getX()%L)/rc);
             int col = (int) Math.floor((particle.getY()%L)/rc);
