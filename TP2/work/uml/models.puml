@@ -1,0 +1,41 @@
+@startuml models.puml
+left to right direction
+
+Velocity *--Agent
+Agent *-- Grid
+Agent *-- Cell
+Cell *-- Grid
+
+class Grid {
+- int N
+- double L
+- double rc
+- double noise
+- Cell[][] cells
+- Map<Agent, Set<Agent>> neighbours
++ Grid(int N, double L, double rc)
++ CIM()
++ updateNeighbours()
+}
+
+class Cell {
+- Set<Agent> agents
++ Cell(Set<Agent> agents)
+}
+
+class Agent {
+- int id
+- double x
+- double y
+- Velocity v
++ Particle(double x, double y)
+}
+
+class Velocity {
+- double velocity
+- double theta
++ Velocity(double velocity, double theta)
+}
+
+
+@enduml
