@@ -68,7 +68,7 @@ public class Simulation {
             related.putIfAbsent(p, new HashSet<>());
         }
         findParticleNeighbours();
-        moveParticles(time);
+        moveParticles(timeStepper);
         dm.writeDynamicFile(particles, "./data/output/Dynamic10.dump", time);
     }
 
