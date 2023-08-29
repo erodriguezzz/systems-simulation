@@ -8,10 +8,10 @@ import java.util.TreeMap;
 
 public class Simulation {
     private static final int rc = 1;
-    private static final double noise = 0.5;
+    private static final double noise = 0.1;
     private static final boolean isPeriodic = true;
     private static final int totalSeconds = 400;
-    private static final long timeStepper = 1;
+    private static final double timeStepper = 0.3;
     private Grid grid;
     private DataManager dm;
     private Set<Particle> particles;
@@ -19,8 +19,8 @@ public class Simulation {
 
     Simulation(){
         this.dm = new DataManager(
-                "./data/input/Static100.txt",
-                "./data/input/Dynamic100.txt");
+                "./data/input/Static300.txt",
+                "./data/input/Dynamic300.txt");
         this.particles = dm.getParticles();
         this.grid = isPeriodic ?
                 new PeriodicGrid(dm.getL(), dm.getParticles(), rc):

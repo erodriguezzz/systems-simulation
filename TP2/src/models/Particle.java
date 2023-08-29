@@ -62,7 +62,7 @@ public class Particle implements Comparable<Particle>{
         if(this.x<0){
             this.x = L + this.x;
         }
-        if(this.x > L){
+        if(this.x >= L){
             this.x -= L;
         }
         this.y = this.y + getVelocity().getVY()*time;
