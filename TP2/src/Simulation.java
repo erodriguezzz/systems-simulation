@@ -8,9 +8,9 @@ import java.util.TreeMap;
 
 public class Simulation {
     private static final int rc = 1;
-    private static final double noise = 5;
+    private static final double noise = 0.5;
     private static final boolean isPeriodic = true;
-    private static final int totalSeconds = 16;
+    private static final int totalSeconds = 400;
     private static final long timeStepper = 1;
     private Grid grid;
     private DataManager dm;
@@ -53,7 +53,7 @@ public class Simulation {
 
     public void moveParticles(double time){
         particles.forEach(p -> {
-            p.updatePosition(time);
+            p.updatePosition(time, grid.getL());
             determineTheta(p);
         });
         grid.resetParticles(particles);
@@ -69,12 +69,12 @@ public class Simulation {
         }
         findParticleNeighbours();
         moveParticles(time);
-        dm.writeDynamicFile(particles, "./data/output/Dynamic10.txt", timeStepper);
+        dm.writeDynamicFile(particles, "./data/output/Dynamic10.dump", time);
     }
 
     public double run(){
         double time = 0;
-        while(time <= totalSeconds){
+        while(time <= totalSeconds && findVa()>0.9){
             simulate(time);
             time += timeStepper;
         }

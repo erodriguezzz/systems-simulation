@@ -48,7 +48,7 @@ public class DataManager {
 
     }
 
-    public void writeDynamicFile(Set<Particle> particles, String filePath, long time) {
+    public void writeDynamicFile(Set<Particle> particles, String filePath, double time) {
         try {
             File file = new File(filePath);
             FileWriter writer = new FileWriter(file, true);
@@ -65,7 +65,7 @@ public class DataManager {
                 System.out.println("File created successfully");
             } else {
                 StringBuilder data = new StringBuilder();
-                data.append(getN() + '\n');
+                data.append(getN() + "\n");
                 data.append("Frame: " + time + '\n');
                 for (Particle p : particles) {
                     data.append(p.getId() + " " + p.getX() + " " + p.getY() + " " + p.getVelocity().getVX() + " " + p.getVelocity().getVY() + " " + p.getTheta() +"\n");
