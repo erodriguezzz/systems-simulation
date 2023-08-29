@@ -50,7 +50,13 @@ public abstract class Grid {
         }
         particles.forEach(particle -> {
             int row = (int) Math.floor((particle.getX()%L)/rc);
+            if(row <0){
+                row = getM()-1;
+            }
             int col = (int) Math.floor((particle.getY()%L)/rc);
+            if(col < 0 ){
+                col= getM()-1;
+            }
             cells[row][col].getParticles().add(particle);
         });
     }

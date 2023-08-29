@@ -57,9 +57,21 @@ public class Particle implements Comparable<Particle>{
     }
 
 
-    public void updatePosition(double time) {
+    public void updatePosition(double time, double L) {
         this.x = this.x + getVelocity().getVX()*time;
+        if(this.x<0){
+            this.x = L + this.x;
+        }
+        if(this.x > L){
+            this.x -= L;
+        }
         this.y = this.y + getVelocity().getVY()*time;
+        if(this.y < 0){
+            this.y = L + this.y;
+        }
+        if(this.y > L){
+            this.y -= L;
+        }
     }
 
     public int getId() {
