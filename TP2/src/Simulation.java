@@ -12,6 +12,7 @@ public class Simulation {
     private static final boolean isPeriodic = true;
     private static final int totalSeconds = 400;
     private static final double timeStepper = 0.3;
+    private static final double tolerance=0.001;
     private Grid grid;
     private DataManager dm;
     private Set<Particle> particles;
@@ -74,10 +75,11 @@ public class Simulation {
 
     public double run(){
         double time = 0;
-        while(time <= totalSeconds && findVa()>0.9){
+        while(time <= totalSeconds &&  1 - findVa() > tolerance){
             simulate(time);
             time += timeStepper;
         }
+        System.out.println("Iterations " + Math.round(time/timeStepper));
         return findVa();
     }
 
@@ -115,12 +117,21 @@ public class Simulation {
     }
 
     private double findVa(){
-        double VX = 0, VY = 0;
-        for (Particle particle: dm.getParticles()) {
-            VX += particle.getVelocity().getVX();
-            VY += particle.getVelocity().getVY();
+        double VX = 0, VY = 0, v0 = 1;
+        boolean flag = true;
+        for (Particle p: particles) {
+            VX += p.getVelocity().getVX();
+            VY += p.getVelocity().getVY();
+            if (flag) {
+                v0 = p.getVelocity().getVelocity();
+                flag = false;
+            }
         }
-        return Math.sqrt(Math.pow(VX, 2)+Math.pow(VY, 2));
+        double avg = Math.sqrt(Math.pow(VX, 2) + Math.pow(VY, 2));
+        return avg / (dm.getN() * v0); // This assumes all particles have the same velocity
+
     }
+
+
 
 }
