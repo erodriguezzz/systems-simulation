@@ -8,10 +8,10 @@ import java.util.TreeMap;
 
 public class Simulation {
     private static final int rc = 1;
-    private static final double noise = 0.1;
+    private static final double noise = 2.5;
     private static final boolean isPeriodic = true;
-    private static final int totalSeconds = 400;
-    private static final double timeStepper = 0.3;
+    private static final double totalSeconds = 15000;
+    private static final double timeStepper = 1;
     private static final double tolerance=0.001;
     private double lastVa = 0;
     private int stableCount = 0;
@@ -20,12 +20,19 @@ public class Simulation {
     private DataManager dm;
     private Set<Particle> particles;
     private Map<Particle, Set<Particle>> related = new TreeMap<>();
+    
 
-    Simulation(){
+    Simulation(int N, int L, double noise){
+        String[] outputs = {
+                    "./data/output/dynamic/Dynamic_N_" + N + "_L_" + L + "_noise_" + noise +"_v1.dump",
+                    "./data/output/VaN_" + N + "_L_" + L + "_noise_" + noise +".txt",
+                    "./data/output/VaN_" + N + "_L_" + L + "_noise_" + noise +".txt",
+                    "./data/output/VaN_" + N + "_L_" + L + "_noise_" + noise +".txt",
+};
         this.dm = new DataManager(
-                "./data/input/Static300.txt",
-                "./data/input/Dynamic300.txt",
-                "./data/output/Dynamic10.dump");
+                "./data/input/Static_N_" + N + "_L_" + L + "_v_1.txt",
+                "./data/input/Dynamic_N_" + N + "_L_" + L + "_v_1.txt",
+                outputs);
         this.particles = dm.getParticles();
         this.grid = isPeriodic ?
                 new PeriodicGrid(dm.getL(), dm.getParticles(), rc):
@@ -33,10 +40,16 @@ public class Simulation {
     }
 
     public static void main(String[] args) {
-        Simulation simulation= new Simulation();
-        // simulation.visualization();
-        double va = simulation.run();
-        System.out.println("Va: " + va);
+        int[] nValues = {400, 1200, 2800};
+        int[] LValues = {20, 20, 20, 15, 15};
+        double[] noiseValues = {noise, noise, noise, noise, noise};
+        for(int i = 0; i < nValues.length; i++){
+            Simulation simulation= new Simulation(nValues[i], LValues[i], noiseValues[i]);
+            // simulation.visualization();
+            double va = simulation.run(nValues[i], LValues[i], noiseValues[i]);
+            System.out.println("Va_n," + nValues[i] + ":" + va);
+        }
+        
     }
 
     /**
@@ -51,8 +64,8 @@ public class Simulation {
             dx += Math.cos(p.getVelocity().getTheta());
             dy += Math.sin(p.getVelocity().getTheta());
         }
-        dx /= related.get(particle).size() + 1;
-        dy /= related.get(particle).size() + 1;
+        dx /= (related.get(particle).size() + 1);
+        dy /= (related.get(particle).size() + 1);
         particle.setTheta(Math.atan2(dy, dx) + (Math.random()-0.5) * noise);
     }
 
@@ -67,24 +80,30 @@ public class Simulation {
     /**
      * This method will simulate the transition of the particles between times
      */
-    public void simulate(double time){
+    public void simulate(double time, int N, int L, double noise){
         related.clear();
         for (Particle p : particles) {
             related.putIfAbsent(p, new HashSet<>());
         }
         findParticleNeighbours();
         moveParticles(timeStepper);
-        dm.writeDynamicFile(particles, "./data/output/Dynamic10.dump", time);
+        dm.writeDynamicFile(particles, "./data/output/dynamic/Dynamic_N_" + N + "_L_" + L + "_noise_" + noise +"_v1.dump", time);
     }
 
-    public double run(){
+    public double run(int N, int L, double noise){
         double time = 0;
-        while(time <= totalSeconds &&  endCondition(findVa()) == false){
-            simulate(time);
+        while(time <= totalSeconds ){
+            // &&  endCondition(findVa()) == false
+            simulate(time, N, L, noise);
             time += timeStepper;
+            writeVa(time/timeStepper, findVa(), N, L, noise);
         }
         System.out.println("Iterations " + Math.round(time/timeStepper));
         return findVa();
+    }
+
+    private void writeVa(double time, double va, int N, int L, double noise){
+        dm.writeVa(time, va, N, L, noise);
     }
 
     private boolean endCondition(double newVa){
@@ -138,18 +157,23 @@ public class Simulation {
     }
 
     private double findVa(){
-        double VX = 0, VY = 0, v0 = 1;
-        boolean flag = true;
-        for (Particle p: particles) {
-            VX += p.getVelocity().getVX();
-            VY += p.getVelocity().getVY();
-            if (flag) {
-                v0 = p.getVelocity().getVelocity();
-                flag = false;
-            }
-        }
-        double avg = Math.sqrt(Math.pow(VX, 2) + Math.pow(VY, 2));
-        return avg / (dm.getN() * v0); // This assumes all particles have the same velocity
+        double sumVx = particles.stream().mapToDouble(Particle::getVx).sum();
+        double sumVy = particles.stream().mapToDouble(Particle::getVy).sum();
+        double moduleV = Math.sqrt(Math.pow(sumVx,2) + Math.pow(sumVy,2));
+
+        return moduleV/(dm.getN()*0.3);
+        // double VX = 0, VY = 0, v0 = 0.3;
+        // boolean flag = true;
+        // for (Particle p: particles) {
+        //     VX += p.getVelocity().getVX();
+        //     VY += p.getVelocity().getVY();
+        //     // if (flag) {
+        //     //     v0 = p.getVelocity().getVelocity();
+        //     //     flag = false;
+        //     // }
+        // }
+        // double avg = Math.sqrt(Math.pow(VX, 2) + Math.pow(VY, 2));
+        // return avg / (dm.getN() * v0); // This assumes all particles have the same velocity
 
     }
 

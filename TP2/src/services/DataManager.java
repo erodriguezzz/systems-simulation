@@ -13,9 +13,22 @@ public class DataManager {
     private int time;
     private Set<Particle> particles = new HashSet<>();
 
-    public DataManager(String staticPath, String dynamicPath, String output) {
+    public DataManager(String staticPath, String dynamicPath, String[] output) {
         readParticlesFiles(staticPath, dynamicPath);
-        clearOutputFile(output);
+        for(String s : output) {
+            clearOutputFile(s);
+        }
+    }
+
+    public void writeVa(double time, double va, int N, int L, double noise) {
+        try {
+            File file = new File("./data/output/VaN_" + N + "_L_" + L + "_noise_" + noise +".txt");
+            FileWriter writer = new FileWriter(file, true);
+            writer.write(time + " " + va + "\n");
+            writer.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void clearOutputFile(String output) {

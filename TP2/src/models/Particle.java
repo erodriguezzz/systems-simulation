@@ -31,6 +31,13 @@ public class Particle implements Comparable<Particle>{
         return velocity;
     }
 
+    public double getVx(){
+        return velocity.getVX();
+    }
+
+    public double getVy(){
+        return velocity.getVY();
+    }
 
     public void setVelocity(Velocity velocity) {
         this.velocity = velocity;
