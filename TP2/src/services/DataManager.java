@@ -13,8 +13,20 @@ public class DataManager {
     private int time;
     private Set<Particle> particles = new HashSet<>();
 
-    public DataManager(String staticPath, String dynamicPath) {
+    public DataManager(String staticPath, String dynamicPath, String output) {
         readParticlesFiles(staticPath, dynamicPath);
+        clearOutputFile(output);
+    }
+
+    private void clearOutputFile(String output) {
+        try {
+            File file = new File(output);
+            FileWriter writer = new FileWriter(file, false);
+            writer.write("");
+            writer.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
     private void readParticlesFiles(String staticPath, String dynamicPath) {
 

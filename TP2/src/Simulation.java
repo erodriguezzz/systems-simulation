@@ -13,6 +13,9 @@ public class Simulation {
     private static final int totalSeconds = 400;
     private static final double timeStepper = 0.3;
     private static final double tolerance=0.001;
+    private double lastVa = 0;
+    private int stableCount = 0;
+    private final int stableMarker = 20;
     private Grid grid;
     private DataManager dm;
     private Set<Particle> particles;
@@ -21,7 +24,8 @@ public class Simulation {
     Simulation(){
         this.dm = new DataManager(
                 "./data/input/Static300.txt",
-                "./data/input/Dynamic300.txt");
+                "./data/input/Dynamic300.txt",
+                "./data/output/Dynamic10.dump");
         this.particles = dm.getParticles();
         this.grid = isPeriodic ?
                 new PeriodicGrid(dm.getL(), dm.getParticles(), rc):
@@ -75,12 +79,29 @@ public class Simulation {
 
     public double run(){
         double time = 0;
-        while(time <= totalSeconds &&  1 - findVa() > tolerance){
+        while(time <= totalSeconds &&  endCondition(findVa()) == false){
             simulate(time);
             time += timeStepper;
         }
         System.out.println("Iterations " + Math.round(time/timeStepper));
         return findVa();
+    }
+
+    private boolean endCondition(double newVa){
+        if ( Math.abs(newVa - lastVa) < tolerance) {
+            stableCount++;
+
+            if (stableCount == stableMarker){
+                return true;
+            }
+        }
+        else{
+            stableCount = 0;
+        }
+
+        // update last value
+        lastVa = newVa;
+        return false;
     }
 
     /**
