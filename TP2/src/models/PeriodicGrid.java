@@ -11,18 +11,11 @@ public class PeriodicGrid extends Grid{
 
     @Override
     public void CIM() {
-        //TODO: implementar CIM bien
+        //TODO: should have CIM method rather than in simulation
         for (int i=0; i<getM(); i++){
             for (int j=0; j<getM(); j++){
                 Cell cell = getCells()[i][j];
                 cell.getParticles().forEach(particle -> {
-//                    int row = (int) Math.floor((particle.getX()%getL())/getRc());
-//                    int col = (int) Math.floor((particle.getY()%getL())/getRc());
-//                    getCells()[row][col].getParticles().forEach(particle1 -> {
-//                        if (particle1.getId() != particle.getId()){
-//                            particle.getNeighbours().add(particle1);
-//                        }
-//                    });
                 });
             }
         }

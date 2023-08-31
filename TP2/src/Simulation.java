@@ -9,7 +9,6 @@ import java.util.TreeMap;
 public class Simulation {
     private static final int rc = 1;
     private static final double noise = 0.1;
-    private static final boolean isPeriodic = true;
     private static final int totalSeconds = 400;
     private static final double timeStepper = 0.3;
     private static final double tolerance=0.001;
@@ -27,9 +26,7 @@ public class Simulation {
                 "./data/input/Dynamic300.txt",
                 "./data/output/Dynamic10.dump");
         this.particles = dm.getParticles();
-        this.grid = isPeriodic ?
-                new PeriodicGrid(dm.getL(), dm.getParticles(), rc):
-                new NonPeriodicGrid(dm.getL(), dm.getParticles(), rc);
+        this.grid = new PeriodicGrid(dm.getL(), dm.getParticles(), rc);
     }
 
     public static void main(String[] args) {
