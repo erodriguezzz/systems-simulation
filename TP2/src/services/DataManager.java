@@ -20,9 +20,20 @@ public class DataManager {
         }
     }
 
-    public void writeVa(double time, double va, int N, int L, double noise) {
+    public void writeVa(double time, double va, int N, int L, double noise, int v) {
         try {
-            File file = new File("./data/output/VaN_" + N + "_L_" + L + "_noise_" + noise +".txt");
+            File file = new File("./data/output/VaN_" + N + "_L_" + L + "_noise_" + noise +"_v" +v+".txt");
+            FileWriter writer = new FileWriter(file, true);
+            writer.write(time + " " + va + "\n");
+            writer.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void writeVa(int N, int L, double noise, int v, double va){
+        try {
+            File file = new File("./data/output/noise_VaN_" + N + "_L_" + L + "_noise_" + String.format("%.2f",noise) +".txt");
             FileWriter writer = new FileWriter(file, true);
             writer.write(time + " " + va + "\n");
             writer.close();

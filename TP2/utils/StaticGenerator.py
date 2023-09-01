@@ -19,14 +19,16 @@ def generate_file(L, N, v, iteration):
 
 
 # v = float(input("Enter v: "))
-L=[5, 7, 10, 14, 20]
-N = [50, 100, 200, 400, 800]
-# for iteration in range(1, 6):
+# L=[5, 7, 10, 14, 20]
+# N = [50, 100, 200, 400, 800]
+# # for iteration in range(1, 6):
+# for i in range(len(N)):
+#     generate_file(L[i], N[i], 0.03, 1)
+# n 300
+# L 7, 25, 5
+# se ordena para n 300 y L = 5
+L = [5, 7, 14]
+N = [300, 588, 2352]
 for i in range(len(N)):
-    generate_file(L[i], N[i], 0.03, 1)
-
-l = 20
-N = [50, 100, 200, 400, 800]
-for i in range(len(N)):
-    generate_file(l, N[i], 0.03, 1)
+    generate_file(L[i], N[i], 0.05, 1)
 print("Files generated.")
