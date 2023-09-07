@@ -31,6 +31,13 @@ public class Particle implements Comparable<Particle>{
         return velocity;
     }
 
+    public double getVx(){
+        return velocity.getVX();
+    }
+
+    public double getVy(){
+        return velocity.getVY();
+    }
 
     public void setVelocity(Velocity velocity) {
         this.velocity = velocity;
@@ -42,7 +49,7 @@ public class Particle implements Comparable<Particle>{
     }
 
 
-    public void setTheta(int theta) {
+    public void setTheta(double theta) {
         this.velocity.setTheta(theta);
     }
 
@@ -57,9 +64,21 @@ public class Particle implements Comparable<Particle>{
     }
 
 
-    public void updatePosition(double time) {
+    public void updatePosition(double time, double L) {
         this.x = this.x + getVelocity().getVX()*time;
+        if(this.x<0){
+            this.x = L + this.x;
+        }
+        if(this.x >= L){
+            this.x -= L;
+        }
         this.y = this.y + getVelocity().getVY()*time;
+        if(this.y < 0){
+            this.y = L + this.y;
+        }
+        if(this.y > L){
+            this.y -= L;
+        }
     }
 
     public int getId() {

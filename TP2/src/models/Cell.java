@@ -1,10 +1,11 @@
 package models;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Cell {
-    private Set<Particle> particles;
-    private Set<Cell> adjacentNeighbours;
+    private Set<Particle> particles = new HashSet<>();
+    private Set<Cell> adjacentNeighbours = new HashSet<>();
 
     public Set<Particle> getParticles() {
         return particles;

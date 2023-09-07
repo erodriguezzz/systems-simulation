@@ -16,6 +16,11 @@ public abstract class Grid {
         this.rc = rc;
         this.M = getM(L, rc);
         this.cells = new Cell[M][M];
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < M; j++){
+                cells[i][j] = new Cell();
+            }
+        }
     }
 
     /**
@@ -36,11 +41,31 @@ public abstract class Grid {
      */
     public abstract void CIM();
 
+    public void resetParticles(Set<Particle> particles){
+        cells = new Cell[getM()][getM()];
+        for (int i = 0; i < getM(); i++) {
+            for (int j = 0; j < getM(); j++){
+                cells[i][j] = new Cell();
+            }
+        }
+        particles.forEach(particle -> {
+            int row = (int) Math.floor((particle.getX()%L)/rc);
+            if(row <0){
+                row = getM()-1;
+            }
+            int col = (int) Math.floor((particle.getY()%L)/rc);
+            if(col < 0 ){
+                col= getM()-1;
+            }
+            cells[row][col].getParticles().add(particle);
+        });
+    }
+
     /**
      * This method relocates a particle according to its properties
      * @param p - Particle being relocated
      */
-    public abstract void updatePosition(Particle p);
+    public abstract void updatePositions(Particle p);
 
     /**
      * This formula corresponds to puntual particles only
@@ -125,6 +150,7 @@ public abstract class Grid {
         }
         return paddedValues;
     }
+    public abstract void setAdjacentNeighbours();
 
 }
 
