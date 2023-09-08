@@ -59,10 +59,15 @@ public class Simulation {
     public static void main(String[] args) {
         int[] Ns = {200, 500, 1000};
         double[] Ls = {0.03, 0.05, 0.07, 0.09};
-        for (int N : Ns) {
-            for(double L : Ls ){
-                uniqueSimulation(N, L, 1);
+        boolean unique = false;
+        if(!unique){
+            for (int N : Ns) {
+                for(double L : Ls ){
+                    uniqueSimulation(N, L, 1);
+                }
             }
+        } else {
+            uniqueSimulation(Ns[0], Ls[0], 1);
         }
     }
 
@@ -74,7 +79,7 @@ public class Simulation {
 
     public void calculateCollisions(Particle p) {
         // Create wall collisions
-        double timeToCollision = domain.getWallCollisionTime(p);
+        double timeToCollision = domain.getWallCollisionTime(p); //TODO: check if this collision is with a corner
         collisions.add(new Collision(p, timeToCollision));
 
         // Create particle collisions

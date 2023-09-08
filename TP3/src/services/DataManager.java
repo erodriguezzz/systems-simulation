@@ -31,8 +31,8 @@ public class DataManager {
             throw new RuntimeException(e);
         }
     }
-    private void readParticlesFiles(String staticPath, String dynamicPath) {
 
+    private void readParticlesFiles(String staticPath, String dynamicPath) {
         try {
             File staticFile = new File(staticPath);
             File dynamicFile = new File(dynamicPath);

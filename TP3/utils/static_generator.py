@@ -22,7 +22,7 @@ def generate_file(L, N, radius, v, mass):
             vy = v * math.sin(theta)
             f.write(f"{x}   {y}   {vx}  {vy}\n")
 
-L = [0.09, 0.09, 0.09]
+L = [0.03, 0.05, 0.07, 0.09]
 N = [200, 500]
 
 for i in range(len(N)):

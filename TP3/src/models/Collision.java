@@ -30,7 +30,7 @@ public class Collision implements Comparable<Collision> {
         double vx1 = p1.getVx();
         double vy1 = p1.getVy();
         double radius1 = p1.getRadius();
-        if (isWallCollision) {
+        if (this.isWallCollision) {
             // Collision with vertical wall
             if (x1 + radius1 >= M+L || x1 - radius1 <= 0 || (x1 + radius1 >= M && ((y1 + radius1 > (L + M)/2 ) || (y1 - radius1 < (L - M)/2) ))) {
                 p1.setVelocity(new Velocity(-vx1, vy1)); //TODO: decide whether we should use the Velocity class setters or create a new Velocity object
@@ -40,6 +40,7 @@ public class Collision implements Comparable<Collision> {
                 p1.setVelocity(new Velocity(vx1, -vy1)); //TODO: decide whether we should use the Velocity class setters or create a new Velocity object
             }
             //TODO: Handle collisions with corners
+            
         } else {
             // TODO: check copilot implemented algorithm correctly
             if (p2 == null) {

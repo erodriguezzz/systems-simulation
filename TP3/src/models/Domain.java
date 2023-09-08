@@ -12,12 +12,17 @@ public class Domain {
      */
     private final double L;
 
+    private final Particle upperCorner;
+    private final Particle lowerCorner;
+
     public Domain(double m, double l) {
         if (l > m) {
             throw new IllegalArgumentException("L must be smaller than M");
         }
         this.M = m;
         this.L = l;
+        this.upperCorner = new Particle(0, new Velocity(0,0), M, (L+M)/2, Double.POSITIVE_INFINITY);
+        this.lowerCorner = new Particle(0, new Velocity(0,0), M, (L-M)/2, Double.POSITIVE_INFINITY);
     }
 
     /*
@@ -30,6 +35,12 @@ public class Domain {
         double vx = p.getVx();
         double vy = p.getVy();
         double radius = p.getRadius();
+        time = upperCorner.timeToCollision(p);
+        if (time != -1)
+            return time; //TODO: make Simulation class aware that this collision is with a corner
+        time = lowerCorner.timeToCollision(p);
+        if (time != -1)
+            return time; //TODO: make Simulation class aware that this collision is with a corner
         if (vx > 0) {
             double timeToRightWall = (M + L - x - radius) / vx;
             // Check if I'm on the right side of the domain. If not, check if I will collide with the middle wall.
