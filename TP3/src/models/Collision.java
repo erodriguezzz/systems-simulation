@@ -65,6 +65,18 @@ public class Collision implements Comparable<Collision> {
         }
     }
 
+    public Particle getP1() {
+        return this.p1;
+    }
+
+    public Particle getP2() {
+        return this.p2;
+    }
+
+    public double getTime() {
+        return this.time;
+    }
+
     @Override
     public String toString() {
         return "Collision{" +

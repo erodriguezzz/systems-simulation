@@ -11,35 +11,13 @@ public class DataManager {
     private double max_radius = 0;
     private float L;
     private int N;
-    private int time;
+    private float time;
     private Set<Particle> particles = new HashSet<>();
 
     public DataManager(String staticPath, String dynamicPath, String[] output) {
         readParticlesFiles(staticPath, dynamicPath);
         for(String s : output) {
             clearOutputFile(s);
-        }
-    }
-
-    public void writeVa(double time, double va, int N, int L, double noise, int v) {
-        try {
-            File file = new File("./data/output/VaN_" + N + "_L_" + L + "_noise_" + noise +"_v" +v+".txt");
-            FileWriter writer = new FileWriter(file, true);
-            writer.write(time + " " + va + "\n");
-            writer.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void writeVa(int N, int L, double noise, int v, double va){
-        try {
-            File file = new File("./data/output/noise_VaN_" + N + "_L_" + L + "_noise_" + String.format("%.2f",noise) +".txt");
-            FileWriter writer = new FileWriter(file, true);
-            writer.write(time + " " + va + "\n");
-            writer.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -61,20 +39,20 @@ public class DataManager {
 
             Scanner staticScanner = new Scanner(staticFile);
             Scanner dynamicScanner = new Scanner(dynamicFile);
-            this.time = dynamicScanner.nextInt();
-            this.L = staticScanner.nextFloat();
-            this.N = staticScanner.nextInt();
+            this.time = dynamicScanner.nextFloat();
 
             while (staticScanner.hasNext() && dynamicScanner.hasNext()) {
                 float x = dynamicScanner.nextFloat();
                 float y = dynamicScanner.nextFloat();
-                float radius = staticScanner.nextFloat();
+                double radius = staticScanner.nextFloat();
+                double mass = staticScanner.nextFloat();
+
                 if (radius > max_radius) {
                     this.max_radius = radius;
                 }
-                float theta = dynamicScanner.nextFloat();
-                float velocity = staticScanner.nextFloat();
-                particles.add(new Particle(radius, new Velocity(velocity, theta), x, y, 1)); //TODO: avoid hard coding
+                double vx = dynamicScanner.nextDouble();
+                double vy = dynamicScanner.nextDouble();
+                particles.add(new Particle(radius, new Velocity(vx, vy), x, y, mass)); //TODO: avoid hard coding
             }
             staticScanner.close();
             dynamicScanner.close();
@@ -91,7 +69,7 @@ public class DataManager {
             FileWriter writer = new FileWriter(file, true);
             if (file.createNewFile()) {
                 int id = 1;
-                File startingFile = new File("./TP2/data/input/dynamic.txt");
+                File startingFile = new File("./TP3/data/input/dynamic.txt");
                 Scanner scanner = new Scanner(startingFile);
                 while (scanner.hasNext()) {
                     String line = scanner.nextLine();

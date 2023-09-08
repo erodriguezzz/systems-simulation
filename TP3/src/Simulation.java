@@ -15,44 +15,78 @@ public class Simulation {
     private TreeSet<Collision> collisions;
     
 
-    Simulation(int N, double M, double L, double v){
+    Simulation(int N, double L, int version){
         String[] outputs = {
-                    "./data/output/dynamic/Dynamic_N_" + N + "_M_" + M + "_L_" + L +"_v" +v+".dump",
-                    "./data/output/VaN_" + N + "_M_" + M + "_L_" + L + "_v" +v+".txt",
-                    "./data/output/VaN_" + N + "_M_" + M + "_L_" + L +"_v" +v+".txt",
-                    "./data/output/VaN_" + N + "_M_" + M + "_L_" + L +"_v" +v+".txt",
-};
+                    "./data/output/dynamic/Dynamic_N_" + N + "_L_" + L +"_v" +version+".dump",
+                    "./data/output/VaN_" + N + "_L_" + L + "_v" +version+".txt",
+                    "./data/output/VaN_" + N + "_L_" + L +"_v" +version+".txt",
+                    "./data/output/VaN_" + N + "_L_" + L +"_v" +version+".txt",
+        };
         this.dm = new DataManager(
-                "./data/input/Static_N_"  + N + "_M_"+ M + "_L_" + L + "_v_1.txt",
-                "./data/input/Dynamic_N_" + N + "_M_" + M + "_L_" + L + "_v_1.txt",
+                "./data/input/Static_N_" + N + "_L_" + L + ".txt",
+                "./data/input/Dynamic_N_" + N + "_L_" + L + ".txt",
                 outputs);
         this.particles = dm.getParticles();
         this.domain = new Domain(dm.getL(), dm.getL()); // TODO: adjust DataManager to new input format
     }
 
-    public static void main(String[] args) {
-        Simulation sim = new Simulation(100, 0.09, 0.03, 0.01); //TODO: avoid hard coding
-        double time = 0, timeToNextCollision = sim.calculateCollisions();
+    private static void uniqueSimulation(int N, double L, int version){
+        Simulation sim = new Simulation(N, L, 1); //TODO: avoid hard coding
+        double time = 0, timeToNextCollision;
+        timeToNextCollision = sim.calculateCollisions();
         if (timeToNextCollision < 0) {
             throw new RuntimeException("No collisions found");
         }
         while (time < totalSeconds) {
-            while (time < timeToNextCollision) {
-                sim.moveParticles(time);
-                time += timeStepper;
+            sim.moveParticles(timeToNextCollision - time);
+            sim.dm.writeDynamicFile(sim.particles, "./output/Dynamic.txt", time);
+            Collision next = sim.collisions.first();
+            next.exec(sim.domain.getM(), sim.domain.getL());
+            for (Collision c : sim.collisions) {
+                if (c.getP1().equals(next.getP1()) || ( c.getP2() != null && c.getP2().equals(next.getP1()) ) || c.getP1().equals(next.getP2()) || (c.getP2() != null && c.getP2().equals(next.getP2()))) {
+                    sim.collisions.remove(c);
+                }
             }
-            sim.dm.writeDynamicFile(sim.particles, "./output/temp.txt", time); //TODO: check if this is what the theory means by "storing only events"
-            sim.collisions.first().exec(sim.domain.getM(), sim.domain.getL());
-            sim.collisions.remove(sim.collisions.first());
-            timeToNextCollision = sim.calculateCollisions();
+            sim.collisions.remove(next);
+            sim.calculateCollisions(next.getP1());
+            sim.calculateCollisions(next.getP2());
+            time = timeToNextCollision;
+            timeToNextCollision = sim.collisions.first().getTime();
         }
-        
+        return;
+    }
+
+    public static void main(String[] args) {
+        int[] Ns = {200, 500, 1000};
+        double[] Ls = {0.03, 0.05, 0.07, 0.09};
+        for (int N : Ns) {
+            for(double L : Ls ){
+                uniqueSimulation(N, L, 1);
+            }
+        }
     }
 
     public void moveParticles(double time){
         particles.forEach(p -> {
             p.updatePosition(time);
         });
+    }
+
+    public void calculateCollisions(Particle p) {
+        // Create wall collisions
+        double timeToCollision = domain.getWallCollisionTime(p);
+        collisions.add(new Collision(p, timeToCollision));
+
+        // Create particle collisions
+        for (Particle q : particles) {
+            if (p != q) {
+                timeToCollision = p.timeToCollision(q);
+                if (timeToCollision >= 0) {
+                    collisions.add(new Collision(p, q, timeToCollision));
+                }
+            }
+        }
+        return;
     }
 
     public double calculateCollisions() {
