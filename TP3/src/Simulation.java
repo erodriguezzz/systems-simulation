@@ -2,6 +2,7 @@ import models.Domain;
 import models.Collision;
 import models.Particle;
 import services.DataManager;
+import sun.java2d.xr.MutableInteger;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -75,8 +76,18 @@ public class Simulation {
 
     public double calculateCollisions(Particle p) {
         // Create wall collisions
-        double timeToFirstCollision = domain.getWallCollisionTime(p); //TODO: check if this collision is with a corner
-        collisions.add(new Collision(p, timeToFirstCollision));
+        MutableInteger isCornerCollision = new MutableInteger(0);
+        double timeToFirstCollision = domain.getWallCollisionTime(p, isCornerCollision);
+        int corner = isCornerCollision.getValue();
+        if (corner == 0)
+            collisions.add(new Collision(p, timeToFirstCollision));
+        else if (corner == 1)
+            collisions.add(new Collision(p, domain.getLowerCorner() ,timeToFirstCollision));
+        else if (corner == 2)
+            collisions.add(new Collision(p, domain.getUpperCorner() ,timeToFirstCollision));
+        else
+            throw new RuntimeException("No collision with wall found for particle " + p.getId());
+
 
         // Create particle collisions
         for (Particle q : particles) {

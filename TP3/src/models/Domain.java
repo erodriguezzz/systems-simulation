@@ -1,4 +1,7 @@
 package models;
+
+import sun.java2d.xr.MutableInteger;
+
 /**
  * This class represents the domain of the simulation as specified in the assignment.
  */
@@ -27,8 +30,10 @@ public class Domain {
 
     /*
     * This method returns the minimum time it will take for the particle to collide with a wall.
+    * It also returns whether the collision is with the upper corner (2), the lower corner (1)
+    * or no corner (0) in the isCornerCollision variable.
      */
-    public double getWallCollisionTime(Particle p) {
+    public double getWallCollisionTime(Particle p, MutableInteger isCornerCollision) {
         double time = -1;
         double x = p.getX();
         double y = p.getY();
@@ -36,11 +41,15 @@ public class Domain {
         double vy = p.getVy();
         double radius = p.getRadius();
         time = upperCorner.timeToCollision(p);
-        if (time != -1)
-            return time; //TODO: make Simulation class aware that this collision is with a corner
+        if (time != -1) {
+            isCornerCollision.setValue(2);
+            return time;
+        }
         time = lowerCorner.timeToCollision(p);
-        if (time != -1)
-            return time; //TODO: make Simulation class aware that this collision is with a corner
+        if (time != -1) {
+            isCornerCollision.setValue(1);
+            return time;
+        }
         if (vx > 0) {
             double timeToRightWall = (M + L - x - radius) / vx;
             // Check if I'm on the right side of the domain. If not, check if I will collide with the middle wall.
@@ -78,5 +87,13 @@ public class Domain {
 
     public double getL() {
         return L;
+    }
+
+    public Particle getUpperCorner() {
+        return upperCorner;
+    }
+
+    public Particle getLowerCorner() {
+        return lowerCorner;
     }
 }
