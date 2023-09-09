@@ -42,12 +42,8 @@ public class Simulation {
             sim.dm.writeDynamicFile(sim.particles, "./output/Dynamic.txt", time);
             Collision next = sim.collisions.first();
             next.exec(sim.domain.getM(), sim.domain.getL());
-            for (Collision c : sim.collisions) {
-                if (c.getP1().equals(next.getP1()) || ( c.getP2() != null && c.getP2().equals(next.getP1()) ) || c.getP1().equals(next.getP2()) || (c.getP2() != null && c.getP2().equals(next.getP2()))) {
-                    sim.collisions.remove(c);
-                }
-            }
-            sim.collisions.remove(next);
+            sim.collisions.removeIf(c -> c.getP1().equals(next.getP1()) || (c.getP2() != null && c.getP2().equals(next.getP1())) || c.getP1().equals(next.getP2()) || (c.getP2() != null && c.getP2().equals(next.getP2())));
+            // sim.collisions.remove(next); // This one should be deleted in the previous line
             sim.calculateCollisions(next.getP1());
             sim.calculateCollisions(next.getP2());
             time = timeToNextCollision;
@@ -77,40 +73,28 @@ public class Simulation {
         });
     }
 
-    public void calculateCollisions(Particle p) {
+    public double calculateCollisions(Particle p) {
         // Create wall collisions
-        double timeToCollision = domain.getWallCollisionTime(p); //TODO: check if this collision is with a corner
-        collisions.add(new Collision(p, timeToCollision));
+        double timeToFirstCollision = domain.getWallCollisionTime(p); //TODO: check if this collision is with a corner
+        collisions.add(new Collision(p, timeToFirstCollision));
 
         // Create particle collisions
         for (Particle q : particles) {
             if (p != q) {
-                timeToCollision = p.timeToCollision(q);
+                double timeToCollision = p.timeToCollision(q);
                 if (timeToCollision >= 0) {
                     collisions.add(new Collision(p, q, timeToCollision));
+                    timeToFirstCollision = Math.min(timeToFirstCollision, timeToCollision);
                 }
             }
         }
-        return;
+        return timeToFirstCollision;
     }
 
     public double calculateCollisions() {
         double timeToFirstCollision = -1;
         for (Particle p : particles) {
-            // Create wall collisions
-            timeToFirstCollision = domain.getWallCollisionTime(p);
-            collisions.add(new Collision(p, timeToFirstCollision));
-
-            // Create particle collisions
-            for (Particle q : particles) { //TODO: check efficency. It might be better to use a custom data structure for both particles and collisions
-                if (p != q) {
-                    double timeToCollision = p.timeToCollision(q);
-                    if (timeToCollision >= 0) {
-                        collisions.add(new Collision(p, q, timeToCollision));
-                        timeToFirstCollision = Math.min(timeToFirstCollision, timeToCollision);
-                    }
-                }
-            }
+            timeToFirstCollision = Math.min(timeToFirstCollision, calculateCollisions(p));
         }
         return timeToFirstCollision;
     }
