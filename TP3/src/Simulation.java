@@ -13,7 +13,7 @@ public class Simulation {
     private final Domain domain;
     private final DataManager dm;
     private final Set<Particle> particles;
-    private TreeSet<Collision> collisions;
+    private final TreeSet<Collision> collisions;
     
 
     Simulation(int N, double L, int version){
@@ -24,15 +24,16 @@ public class Simulation {
                     "./data/output/VaN_" + N + "_L_" + L +"_v" +version+".txt",
         };
         this.dm = new DataManager(
-                "./data/input/Static_N_" + N + "_L_" + L + ".txt",
-                "./data/input/Dynamic_N_" + N + "_L_" + L + ".txt",
+                "./data/input/Static_N_" + N + ".dump",
+                "./data/input/Dynamic_N_" + N + ".dump",
                 outputs);
         this.particles = dm.getParticles();
+        this.collisions = new TreeSet<>();
         this.domain = new Domain(dm.getL(), dm.getL()); // TODO: adjust DataManager to new input format
     }
 
     private static void uniqueSimulation(int N, double L, int version){
-        Simulation sim = new Simulation(N, L, 1); //TODO: avoid hard coding
+        Simulation sim = new Simulation(N, L, version);
         double time = 0, timeToNextCollision;
         timeToNextCollision = sim.calculateCollisions();
         if (timeToNextCollision < 0) {
@@ -54,17 +55,17 @@ public class Simulation {
     }
 
     public static void main(String[] args) {
-        int[] Ns = {200, 500, 1000};
+        int[] Ns = {200, 500};
         double[] Ls = {0.03, 0.05, 0.07, 0.09};
         boolean unique = false;
         if(!unique){
             for (int N : Ns) {
                 for(double L : Ls ){
-                    uniqueSimulation(N, L, 1);
+                    uniqueSimulation(N, L, 1); //TODO: avoid hard coding
                 }
             }
         } else {
-            uniqueSimulation(Ns[0], Ls[0], 1);
+            uniqueSimulation(Ns[0], Ls[0], 1); //TODO: avoid hard coding
         }
     }
 

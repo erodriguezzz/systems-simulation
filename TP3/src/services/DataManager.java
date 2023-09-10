@@ -16,9 +16,6 @@ public class DataManager {
 
     public DataManager(String staticPath, String dynamicPath, String[] output) {
         readParticlesFiles(staticPath, dynamicPath);
-        for(String s : output) {
-            clearOutputFile(s);
-        }
     }
 
     private void clearOutputFile(String output) {
