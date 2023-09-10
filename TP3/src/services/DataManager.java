@@ -16,6 +16,7 @@ public class DataManager {
 
     public DataManager(String staticPath, String dynamicPath, String[] output) {
         readParticlesFiles(staticPath, dynamicPath);
+        // TODO: should we include the clear of OutputFiles?
     }
 
     private void clearOutputFile(String output) {
