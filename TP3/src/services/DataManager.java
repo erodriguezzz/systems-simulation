@@ -53,7 +53,6 @@ public class DataManager {
             }
             staticScanner.close();
             dynamicScanner.close();
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -66,7 +65,7 @@ public class DataManager {
             FileWriter writer = new FileWriter(file, true);
             if (file.createNewFile()) {
                 int id = 1;
-                File startingFile = new File("./TP3/data/input/dynamic.txt");
+                File startingFile = new File("./data/input/dynamic.txt");
                 Scanner scanner = new Scanner(startingFile);
                 while (scanner.hasNext()) {
                     String line = scanner.nextLine();

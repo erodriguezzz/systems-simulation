@@ -36,12 +36,12 @@ public class Simulation {
         Simulation sim = new Simulation(N, L, version);
         double time = 0, timeToNextCollision;
         timeToNextCollision = sim.calculateCollisions();
-        if (timeToNextCollision < 0) {
+        if (timeToNextCollision == Double.POSITIVE_INFINITY) {
             throw new RuntimeException("No collisions found");
         }
         while (time < totalSeconds) {
             sim.moveParticles(timeToNextCollision - time);
-            sim.dm.writeDynamicFile(sim.particles, "./output/Dynamic.txt", time);
+            sim.dm.writeDynamicFile(sim.particles, "./data/output/Dynamic.txt", time);
             Collision next = sim.collisions.first();
             next.exec(sim.domain.getM(), sim.domain.getL());
             sim.collisions.removeIf(c -> c.getP1().equals(next.getP1()) || (c.getP2() != null && c.getP2().equals(next.getP1())) || c.getP1().equals(next.getP2()) || (c.getP2() != null && c.getP2().equals(next.getP2())));
@@ -104,7 +104,7 @@ public class Simulation {
     }
 
     public double calculateCollisions() {
-        double timeToFirstCollision = -1;
+        double timeToFirstCollision = Double.POSITIVE_INFINITY;
         for (Particle p : particles) {
             timeToFirstCollision = Math.min(timeToFirstCollision, calculateCollisions(p));
         }
