@@ -31,21 +31,25 @@ public class Collision implements Comparable<Collision> {
         double vy1 = p1.getVy();
         double radius1 = p1.getRadius();
         if (this.isWallCollision) {
+            System.out.println("Collision between " + p1.getId() + " and wall");
+            System.out.println("x1 = " + p1.getX() + " y1 = " + p1.getY() + " vx1 = " + p1.getVx() + " vy1 = " + p1.getVy() + " radius1 = " + p1.getRadius());
             // Collision with vertical wall
             if (x1 + radius1 >= M+L || x1 - radius1 <= 0 || (x1 + radius1 >= M && ((y1 + radius1 > (L + M)/2 ) || (y1 - radius1 < (L - M)/2) ))) {
                 p1.setVelocity(new Velocity(-vx1, vy1)); //TODO: decide whether we should use the Velocity class setters or create a new Velocity object
             }
             // Collision with horizontal wall
-            if (y1 + radius1 >= M || y1 - radius1 <= 0 || (x1 + radius1 >= M && (y1 + radius1 >= (L + M)/2 || y1 - radius1 <= (L - M)/2))) {
+            if ( (y1 + radius1 >= M) || y1 - radius1 <= 0 || (x1 + radius1 >= M && (y1 + radius1 >= (L + M)/2 || y1 - radius1 <= (L - M)/2))) {
                 p1.setVelocity(new Velocity(vx1, -vy1)); //TODO: decide whether we should use the Velocity class setters or create a new Velocity object
             }
-            //TODO: Handle collisions with corners
-            
+            System.out.println("x1 = " + p1.getX() + " y1 = " + p1.getY() + " vx1 = " + p1.getVx() + " vy1 = " + p1.getVy() + " radius1 = " + p1.getRadius());
+
         } else {
             // TODO: check copilot implemented algorithm correctly
             if (p2 == null) {
                 throw new IllegalArgumentException("p2 cannot be null if isWallCollision is false");
             }
+            System.out.println("Collision between " + p1.getId() + " and " + p2.getId());
+            
             double x2 = p2.getX();
             double y2 = p2.getY();
             double vx2 = p2.getVx();
@@ -57,13 +61,18 @@ public class Collision implements Comparable<Collision> {
             double dvy = vy2 - vy1;
             double dvdr = dx*dvx + dy*dvy;
             double dist = Math.sqrt(dx*dx + dy*dy);
+
             double sigma = radius1 + radius2;
+            System.out.println("Dist = " + dist + " sigma^2 = " + sigma*sigma);
+            System.out.println();
             double J = 2*p1.getMass()*p2.getMass()*dvdr / ((p1.getMass() + p2.getMass())*sigma);
             double Jx = J*dx / dist;
             double Jy = J*dy / dist;
             p1.setVelocity(new Velocity(vx1 + Jx/p1.getMass(), vy1 + Jy/p1.getMass())); //TODO: decide whether we should use the Velocity class setters or create a new Velocity object
             p2.setVelocity(new Velocity(vx2 - Jx/p2.getMass(), vy2 - Jy/p2.getMass())); //TODO: decide whether we should use the Velocity class setters or create a new Velocity object
         }
+        System.out.println();
+
     }
 
     public Particle getP1() {

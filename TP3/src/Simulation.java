@@ -29,7 +29,7 @@ public class Simulation {
                 outputs);
         this.particles = dm.getParticles();
         this.collisions = new TreeSet<>();
-        this.domain = new Domain(dm.getL(), dm.getL()); // TODO: adjust DataManager to new input format
+        this.domain = new Domain(dm.getL());
     }
 
     private static void uniqueSimulation(int N, double L, int version){
@@ -45,9 +45,11 @@ public class Simulation {
             Collision next = sim.collisions.first();
             next.exec(sim.domain.getM(), sim.domain.getL());
             sim.collisions.removeIf(c -> c.getP1().equals(next.getP1()) || (c.getP2() != null && c.getP2().equals(next.getP1())) || c.getP1().equals(next.getP2()) || (c.getP2() != null && c.getP2().equals(next.getP2())));
-            // sim.collisions.remove(next); // This one should be deleted in the previous line
+            // sim.collisions.remove(next);
             sim.calculateCollisions(next.getP1());
-            sim.calculateCollisions(next.getP2());
+            if (next.getP2() != null)
+               sim.calculateCollisions(next.getP2());
+            // sim.calculateCollisions();
             time = timeToNextCollision;
             timeToNextCollision = sim.collisions.first().getTime();
         }
@@ -77,18 +79,9 @@ public class Simulation {
 
     public double calculateCollisions(Particle p) {
         // Create wall collisions
-        MutableInteger isCornerCollision = new MutableInteger(0);
-        double timeToFirstCollision = domain.getWallCollisionTime(p, isCornerCollision);
-        int corner = isCornerCollision.getValue();
-        if (corner == 0)
-            collisions.add(new Collision(p, timeToFirstCollision));
-        else if (corner == 1)
-            collisions.add(new Collision(p, domain.getLowerCorner() ,timeToFirstCollision));
-        else if (corner == 2)
-            collisions.add(new Collision(p, domain.getUpperCorner() ,timeToFirstCollision));
-        else
-            throw new RuntimeException("No collision with wall found for particle " + p.getId());
-
+        Collision wallCollision = domain.getNextWallCollision(p);
+        double timeToFirstCollision = wallCollision.getTime();
+        collisions.add(wallCollision);
 
         // Create particle collisions
         for (Particle q : particles) {

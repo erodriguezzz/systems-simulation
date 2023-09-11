@@ -50,7 +50,7 @@ public class DataManager {
                 }
                 double vx = dynamicScanner.nextDouble();
                 double vy = dynamicScanner.nextDouble();
-                particles.add(new Particle(radius, new Velocity(vx, vy), x, y, mass)); //TODO: avoid hard coding
+                particles.add(new Particle(radius, new Velocity(vx, vy), x, y, mass));
             }
             staticScanner.close();
             dynamicScanner.close();

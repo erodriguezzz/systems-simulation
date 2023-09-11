@@ -30,9 +30,9 @@ public class Particle implements Comparable<Particle>{
     * If the two particles never collide, return a negative value.
      */
     public double timeToCollision(Particle b) {
-        double dx = b.getX() - this.getX();
         double dy = b.getY() - this.getY();
         double dvx = b.getVx() - this.getVx();
+        double dx = b.getX() - this.getX();
         double dvy = b.getVy() - this.getVy();
         double dvdr = dx * dvx + dy * dvy;
         double dvdv = dvx * dvx + dvy * dvy;
@@ -43,10 +43,19 @@ public class Particle implements Comparable<Particle>{
         if (dvdr >= 0 || d < 0)
             return -1;
 
-        if (drdr < sigma * sigma)
-            throw new RuntimeException("overlapping particles");
+        if (drdr == sigma * sigma) 
+            System.out.println("Holis");
 
-        return -(dvdr + Math.sqrt(d)) / dvdv;
+        if (drdr < sigma * sigma) {
+            System.out.println("p1 = " + this.getId() + " p2 = " + b.getId());
+            System.out.println("Drdr = " + drdr + " sigma^2 = " + sigma*sigma);
+            System.out.println("x1 = " + this.getX() + " y1 = " + this.getY() + " r1 = " + this.getRadius() + " x2 = " + b.getX() + " y2 = " + b.getY() + " r2 = " + b.getRadius());
+            throw new RuntimeException("overlapping particles for particles " + this.getId() + " and " + b.getId());
+        }
+
+        double timeToCollision = -(dvdr + Math.sqrt(d)) / dvdv;
+        // System.out.println(timeToCollision);
+        return timeToCollision;
     }
 
 
@@ -68,7 +77,8 @@ public class Particle implements Comparable<Particle>{
     }
 
     public void setVelocity(Velocity velocity) {
-        this.velocity = velocity;
+        this.velocity.setVx(velocity.getVx());
+        this.velocity.setVy(velocity.getVy());
     }
 
 
