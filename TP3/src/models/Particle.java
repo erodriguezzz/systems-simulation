@@ -47,9 +47,8 @@ public class Particle implements Comparable<Particle>{
             System.out.println("Holis");
 
         if (drdr < sigma * sigma) {
-            System.out.println("p1 = " + this.getId() + " p2 = " + b.getId());
+            System.out.println("p1 = " + this + "\np2 = " + b);
             System.out.println("Drdr = " + drdr + " sigma^2 = " + sigma*sigma);
-            System.out.println("x1 = " + this.getX() + " y1 = " + this.getY() + " r1 = " + this.getRadius() + " x2 = " + b.getX() + " y2 = " + b.getY() + " r2 = " + b.getRadius());
             throw new RuntimeException("overlapping particles for particles " + this.getId() + " and " + b.getId());
         }
 
@@ -121,5 +120,13 @@ public class Particle implements Comparable<Particle>{
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString(){
+        return "Particle " + this.id +
+                " at (" + this.x + ", " + this.y +
+                ") with velocity (" + this.velocity.getVx() +
+                ", " + this.velocity.getVy() + ")";
     }
 }

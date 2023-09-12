@@ -24,15 +24,14 @@ public class Collision implements Comparable<Collision> {
         return isWallCollision;
     }
 
-    public void exec(double M, double L) {
+    public void collide(double M, double L) {
         double x1 = p1.getX();
         double y1 = p1.getY();
         double vx1 = p1.getVx();
         double vy1 = p1.getVy();
         double radius1 = p1.getRadius();
         if (this.isWallCollision) {
-            System.out.println("Collision between " + p1.getId() + " and wall");
-            System.out.println("x1 = " + p1.getX() + " y1 = " + p1.getY() + " vx1 = " + p1.getVx() + " vy1 = " + p1.getVy() + " radius1 = " + p1.getRadius());
+            System.out.println("Collision between:\n" + p1 + "\nand wall");
             // Collision with vertical wall
             if (x1 + radius1 >= M+L || x1 - radius1 <= 0 || (x1 + radius1 >= M && ((y1 + radius1 > (L + M)/2 ) || (y1 - radius1 < (L - M)/2) ))) {
                 p1.setVelocity(new Velocity(-vx1, vy1)); //TODO: decide whether we should use the Velocity class setters or create a new Velocity object
@@ -48,7 +47,7 @@ public class Collision implements Comparable<Collision> {
             if (p2 == null) {
                 throw new IllegalArgumentException("p2 cannot be null if isWallCollision is false");
             }
-            System.out.println("Collision between " + p1.getId() + " and " + p2.getId());
+            System.out.println("Collision between:\n" + p1 + "\nand\n" + p2);
             
             double x2 = p2.getX();
             double y2 = p2.getY();
@@ -91,7 +90,7 @@ public class Collision implements Comparable<Collision> {
     public String toString() {
         return "Collision{" +
                 "p1=" + p1 +
-                ", p2=" + p2 +
+                ", p2=" + (p2==null? "wall":p2) +
                 ", time=" + time +
                 '}';
     }
