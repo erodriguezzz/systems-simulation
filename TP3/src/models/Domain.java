@@ -27,7 +27,7 @@ public class Domain {
         this.M = DOMAIN_LENGTH;
         this.L = l;
         this.upperCorner = new Particle(0, new Velocity(0,0), M, (L+M)/2, Double.POSITIVE_INFINITY);
-        this.lowerCorner = new Particle(0, new Velocity(0,0), M, (L-M)/2, Double.POSITIVE_INFINITY);
+        this.lowerCorner = new Particle(0, new Velocity(0,0), M, (M-L)/2, Double.POSITIVE_INFINITY);
     }
 
     /*
@@ -35,8 +35,8 @@ public class Domain {
     * It also returns whether the collision is with the upper corner (2), the lower corner (1)
     * or no corner (0) in the isCornerCollision variable.
      */
-    public Collision getNextWallCollision(Particle p) {
-        double time = -1;
+    public Collision getNextWallCollision(Particle p, double currentTime) {
+        double time;
         double x = p.getX();
         double y = p.getY();
         double vx = p.getVx();
@@ -78,7 +78,7 @@ public class Domain {
                 time = Math.min(time, ( (M-L)/2 + radius - y) / vy);
             }
         }
-        return new Collision(p, time);
+        return new Collision(p, time + currentTime);
     }
 
     public double getM() {

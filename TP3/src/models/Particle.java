@@ -9,7 +9,7 @@ public class Particle implements Comparable<Particle>{
     private final double mass;
 
     private final double radius;
-    private Velocity velocity;
+    private final Velocity velocity;
 
     private double x;
     private double y;
@@ -78,6 +78,14 @@ public class Particle implements Comparable<Particle>{
     public void setVelocity(Velocity velocity) {
         this.velocity.setVx(velocity.getVx());
         this.velocity.setVy(velocity.getVy());
+    }
+
+    public void setVx(double vx) {
+        this.velocity.setVx(vx);
+    }
+
+    public void setVy(double vy) {
+        this.velocity.setVy(vy);
     }
 
 
