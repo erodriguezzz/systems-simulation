@@ -58,7 +58,7 @@ public class Domain {
             } else {
                 time = (M - x - radius) / vx;
                 double middleY = y + vy * time;
-                if (middleY + radius < (L + M) / 2 || middleY - radius > (L - M) / 2) {
+                if (middleY + radius < (L + M) / 2 || middleY - radius > (M - L) / 2) {
                     time = timeToRightWall;
                 }
             }
@@ -66,16 +66,22 @@ public class Domain {
             time = (radius - x) / vx;
         }
         if (vy > 0) {
-            if (x < M) {
-                time = Math.min(time, (M - y - radius) / vy);
+            double timeToMidUpper = ((M + L) / 2 - y - radius) / vy;
+            double midUpperX = x + vx * timeToMidUpper;
+            double timeToCeiling = (M - y - radius) / vy;
+            if (y > (M+L)/ 2 || midUpperX + radius < M) {
+                    time = Math.min(time, timeToCeiling);
             } else {
-                time = Math.min(time, ((M+L)/2 - y - radius) / vy);
+                    time = Math.min(time, timeToMidUpper);
             }
         } else if (vy < 0) {
-            if (x < M) {
-                time = Math.min(time, (radius - y) / vy);
+            double timeToMidLower = ((M - L) / 2 - y - radius) / vy;
+            double midLowerX = x + vx * timeToMidLower;
+            double timeToFloor = (radius - y) / vy;
+            if (y < (M-L)/2 || midLowerX + radius < M) {
+                time = Math.min(time, timeToFloor);
             } else {
-                time = Math.min(time, ( (M-L)/2 + radius - y) / vy);
+                time = Math.min(time, timeToMidLower);
             }
         }
         return new Collision(p, time + currentTime);

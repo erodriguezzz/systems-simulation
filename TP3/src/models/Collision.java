@@ -31,7 +31,6 @@ public class Collision implements Comparable<Collision> {
         double vy1 = p1.getVy();
         double radius1 = p1.getRadius();
         if (this.isWallCollision) {
-            System.out.println("Collision between:\n" + p1 + "\nand wall");
             // Collision with vertical wall
             if (x1 + radius1 >= M+L || x1 - radius1 <= 0 || (x1 + radius1 >= M && ((y1 + radius1 > (L + M)/2 ) || (y1 - radius1 < (L - M)/2) ))) {
                 p1.setVx(-vx1); //TODO: decide whether we should use the Velocity class setters or create a new Velocity object
@@ -40,13 +39,10 @@ public class Collision implements Comparable<Collision> {
             if ( (y1 + radius1 >= M) || y1 - radius1 <= 0 || (x1 + radius1 >= M && (y1 + radius1 >= (L + M)/2 || y1 - radius1 <= (L - M)/2))) {
                 p1.setVy(-vy1); //TODO: decide whether we should use the Velocity class setters or create a new Velocity object
             }
-            System.out.println("x1 = " + p1.getX() + " y1 = " + p1.getY() + " vx1 = " + p1.getVx() + " vy1 = " + p1.getVy() + " radius1 = " + p1.getRadius());
-
         } else {
             if (p2 == null) {
                 throw new IllegalArgumentException("p2 cannot be null if isWallCollision is false");
             }
-            System.out.println("Collision between:\n" + p1 + "\nand\n" + p2);
 
             double x2 = p2.getX();
             double y2 = p2.getY();
@@ -76,18 +72,20 @@ public class Collision implements Comparable<Collision> {
             double newVx2 = vx2 - Jx / p2.getMass();
             double newVy2 = vy2 - Jy / p2.getMass();
 
+            /*
             System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             System.out.println("dist = " + dist + " sigma = " + sigma);
             System.out.println("Old total vx = " + (vx1 + vx2) + " Total vy = " + (vy1 + vy2));
             System.out.println("New total vx = " + (newVx1 + newVx2) + " Total vy = " + (newVy1 + newVy2));
             System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            */
 
             p1.setVelocity(new Velocity(newVx1, newVy1));
             p2.setVelocity(new Velocity(newVx2, newVy2));
 
         }
 
-        System.out.println();
+        // System.out.println();
 
     }
 

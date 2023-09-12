@@ -43,12 +43,14 @@ public class Particle implements Comparable<Particle>{
         if (dvdr >= 0 || d < 0)
             return -1;
 
-        if (drdr == sigma * sigma) 
-            System.out.println("Holis");
-
-        if (drdr < sigma * sigma) {
+        double tolerance = 1E-2;
+        if (Math.abs(drdr - sigma * sigma) >= tolerance) {
+            /*
             System.out.println("p1 = " + this + "\np2 = " + b);
             System.out.println("Drdr = " + drdr + " sigma^2 = " + sigma*sigma);
+            System.out.println("drdr - sigma^2 = " + (drdr - sigma*sigma));
+
+             */
             throw new RuntimeException("overlapping particles for particles " + this.getId() + " and " + b.getId());
         }
 

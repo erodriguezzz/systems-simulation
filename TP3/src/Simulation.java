@@ -52,25 +52,26 @@ public class Simulation {
         if (timeOfNextCollision == Double.POSITIVE_INFINITY) {
             throw new RuntimeException("No collisions found");
         }
+
         while (time < totalSeconds) {
-            this.moveParticles(timeOfNextCollision - time);
-            this.dm.writeDynamicFile(this.particles, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
             Collision next = this.collisions.first();
+            this.moveParticles(timeOfNextCollision - time);
+            time = timeOfNextCollision;
+            this.dm.writeDynamicFile(this.particles, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
             next.collide(this.domain.getM(), this.domain.getL());
             this.collisions.removeIf(c -> c.getP1().equals(next.getP1()) ||
                                         (c.getP2() != null && c.getP2().equals(next.getP1())) ||
                                         c.getP1().equals(next.getP2()) ||
                                         (c.getP2() != null && c.getP2().equals(next.getP2())));
-            System.out.println("p1 = " + next.getP1() + "\np2 = " + next.getP2());
-            System.out.println("Removing collisions for particles " + next.getP1().getId() + " and " + (next.getP2() != null ? next.getP2().getId() : "wall"));
+            if (next.getP2() == null)
+                System.out.println("p1 = " + next.getP1().getId() + " p2 = " + (next.getP2() == null ? "wall" : next.getP2().getId()));
             if (next.getP1() != domain.getUpperCorner() && next.getP1() != domain.getLowerCorner())
                 this.calculateCollisions(next.getP1(), time);
             if (next.getP2() != null && next.getP2() != domain.getUpperCorner() && next.getP2() != domain.getLowerCorner()) {
                 this.calculateCollisions(next.getP2(), time);
             }
-            System.out.println();
+            // System.out.println();
             // this.showFirstThreeCollisions();
-            time = timeOfNextCollision;
             timeOfNextCollision = this.collisions.first().getTime();
         }
         return;
