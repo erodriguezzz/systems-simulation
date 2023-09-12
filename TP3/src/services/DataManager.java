@@ -4,7 +4,9 @@ import models.Particle;
 import models.Velocity;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class DataManager {
@@ -16,6 +18,9 @@ public class DataManager {
 
     public DataManager(String staticPath, String dynamicPath, String[] output) {
         readParticlesFiles(staticPath, dynamicPath);
+        for (String s : output) {
+            clearOutputFile(s);
+        }
         // TODO: should we include the clear of OutputFiles?
     }
 
@@ -25,8 +30,12 @@ public class DataManager {
             FileWriter writer = new FileWriter(file, false);
             writer.write("");
             writer.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (FileNotFoundException e) {
+            System.out.println("Output file does not exist");
+            // throw new RuntimeException(e);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
