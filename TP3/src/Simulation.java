@@ -2,7 +2,7 @@ import models.Domain;
 import models.Collision;
 import models.Particle;
 import services.DataManager;
-import sun.java2d.xr.MutableInteger;
+// import sun.java2d.xr.MutableInteger;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -54,7 +54,7 @@ public class Simulation {
         }
         while (time < totalSeconds) {
             this.moveParticles(timeToNextCollision - time);
-            this.dm.writeDynamicFile(this.particles, "./data/output/Dynamic_N_" + N + "_L_" + L + ".txt", time);
+            this.dm.writeDynamicFile(this.particles, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
             Collision next = this.collisions.first();
             next.collide(this.domain.getM(), this.domain.getL());
             this.collisions.removeIf(c -> c.getP1().equals(next.getP1()) ||

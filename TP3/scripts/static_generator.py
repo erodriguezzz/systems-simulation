@@ -17,7 +17,7 @@ def generate_file(N, radius, v, mass):
             f.write(f"{radius}   {mass}\n")
     
     with open("./data/input/Dynamic_N_" + str(N) + ".dump", "w") as f:
-        f.write("0" + "\n")
+        f.write(str(N) + "\n")
         for x, y in positions:
             theta = random.uniform(0, 2 * math.pi)
             vx = v * math.cos(theta)

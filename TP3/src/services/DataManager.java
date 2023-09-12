@@ -37,7 +37,7 @@ public class DataManager {
 
             Scanner staticScanner = new Scanner(staticFile);
             Scanner dynamicScanner = new Scanner(dynamicFile);
-            this.time = dynamicScanner.nextFloat();
+            this.N = dynamicScanner.nextInt();
 
             while (staticScanner.hasNext() && dynamicScanner.hasNext()) {
                 float x = dynamicScanner.nextFloat();
