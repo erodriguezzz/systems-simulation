@@ -48,13 +48,13 @@ public class Simulation {
 
     private void uniqueSimulation(int N, double L, int version){
         double time = 0, timeOfNextCollision;
-        timeOfNextCollision = this.calculateCollisions();
-        // this.showFirstThreeCollisions();
+        timeOfNextCollision = this.calculateCollisions(time);
+        this.showFirstThreeCollisions();
         if (timeOfNextCollision == Double.POSITIVE_INFINITY) {
             throw new RuntimeException("No collisions found");
         }
-
-        while (time < totalSeconds) {
+        int condition200 = 0;
+        while (time < totalSeconds && condition200<3) {
             Collision next = this.collisions.first();
             this.moveParticles(timeOfNextCollision - time);
             // time = timeOfNextCollision;
@@ -70,12 +70,11 @@ public class Simulation {
             next.collide(this.domain.getM(), this.domain.getL());
             this.dm.writeDynamicFile(this.particles, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
 
-            /*
-            this.collisions.removeIf(c -> c.getP1().equals(next.getP1()) ||
-                                        (c.getP2() != null && c.getP2().equals(next.getP1())) ||
-                                        c.getP1().equals(next.getP2()) ||
-                                        (c.getP2() != null && c.getP2().equals(next.getP2())));
-
+//            this.collisions.removeIf(c -> c.getP1().equals(next.getP1()) ||
+//                                        (c.getP2() != null && c.getP2().equals(next.getP1())) ||
+//                                        c.getP1().equals(next.getP2()) ||
+//                                        (c.getP2() != null && c.getP2().equals(next.getP2())));
+/*
             System.out.print("p1 = " + next.getP1().getId() + " p2 = " + (next.getP2() == null ? "wall" : next.getP2().getId()));
             if (next.getP2() == null)
                 System.out.print("-------------------------------------------------------");
@@ -85,12 +84,18 @@ public class Simulation {
             if (next.getP2() != null && next.getP2() != domain.getUpperCorner() && next.getP2() != domain.getLowerCorner()) {
                 this.calculateCollisions(next.getP2(), time);
             }
+            if(next.getP1().getId() == 200) {
+                condition200++;
+            }
+
             // System.out.println();
-            // this.showFirstThreeCollisions();
+            this.showFirstThreeCollisions();
+            time = timeOfNextCollision;
             timeOfNextCollision = this.collisions.first().getTime();
-             */
+*/
             collisions = new TreeSet<>();
-            time = calculateCollisions();
+             time = timeOfNextCollision;
+             timeOfNextCollision = calculateCollisions(time);
             System.out.println();
         }
         return;
@@ -141,10 +146,10 @@ public class Simulation {
         return timeOfFirstCollision;
     }
 
-    public double calculateCollisions() {
+    public double calculateCollisions(double time) {
         double timeOfFirstCollision = Double.POSITIVE_INFINITY;
         for (Particle p : particles) {
-            timeOfFirstCollision = Math.min(timeOfFirstCollision, calculateCollisions(p, 0));
+            timeOfFirstCollision = Math.min(timeOfFirstCollision, calculateCollisions(p, time));
         }
         return timeOfFirstCollision;
     }

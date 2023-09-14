@@ -21,6 +21,10 @@ public class Domain {
     private final Particle lowerCorner;
     private double leftSideI = 0;
     private double rightSideI = 0;
+    private double totalI = 0;
+    private final double leftPerimeter;
+    private final double rightPerimeter;
+    private final double totalPerimeter;
 
     public Domain(double l) {
         if (l > DOMAIN_LENGTH) {
@@ -30,22 +34,26 @@ public class Domain {
         this.L = l;
         this.upperCorner = new Particle(0, new Velocity(0,0), M, (L+M)/2, Double.POSITIVE_INFINITY);
         this.lowerCorner = new Particle(0, new Velocity(0,0), M, (M-L)/2, Double.POSITIVE_INFINITY);
+        this.leftPerimeter = 3*M + ((M-L)/2);
+        this.rightPerimeter = 2*M + L;
+        this.totalPerimeter = leftPerimeter + rightPerimeter;
     }
 
     public void addPressure(double v, CollisionType type) {
         switch (type) {
             case LEFT_HORIZONTAL_WALL:
             case LEFT_WALL:
-                leftSideI += v/M;
             case MID_WALL:
-                leftSideI += v/((M-L)/2);
+                leftSideI += v / leftPerimeter;
+                break;
             case RIGHT_HORIZONTAL_WALL:
-                rightSideI += v/M;
             case RIGHT_WALL:
-                rightSideI += v/L;
+                rightSideI += v / rightPerimeter;
+                break;
             default:
                 throw new RuntimeException("Cannot compute pressure for collision of type " + type);
         }
+        totalI += v / totalPerimeter;
     }
 
     public double getLeftSidePressure(double time) {
@@ -57,7 +65,7 @@ public class Domain {
     }
 
     public double getTotalPressure(double time) {
-        return getLeftSidePressure(time) + getRightSidePressure(time);
+        return totalI / time;
     }
 
     /*

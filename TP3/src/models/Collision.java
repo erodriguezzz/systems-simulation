@@ -23,6 +23,7 @@ public class Collision implements Comparable<Collision> {
     public CollisionType collide(double M, double L) {
 
         System.out.println("Type = " + type + " time = " + time);
+        System.out.println("Before collision:");
         System.out.println("p1 = " + p1.getId() + " x = " + p1.getX() + " y = " + p1.getY() + " vx = " + p1.getVx() + " vy = " + p1.getVy() + " radius = " + p1.getRadius());
         if (type == CollisionType.PARTICLE)
             System.out.println("p2 = " + p2.getId() + " x = " + p2.getX() + " y = " + p2.getY() + " vx = " + p2.getVx() + " vy = " + p2.getVy() + " radius = " + p2.getRadius());
@@ -69,6 +70,7 @@ public class Collision implements Comparable<Collision> {
                 double tolerance = 1E-6;
                 System.out.println(sigma - dist < tolerance ? "Ok" : "Sigma = " + sigma + " dist = " + dist);
                 double J;
+
                 if (p2.getMass() == Double.POSITIVE_INFINITY) {
                     J = (2 * p1.getMass() * dvdr) / ((p1.getMass()) * sigma);
                 } else {
@@ -77,45 +79,51 @@ public class Collision implements Comparable<Collision> {
 
                 double Jx = J * dx / dist;
                 double Jy = J * dy / dist;
+                /*
                 System.out.println("Jx: " + Jx);
                 System.out.println("Jy: " + Jy);
                 System.out.println("dx" + dx);
                 System.out.println("dy" + dy);
                 System.out.println("dvx" + dvx);
                 System.out.println("dvy" + dvy);
+                 */
                 double newVx1 = vx1 + Jx / p1.getMass();
                 double newVy1 = vy1 + Jy / p1.getMass();
                 double newVx2 = vx2 - Jx / p2.getMass();
                 double newVy2 = vy2 - Jy / p2.getMass();
 
-
+                /*
                 System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                 System.out.println("dist = " + dist + " sigma = " + sigma);
                 System.out.println("Old total vx = " + (vx1 + vx2) + " Total vy = " + (vy1 + vy2));
                 System.out.println("New total vx = " + (newVx1 + newVx2) + " Total vy = " + (newVy1 + newVy2));
-
                 System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
                 System.out.println("Current Velocities:");
                 System.out.println("p1 " + p1.getVx());
                 System.out.println("p1 " + p1.getVy());
                 System.out.println("p2 " + p2.getVx());
                 System.out.println("p2 " + p2.getVy());
+                */
                 p1.setVelocity(new Velocity(newVx1, newVy1));
                 p2.setVelocity(new Velocity(newVx2, newVy2));
+                /*
                 System.out.println("New Velocities:");
                 System.out.println("p1 " + p1.getVx());
                 System.out.println("p1 " + p1.getVy());
                 System.out.println("p2 " + p2.getVx());
                 System.out.println("p2 " + p2.getVy());
                 System.out.println();
+                */
                 break;
             default:
                 throw new IllegalArgumentException("Invalid CollisionType");
 
         }
-        if (type != CollisionType.PARTICLE) {
-            System.out.println("p1 = " + p1.getId() + " x = " + p1.getX() + " y = " + p1.getY() + " vx = " + p1.getVx() + " vy = " + p1.getVy() + " radius = " + p1.getRadius());
-        }
+        System.out.println("AFTER COLLISION:");
+        System.out.println("p1 = " + p1.getId() + " x = " + p1.getX() + " y = " + p1.getY() + " vx = " + p1.getVx() + " vy = " + p1.getVy() + " radius = " + p1.getRadius());
+        if (type == CollisionType.PARTICLE)
+            System.out.println("p2 = " + p2.getId() + " x = " + p2.getX() + " y = " + p2.getY() + " vx = " + p2.getVx() + " vy = " + p2.getVy() + " radius = " + p2.getRadius());
 
 
         // System.out.println();

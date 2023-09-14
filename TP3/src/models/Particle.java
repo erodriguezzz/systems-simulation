@@ -40,18 +40,26 @@ public class Particle implements Comparable<Particle>{
         double sigma = this.getRadius() + b.getRadius();
         double d = (dvdr * dvdr) - dvdv * (drdr - sigma * sigma);
 
+
         if (dvdr >= 0 || d < 0)
             return -1;
 
         // double tolerance = 1E-2;
         if (drdr < sigma * sigma) {
-
+            System.out.println();
+            System.out.println("Exception --------------------------------------------");
             System.out.println("p1 = " + this + "\np2 = " + b);
             System.out.println("Drdr = " + drdr + " sigma^2 = " + sigma*sigma);
             System.out.println("drdr - sigma^2 = " + (drdr - sigma*sigma));
 
             throw new RuntimeException("overlapping particles for particles " + this.getId() + " and " + b.getId() + " at x = " + this.getX() + " y = " + this.getY() + " (" + b.getX() + " ; " + b.getY() + ")");
         }
+
+        double tolerance = 1E-9;
+        if (drdr-sigma*sigma < tolerance) {
+            System.out.println(id + " y " + b.getId() + " están en contacto");
+        }
+
 
         double timeToCollision = -(dvdr + Math.sqrt(d)) / dvdv;
         // System.out.println(timeToCollision);

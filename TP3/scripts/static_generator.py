@@ -7,12 +7,17 @@ def generate_file(N, radius, v, mass):
     with open("./data/input/Static_N_" + str(N) +".dump", "w") as f:
         positions = set()
         for _ in range(N):
+            counter = 0
+            id = 0
             while True:
-                x = format(random.uniform(radius, DOMAIN_LENGTH - radius), ".7e")
-                y = format(random.uniform(radius, DOMAIN_LENGTH - radius), ".7e")
+                x = random.uniform(radius, DOMAIN_LENGTH - radius)
+                y = random.uniform(radius, DOMAIN_LENGTH - radius)
                 position = (x, y)
-                if all(math.sqrt((float(x) - float(px))**2 + (float(y) - float(py))**2) >= 2 * radius for px, py in positions):
+                if all(math.sqrt(math.pow((x - px),2) + math.pow((y - py),2)) >= 2 * radius + 0.001 for px, py in positions):
+                    print(f"({id} {counter})")
                     break
+                counter = counter + 1
+                id = id + 1
             positions.add(position)
             f.write(f"{radius}   {mass}\n")
 
@@ -35,8 +40,7 @@ def generate_file(N, radius, v, mass):
         #     f.write(f"{x}   {DOMAIN_LENGTH}   0   0   0.0001\n")
         #     x += 0.0001
 
-N = [200, 500]
-
+N = [200]
 
 for i in range(len(N)):
     generate_file(N[i], 0.0015, 0.01, 1)
