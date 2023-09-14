@@ -44,26 +44,31 @@ public class Domain {
         double radius = p.getRadius();
         time = this.upperCorner.timeToCollision(p);
         if (time != -1) {
-            return new Collision(p, this.upperCorner, time);
+            return new Collision(p, this.upperCorner, time, CollisionType.PARTICLE);
         }
         time = this.lowerCorner.timeToCollision(p);
         if (time != -1) {
-            return new Collision(p, this.lowerCorner, time);
+            return new Collision(p, this.lowerCorner, time, CollisionType.PARTICLE);
         }
+        CollisionType type = null;
         if (vx > 0) {
             double timeToRightWall = (M + L - x - radius) / vx;
             // Check if I'm on the right side of the domain. If not, check if I will collide with the middle wall.
             if (x + radius > M) {
                 time = timeToRightWall;
+                type = CollisionType.RIGHT_WALL;
             } else {
                 time = (M - x - radius) / vx;
                 double middleY = y + vy * time;
+                type = CollisionType.MID_WALL;
                 if (middleY + radius < (L + M) / 2 || middleY - radius > (M - L) / 2) {
                     time = timeToRightWall;
+                    type = CollisionType.RIGHT_WALL;
                 }
             }
         } else if (vx < 0) {
             time = (radius - x) / vx;
+            type = CollisionType.LEFT_WALL;
         }
         if (vy > 0) {
             double timeToMidUpper = ((M + L) / 2 - y - radius) / vy;
@@ -71,20 +76,32 @@ public class Domain {
             double timeToCeiling = (M - y - radius) / vy;
             if (y > (M+L)/ 2 || midUpperX + radius < M) {
                     time = Math.min(time, timeToCeiling);
+                    if (time == timeToCeiling) {
+                        type = CollisionType.LEFT_UPPER_WALL;
+                    }
             } else {
                     time = Math.min(time, timeToMidUpper);
+                    if (time == timeToMidUpper) {
+                        type = CollisionType.RIGHT_UPPER_WALL;
+                    }
             }
         } else if (vy < 0) {
-            double timeToMidLower = ((M - L) / 2 - y - radius) / vy;
+            double timeToMidLower = ((M - L) / 2 - y + radius) / vy;
             double midLowerX = x + vx * timeToMidLower;
             double timeToFloor = (radius - y) / vy;
             if (y < (M-L)/2 || midLowerX + radius < M) {
                 time = Math.min(time, timeToFloor);
+                if (time == timeToFloor) {
+                    type = CollisionType.LEFT_LOWER_WALL;
+                }
             } else {
                 time = Math.min(time, timeToMidLower);
+                if (time == timeToMidLower) {
+                    type = CollisionType.RIGHT_LOWER_WALL;
+                }
             }
         }
-        return new Collision(p, time + currentTime);
+        return new Collision(p, time + currentTime, type);
     }
 
     public double getM() {

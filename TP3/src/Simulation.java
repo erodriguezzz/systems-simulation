@@ -1,3 +1,4 @@
+import models.CollisionType;
 import models.Domain;
 import models.Collision;
 import models.Particle;
@@ -48,7 +49,7 @@ public class Simulation {
     private void uniqueSimulation(int N, double L, int version){
         double time = 0, timeOfNextCollision;
         timeOfNextCollision = this.calculateCollisions();
-        this.showFirstThreeCollisions();
+        // this.showFirstThreeCollisions();
         if (timeOfNextCollision == Double.POSITIVE_INFINITY) {
             throw new RuntimeException("No collisions found");
         }
@@ -63,8 +64,11 @@ public class Simulation {
                                         (c.getP2() != null && c.getP2().equals(next.getP1())) ||
                                         c.getP1().equals(next.getP2()) ||
                                         (c.getP2() != null && c.getP2().equals(next.getP2())));
+
+            System.out.print("p1 = " + next.getP1().getId() + " p2 = " + (next.getP2() == null ? "wall" : next.getP2().getId()));
             if (next.getP2() == null)
-                System.out.println("p1 = " + next.getP1().getId() + " p2 = " + (next.getP2() == null ? "wall" : next.getP2().getId()));
+                System.out.print("-------------------------------------------------------");
+            System.out.println("\n");
             if (next.getP1() != domain.getUpperCorner() && next.getP1() != domain.getLowerCorner())
                 this.calculateCollisions(next.getP1(), time);
             if (next.getP2() != null && next.getP2() != domain.getUpperCorner() && next.getP2() != domain.getLowerCorner()) {
@@ -113,7 +117,7 @@ public class Simulation {
             if (p != q) {
                 double timeToCollision = p.timeToCollision(q);
                 if (timeToCollision >= 0) {
-                    Collision particleCollision = new Collision(p, q, timeToCollision + currentTime);
+                    Collision particleCollision = new Collision(p, q, timeToCollision + currentTime, CollisionType.PARTICLE);
                     collisions.add(particleCollision);
                     timeOfFirstCollision = Math.min(timeOfFirstCollision, particleCollision.getTime());
                 }
