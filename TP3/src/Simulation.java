@@ -70,10 +70,18 @@ public class Simulation {
             next.collide(this.domain.getM(), this.domain.getL());
             this.dm.writeDynamicFile(this.particles, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
 
+            /* TODO: Verificar si tenemos que agregar un chequeo para elimiar las colisiones en las que forma parte alguna de las esquinas */
 //            this.collisions.removeIf(c -> c.getP1().equals(next.getP1()) ||
 //                                        (c.getP2() != null && c.getP2().equals(next.getP1())) ||
 //                                        c.getP1().equals(next.getP2()) ||
 //                                        (c.getP2() != null && c.getP2().equals(next.getP2())));
+//                                             &&
+//                                             ( //Dont remove corner collisions
+//                                                 !c.getP1().equals(this.domain.getUpperCorner()) ||
+//                                                 !c.getP2().equals(this.domain.getUpperCorner()) ||
+//                                                 !c.getP1().equals(this.domain.getLowerCorner()) ||
+//                                                 !c.getP2().equals(this.domain.getLowerCorner())
+//                                             )
 /*
             System.out.print("p1 = " + next.getP1().getId() + " p2 = " + (next.getP2() == null ? "wall" : next.getP2().getId()));
             if (next.getP2() == null)
