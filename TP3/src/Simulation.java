@@ -14,7 +14,7 @@ public class Simulation {
     private final Domain domain;
     private final DataManager dm;
     private final Set<Particle> particles;
-    private final TreeSet<Collision> collisions;
+    private TreeSet<Collision> collisions;
     
 
     Simulation(int N, double L, int version){
@@ -57,9 +57,20 @@ public class Simulation {
         while (time < totalSeconds) {
             Collision next = this.collisions.first();
             this.moveParticles(timeOfNextCollision - time);
-            time = timeOfNextCollision;
-            this.dm.writeDynamicFile(this.particles, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
+            // time = timeOfNextCollision;
+
+            if (next.getType() != CollisionType.PARTICLE) {
+                double collisionV;
+                if (next.getType() == CollisionType.LEFT_HORIZONTAL_WALL || next.getType() == CollisionType.RIGHT_HORIZONTAL_WALL)
+                    collisionV = next.getP1().getVy();
+                else
+                    collisionV = next.getP1().getVx();
+                domain.addPressure(collisionV, next.getType());
+            }
             next.collide(this.domain.getM(), this.domain.getL());
+            this.dm.writeDynamicFile(this.particles, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
+
+            /*
             this.collisions.removeIf(c -> c.getP1().equals(next.getP1()) ||
                                         (c.getP2() != null && c.getP2().equals(next.getP1())) ||
                                         c.getP1().equals(next.getP2()) ||
@@ -77,6 +88,10 @@ public class Simulation {
             // System.out.println();
             // this.showFirstThreeCollisions();
             timeOfNextCollision = this.collisions.first().getTime();
+             */
+            collisions = new TreeSet<>();
+            time = calculateCollisions();
+            System.out.println();
         }
         return;
     }

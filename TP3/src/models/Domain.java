@@ -19,6 +19,8 @@ public class Domain {
 
     private final Particle upperCorner;
     private final Particle lowerCorner;
+    private double leftSideI = 0;
+    private double rightSideI = 0;
 
     public Domain(double l) {
         if (l > DOMAIN_LENGTH) {
@@ -28,6 +30,34 @@ public class Domain {
         this.L = l;
         this.upperCorner = new Particle(0, new Velocity(0,0), M, (L+M)/2, Double.POSITIVE_INFINITY);
         this.lowerCorner = new Particle(0, new Velocity(0,0), M, (M-L)/2, Double.POSITIVE_INFINITY);
+    }
+
+    public void addPressure(double v, CollisionType type) {
+        switch (type) {
+            case LEFT_HORIZONTAL_WALL:
+            case LEFT_WALL:
+                leftSideI += v/M;
+            case MID_WALL:
+                leftSideI += v/((M-L)/2);
+            case RIGHT_HORIZONTAL_WALL:
+                rightSideI += v/M;
+            case RIGHT_WALL:
+                rightSideI += v/L;
+            default:
+                throw new RuntimeException("Cannot compute pressure for collision of type " + type);
+        }
+    }
+
+    public double getLeftSidePressure(double time) {
+        return leftSideI / time;
+    }
+
+    public double getRightSidePressure(double time) {
+        return rightSideI / time;
+    }
+
+    public double getTotalPressure(double time) {
+        return getLeftSidePressure(time) + getRightSidePressure(time);
     }
 
     /*
@@ -61,7 +91,7 @@ public class Domain {
                 time = (M - x - radius) / vx;
                 double middleY = y + vy * time;
                 type = CollisionType.MID_WALL;
-                if (middleY + radius < (L + M) / 2 || middleY - radius > (M - L) / 2) {
+                if (middleY + radius < (L + M) / 2 && middleY - radius > (M - L) / 2) {
                     time = timeToRightWall;
                     type = CollisionType.RIGHT_WALL;
                 }
@@ -77,12 +107,12 @@ public class Domain {
             if (y > (M+L)/ 2 || midUpperX + radius < M) {
                     time = Math.min(time, timeToCeiling);
                     if (time == timeToCeiling) {
-                        type = CollisionType.LEFT_UPPER_WALL;
+                        type = CollisionType.LEFT_HORIZONTAL_WALL;
                     }
             } else {
                     time = Math.min(time, timeToMidUpper);
                     if (time == timeToMidUpper) {
-                        type = CollisionType.RIGHT_UPPER_WALL;
+                        type = CollisionType.RIGHT_HORIZONTAL_WALL;
                     }
             }
         } else if (vy < 0) {
@@ -92,12 +122,12 @@ public class Domain {
             if (y < (M-L)/2 || midLowerX + radius < M) {
                 time = Math.min(time, timeToFloor);
                 if (time == timeToFloor) {
-                    type = CollisionType.LEFT_LOWER_WALL;
+                    type = CollisionType.LEFT_HORIZONTAL_WALL;
                 }
             } else {
                 time = Math.min(time, timeToMidLower);
                 if (time == timeToMidLower) {
-                    type = CollisionType.RIGHT_LOWER_WALL;
+                    type = CollisionType.RIGHT_HORIZONTAL_WALL;
                 }
             }
         }

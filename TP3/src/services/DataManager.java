@@ -47,8 +47,10 @@ public class DataManager {
             Scanner staticScanner = new Scanner(staticFile);
             Scanner dynamicScanner = new Scanner(dynamicFile);
             this.N = dynamicScanner.nextInt();
+            dynamicScanner.nextInt();
 
             while (staticScanner.hasNext() && dynamicScanner.hasNext()) {
+                int id = dynamicScanner.nextInt();
                 float x = dynamicScanner.nextFloat();
                 float y = dynamicScanner.nextFloat();
                 double radius = staticScanner.nextFloat();
@@ -59,7 +61,9 @@ public class DataManager {
                 }
                 double vx = dynamicScanner.nextDouble();
                 double vy = dynamicScanner.nextDouble();
-                particles.add(new Particle(radius, new Velocity(vx, vy), x, y, mass));
+                Particle p = new Particle(radius, new Velocity(vx, vy), x, y, mass);
+                particles.add(p);
+//                System.out.println(p);
             }
             staticScanner.close();
             dynamicScanner.close();

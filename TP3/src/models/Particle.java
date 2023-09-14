@@ -43,15 +43,14 @@ public class Particle implements Comparable<Particle>{
         if (dvdr >= 0 || d < 0)
             return -1;
 
-        double tolerance = 1E-2;
-        if (Math.abs(drdr - sigma * sigma) >= tolerance) {
-            /*
+        // double tolerance = 1E-2;
+        if (drdr < sigma * sigma) {
+
             System.out.println("p1 = " + this + "\np2 = " + b);
             System.out.println("Drdr = " + drdr + " sigma^2 = " + sigma*sigma);
             System.out.println("drdr - sigma^2 = " + (drdr - sigma*sigma));
 
-             */
-            throw new RuntimeException("overlapping particles for particles " + this.getId() + " and " + b.getId());
+            throw new RuntimeException("overlapping particles for particles " + this.getId() + " and " + b.getId() + " at x = " + this.getX() + " y = " + this.getY() + " (" + b.getX() + " ; " + b.getY() + ")");
         }
 
         double timeToCollision = -(dvdr + Math.sqrt(d)) / dvdv;
@@ -78,8 +77,8 @@ public class Particle implements Comparable<Particle>{
     }
 
     public void setVelocity(Velocity velocity) {
-        this.velocity.setVx(velocity.getVx());
-        this.velocity.setVy(velocity.getVy());
+        setVx(velocity.getVx());
+        setVy(velocity.getVy());
     }
 
     public void setVx(double vx) {
