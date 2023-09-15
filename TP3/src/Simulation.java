@@ -1,9 +1,11 @@
 import models.CollisionType;
 import models.Domain;
+import models.Limit;
 import models.Collision;
 import models.Particle;
 import services.DataManager;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -15,6 +17,7 @@ public class Simulation {
     private final Set<Particle> particles;
     private TreeSet<Collision> collisions;
     private final double deltaT = 0.25;
+    private Set<Limit> limits = new HashSet<>();
     
 
     Simulation(int N, double L, int version){
@@ -31,6 +34,20 @@ public class Simulation {
         this.particles = dm.getParticles();
         this.collisions = new TreeSet<>();
         this.domain = new Domain(L);
+        for (double i = 0; i < 0.09; i += 0.0005) {
+
+            this.limits.add(new Limit(i, 0));
+            this.limits.add(new Limit(i, 0.09));
+            this.limits.add(new Limit(0, i));
+            this.limits.add(new Limit(0.09+i, (0.09-L)/2));
+            this.limits.add(new Limit(0.09+i, (0.09+L)/2));
+            if(i > (0.09+L)/2 || i < (0.09-L)/2){
+                this.limits.add(new Limit(0.09, i));
+            }
+            else{
+                this.limits.add(new Limit(0.18, i));
+            }
+        }
     }
 
     private void showFirstThreeCollisions(){
@@ -67,7 +84,7 @@ public class Simulation {
                 domain.addPressure(collisionV, next.getType()); // TODO: add deltaT
             }
             next.collide(this.domain.getM(), this.domain.getL());
-            this.dm.writeDynamicFile(this.particles, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
+            this.dm.writeDynamicFile(this.particles, this.limits, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
 
             /* TODO: Verificar si tenemos que agregar un chequeo para elimiar las colisiones en las que forma parte alguna de las esquinas */
             this.collisions.removeIf(c -> c.getP1().equals(next.getP1()) ||

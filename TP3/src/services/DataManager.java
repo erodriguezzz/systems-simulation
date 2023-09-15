@@ -1,5 +1,6 @@
 package services;
 
+import models.Limit;
 import models.Particle;
 import models.Velocity;
 
@@ -73,7 +74,7 @@ public class DataManager {
 
     }
 
-    public void writeDynamicFile(Set<Particle> particles, String filePath, double time) {
+    public void writeDynamicFile(Set<Particle> particles, Set<Limit> limits, String filePath, double time) {
         try {
             File file = new File(filePath);
             FileWriter writer = new FileWriter(file, true);
@@ -90,11 +91,28 @@ public class DataManager {
                 System.out.println("File created successfully");
             } else {
                 StringBuilder data = new StringBuilder();
-                data.append(getN() + "\n");
+                int n = getN() + limits.size();
+                data.append(n + "\n");
                 data.append("Frame: " + time + '\n');
                 for (Particle p : particles) {
-                    data.append(p.getId() + " " + p.getX() + " " + p.getY() + " " + p.getVelocity().getVx() + " " + p.getVelocity().getVy() + /* " " + p.getTheta() +*/ "\n");
+                    int green = p.getId()==153?255:0;
+                    int blue = p.getId()==190?0:255;
+                    data.append(p.getId() + " " + p.getX() + " " + p.getY() + " " + p.getVelocity().getVx() + " " + p.getVelocity().getVy()
+                    + " " + green
+                    + " " + blue
+                    + " " + 255
+                    + " " + p.getRadius() 
+                    /* " " + p.getTheta() +*/+ "\n");
                 }
+                for (Limit p : limits) {
+                    data.append(p.getId() + " " + p.getX() + " " + p.getY() + " " + p.getVelocity().getVx() + " " + p.getVelocity().getVy()
+                    + " " + 255
+                    + " " + 255
+                    + " " + 255
+                    + " " + p.getRadius() 
+                    /* " " + p.getTheta() +*/+ "\n");
+                }
+
                 writer.write(data.toString());
             }
             writer.close();
