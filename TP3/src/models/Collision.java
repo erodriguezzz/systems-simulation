@@ -43,6 +43,7 @@ public class Collision implements Comparable<Collision> {
                 p1.setVy(-p1.getVy());
                 break;
             case UPPER_CORNER:
+                
                 if (p1.getX() > M)
                     p1.setVy(-p1.getVy());
                 else {
@@ -51,7 +52,9 @@ public class Collision implements Comparable<Collision> {
                     p1.setVx(-p1.getVx());
                 }
                 break;
+                 
             case LOWER_CORNER:
+                
                 if (p1.getX() > M)
                     p1.setVy(-p1.getVy());
                 else {
@@ -60,6 +63,7 @@ public class Collision implements Comparable<Collision> {
                     p1.setVx(-p1.getVx());
                 }
                 break;
+                 
             case PARTICLE:
                 double x1 = p1.getX();
                 double y1 = p1.getY();

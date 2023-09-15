@@ -163,24 +163,27 @@ public class Domain {
         if (vx > 0) {
             //Chequeo si voy a chocar con mid o right
             double timeToMidWall = (M - x - radius) / vx;
-            double upperMidWallY = y + radius + vy * timeToMidWall;
-            double lowerMidWallY = y - radius + vy * timeToMidWall;
+            double upperMidWallY = y  + vy * timeToMidWall; //TODO: check if we should add/substract radius here
+            double lowerMidWallY = y  + vy * timeToMidWall; //TODO: check if we should add/substract radius here
             if (x < M && (upperMidWallY > (M + L) / 2 || lowerMidWallY < (M - L) / 2)) {
                 //Choco con mid
-                time = timeToMidWall;
-                type = CollisionType.MID_WALL;
+                time = Math.min(timeToMidWall, time);
+                if(time == timeToMidWall)
+                    type = CollisionType.MID_WALL;
             } else {
                 //Choco con right
-                time = (2 * M - x - radius) / vx;
-                type = CollisionType.RIGHT_WALL;
+                time = Math.min((2 * M - x - radius) / vx, time);
+                if(time == (2 * M - x - radius) / vx)
+                    type = CollisionType.RIGHT_WALL;
             }
         } else if (vx < 0) {
-            time = (radius - x) / vx;
-            type = CollisionType.LEFT_WALL;
+            time = Math.min((radius - x) / vx, time);
+            if(time == (radius - x) / vx)
+                type = CollisionType.LEFT_WALL;
         }
         if (vy > 0) {
             double timeToMidUpper = ((M + L) / 2 - y - radius) / vy;
-            double midUpperX = x + vx * timeToMidUpper;
+            double midUpperX = x  + vx * timeToMidUpper; //TODO: check if we should add/substract radius here
             if (timeToMidUpper < 0 || midUpperX < M) {
                 double timeToCeiling = (M - y - radius) / vy;
                 //Choco con left horizontal
@@ -195,7 +198,7 @@ public class Domain {
             }
         } else if (vy < 0) {
             double timeToMidLower = ((M - L) / 2 - y + radius) / vy;
-            double midLowerX = x + radius + vx * timeToMidLower;
+            double midLowerX = x  + vx * timeToMidLower; //TODO: check if we should add/substract radius here
             if (timeToMidLower < 0 || midLowerX < M) {
                 double timeToFloor = (radius - y) / vy;
                 if (p.getId() == 6){

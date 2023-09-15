@@ -70,8 +70,11 @@ public class Simulation {
         if (timeOfNextCollision == Double.POSITIVE_INFINITY) {
             throw new RuntimeException("No collisions found");
         }
+        int stationary = 0;
+        double previousPressure = 0;
+        int frame = 0;
         int counter6 = 0;
-        while (time < totalSeconds) {
+        while (time < totalSeconds && stationary < 50) {
             Collision next = this.collisions.first();
             this.moveParticles(timeOfNextCollision - time); //TODO: en post-procesamiento (python) hay que calcular el desplazamiento cuadrático medio
             // time = timeOfNextCollision;
@@ -147,6 +150,8 @@ public class Simulation {
             timeOfNextCollision = aux;
              */
             timeOfNextCollision = this.collisions.first().getTime();
+            System.out.println("FRAME: " + frame + "\nTime: " + time + "\nTime of next collision: " + timeOfNextCollision + "\n");
+            frame++;
             /*
             collisions = new TreeSet<>();
              time = timeOfNextCollision;
