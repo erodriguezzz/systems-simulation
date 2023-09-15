@@ -53,11 +53,20 @@ public class Simulation {
         if (timeOfNextCollision == Double.POSITIVE_INFINITY) {
             throw new RuntimeException("No collisions found");
         }
-        int counter6 = 0;
-        while (time < totalSeconds) {
+        int stationary = 0;
+        double previousPressure = 0;
+        while (time < totalSeconds && stationary < 50) {
             Collision next = this.collisions.first();
             this.moveParticles(timeOfNextCollision - time); //TODO: en post-procesamiento (python) hay que calcular el desplazamiento cuadrático medio
             // time = timeOfNextCollision;
+            double leftPressure = domain.getLeftSidePressure(time);
+            double rightPressure = domain.getRightSidePressure(time);
+            if (Math.abs(leftPressure - rightPressure) < 0.0001) {
+                stationary++;
+            } else if (next.getType() != CollisionType.PARTICLE) {
+                stationary = 0;
+            }
+            System.out.println("Left pressure = " + leftPressure + " right pressure = " + rightPressure + " constant pressure = " + stationary);
             if (next.getType() != CollisionType.PARTICLE) {
                 double collisionV;
                 if (next.getType() == CollisionType.LEFT_HORIZONTAL_WALL || next.getType() == CollisionType.RIGHT_HORIZONTAL_WALL)
@@ -93,6 +102,7 @@ public class Simulation {
              */
 
             time = timeOfNextCollision;
+            /*
             if (next.getP1().getId() == 6 || (next.getP2() != null && next.getP2().getId() == 6)) {
                 counter6++;
                 System.out.println();
@@ -100,6 +110,7 @@ public class Simulation {
                 System.out.print("p1 = " + next.getP1().getId() + " p2 = " + (next.getP2() == null ? "wall" : next.getP2().getId()));
                 System.out.println("\n");
             }
+             */
             if (next.getP1() != domain.getUpperCorner() && next.getP1() != domain.getLowerCorner())
                 this.calculateCollisions(next.getP1(), time);
             if (next.getP2() != null && next.getP2() != domain.getUpperCorner() && next.getP2() != domain.getLowerCorner()) {
@@ -135,7 +146,11 @@ public class Simulation {
              time = timeOfNextCollision;
              timeOfNextCollision = calculateCollisions(time);
              */
-            System.out.println();
+            /*
+            if (next.getType() == CollisionType.UPPER_CORNER || next.getType() == CollisionType.LOWER_CORNER)
+                break;
+
+             */
         }
         return;
     }

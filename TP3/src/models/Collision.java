@@ -43,6 +43,7 @@ public class Collision implements Comparable<Collision> {
                 p1.setVy(-p1.getVy());
                 break;
             case UPPER_CORNER:
+                /*
                 if (p1.getX() > M)
                     p1.setVy(-p1.getVy());
                 else {
@@ -51,7 +52,9 @@ public class Collision implements Comparable<Collision> {
                     p1.setVx(-p1.getVx());
                 }
                 break;
+                 */
             case LOWER_CORNER:
+                /*
                 if (p1.getX() > M)
                     p1.setVy(-p1.getVy());
                 else {
@@ -60,6 +63,7 @@ public class Collision implements Comparable<Collision> {
                     p1.setVx(-p1.getVx());
                 }
                 break;
+                 */
             case PARTICLE:
                 double x1 = p1.getX();
                 double y1 = p1.getY();
@@ -142,7 +146,7 @@ public class Collision implements Comparable<Collision> {
         System.out.println("p1 = " + p1.getId() + " x = " + p1.getX() + " y = " + p1.getY() + " vx = " + p1.getVx() + " vy = " + p1.getVy() + " radius = " + p1.getRadius());
         if (type == CollisionType.PARTICLE)
             System.out.println("p2 = " + p2.getId() + " x = " + p2.getX() + " y = " + p2.getY() + " vx = " + p2.getVx() + " vy = " + p2.getVy() + " radius = " + p2.getRadius());
-
+        System.out.println();
 
         // System.out.println();
         return type;
