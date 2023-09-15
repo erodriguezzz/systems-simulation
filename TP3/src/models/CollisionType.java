@@ -7,6 +7,8 @@ public enum CollisionType {
     RIGHT_HORIZONTAL_WALL,
     LEFT_WALL,
     MID_WALL,
-    RIGHT_WALL;
+    RIGHT_WALL,
+    UPPER_CORNER,
+    LOWER_CORNER;
 
 }

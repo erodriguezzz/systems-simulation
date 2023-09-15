@@ -42,6 +42,24 @@ public class Collision implements Comparable<Collision> {
             case RIGHT_HORIZONTAL_WALL:
                 p1.setVy(-p1.getVy());
                 break;
+            case UPPER_CORNER:
+                if (p1.getX() > M)
+                    p1.setVy(-p1.getVy());
+                else {
+                    if (! (p1.getY() > (M+L)/2))
+                        p1.setVy(-p1.getVy());
+                    p1.setVx(-p1.getVx());
+                }
+                break;
+            case LOWER_CORNER:
+                if (p1.getX() > M)
+                    p1.setVy(-p1.getVy());
+                else {
+                    if (! (p1.getY() < (M-L)/2))
+                        p1.setVy(-p1.getVy());
+                    p1.setVx(-p1.getVx());
+                }
+                break;
             case PARTICLE:
                 double x1 = p1.getX();
                 double y1 = p1.getY();
@@ -50,7 +68,7 @@ public class Collision implements Comparable<Collision> {
                 double radius1 = p1.getRadius();
 
                 if (p2 == null) {
-                    throw new IllegalArgumentException("p2 cannot be null if isWallCollision is false");
+                    throw new IllegalArgumentException("p2 cannot be null if Collision is of type PARTICLE");
                 }
 
                 double x2 = p2.getX();

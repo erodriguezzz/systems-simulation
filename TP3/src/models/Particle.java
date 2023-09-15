@@ -22,6 +22,9 @@ public class Particle implements Comparable<Particle>{
         this.y = y;
         this.mass = mass;
         counter++;
+        if (this.id == 6) {
+            System.out.println(this);
+        }
     }
 
     /*

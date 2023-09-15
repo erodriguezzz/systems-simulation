@@ -3,7 +3,6 @@ import models.Domain;
 import models.Collision;
 import models.Particle;
 import services.DataManager;
-// import sun.java2d.xr.MutableInteger;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -54,9 +53,10 @@ public class Simulation {
         if (timeOfNextCollision == Double.POSITIVE_INFINITY) {
             throw new RuntimeException("No collisions found");
         }
+        int counter6 = 0;
         while (time < totalSeconds) {
             Collision next = this.collisions.first();
-            this.moveParticles(timeOfNextCollision - time);
+            this.moveParticles(timeOfNextCollision - time); //TODO: en post-procesamiento (python) hay que calcular el desplazamiento cuadrático medio
             // time = timeOfNextCollision;
             if (next.getType() != CollisionType.PARTICLE) {
                 double collisionV;
@@ -92,11 +92,14 @@ public class Simulation {
             }
              */
 
-            System.out.print("p1 = " + next.getP1().getId() + " p2 = " + (next.getP2() == null ? "wall" : next.getP2().getId()));
-            if (next.getP2() == null)
-                System.out.print("-------------------------------------------------------");
-            System.out.println("\n");
             time = timeOfNextCollision;
+            if (next.getP1().getId() == 6 || (next.getP2() != null && next.getP2().getId() == 6)) {
+                counter6++;
+                System.out.println();
+                System.out.println("Counter6 = " + counter6);
+                System.out.print("p1 = " + next.getP1().getId() + " p2 = " + (next.getP2() == null ? "wall" : next.getP2().getId()));
+                System.out.println("\n");
+            }
             if (next.getP1() != domain.getUpperCorner() && next.getP1() != domain.getLowerCorner())
                 this.calculateCollisions(next.getP1(), time);
             if (next.getP2() != null && next.getP2() != domain.getUpperCorner() && next.getP2() != domain.getLowerCorner()) {
@@ -163,9 +166,13 @@ public class Simulation {
     }
 
     public double calculateCollisions(Particle p, double currentTime) {
+        // System.out.println("Calculating collisions for time "+ currentTime + " for particle " + p.getId());
         // Create wall collisions
         Collision wallCollision = domain.getNextWallCollision(p, currentTime);
         double timeOfFirstCollision = wallCollision.getTime();
+        if (timeOfFirstCollision < 0) {
+            System.out.println("Negative wall collision time " + timeOfFirstCollision + " for particle " + p.getId());
+        }
         collisions.add(wallCollision);
 
         // Create particle collisions

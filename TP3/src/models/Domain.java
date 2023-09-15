@@ -50,6 +50,9 @@ public class Domain {
             case RIGHT_WALL:
                 rightSideI += v / rightPerimeter;
                 break;
+            case UPPER_CORNER:
+            case LOWER_CORNER:
+                break;
             default:
                 throw new RuntimeException("Cannot compute pressure for collision of type " + type);
         }
@@ -81,16 +84,19 @@ public class Domain {
         double vy = p.getVy();
         double radius = p.getRadius();
         time = this.upperCorner.timeToCollision(p);
-        if (time != -1) {
-            return new Collision(p, this.upperCorner, time, CollisionType.PARTICLE);
+        /* //TODO: particles are leaving the grid through the corner. Handle times.
+        if (time >= 0) {
+            return new Collision(p, time, CollisionType.UPPER_CORNER);
         }
         time = this.lowerCorner.timeToCollision(p);
-        if (time != -1) {
-            return new Collision(p, this.lowerCorner, time, CollisionType.PARTICLE);
+        if (time >= 0) {
+            return new Collision(p, time, CollisionType.LOWER_CORNER);
         }
+         */
         CollisionType type = null;
+        /*
         if (vx > 0) {
-            double timeToRightWall = (M + L - x - radius) / vx;
+            double timeToRightWall = (2 * M  - x - radius) / vx;
             // Check if I'm on the right side of the domain. If not, check if I will collide with the middle wall.
             if (x + radius > M) {
                 time = timeToRightWall;
@@ -106,6 +112,7 @@ public class Domain {
             }
         } else if (vx < 0) {
             time = (radius - x) / vx;
+            System.out.println("Time to left wall = " + time);
             type = CollisionType.LEFT_WALL;
         }
         if (vy > 0) {
@@ -113,30 +120,98 @@ public class Domain {
             double midUpperX = x + vx * timeToMidUpper;
             double timeToCeiling = (M - y - radius) / vy;
             if (y > (M+L)/ 2 || midUpperX + radius < M) {
+                if (time > 0 && timeToCeiling > 0)
                     time = Math.min(time, timeToCeiling);
-                    if (time == timeToCeiling) {
-                        type = CollisionType.LEFT_HORIZONTAL_WALL;
-                    }
+                if (time == timeToCeiling) {
+                    type = CollisionType.LEFT_HORIZONTAL_WALL;
+                    System.out.println("LEFT HORIZONTAL WALL");
+                }
+                System.out.println("RIGHT HORIZONTAL WALL 1");
             } else {
-                    time = Math.min(time, timeToMidUpper);
+                    System.out.println("Time: "+ time + " Time to midupper: " + timeToMidUpper);
+                    if (time > 0 && timeToMidUpper > 0)
+                        time = Math.min(time, timeToMidUpper);
                     if (time == timeToMidUpper) {
                         type = CollisionType.RIGHT_HORIZONTAL_WALL;
+                        System.out.println("RIGHT HORIZONTAL WALL 2");
                     }
             }
+            System.out.println("Time after vy>0 = " + time);
         } else if (vy < 0) {
             double timeToMidLower = ((M - L) / 2 - y + radius) / vy;
             double midLowerX = x + vx * timeToMidLower;
             double timeToFloor = (radius - y) / vy;
             if (y < (M-L)/2 || midLowerX + radius < M) {
-                time = Math.min(time, timeToFloor);
+                if (time > 0 && timeToFloor > 0)
+                    time = Math.min(time, timeToFloor);
                 if (time == timeToFloor) {
                     type = CollisionType.LEFT_HORIZONTAL_WALL;
                 }
             } else {
-                time = Math.min(time, timeToMidLower);
+                if (time >0 && timeToMidLower > 0)
+                    time = Math.min(time, timeToMidLower);
                 if (time == timeToMidLower) {
                     type = CollisionType.RIGHT_HORIZONTAL_WALL;
                 }
+            }
+            System.out.println("Time after vy<0 = " + time);
+        }
+        return new Collision(p, time + currentTime, type);
+
+         */
+
+        if (vx > 0) {
+            //Chequeo si voy a chocar con mid o right
+            double timeToMidWall = (M - x - radius) / vx;
+            double upperMidWallY = y + radius + vy * timeToMidWall;
+            double lowerMidWallY = y - radius + vy * timeToMidWall;
+            if (x < M && (upperMidWallY > (M + L) / 2 || lowerMidWallY < (M - L) / 2)) {
+                //Choco con mid
+                time = timeToMidWall;
+                type = CollisionType.MID_WALL;
+            } else {
+                //Choco con right
+                time = (2 * M - x - radius) / vx;
+                type = CollisionType.RIGHT_WALL;
+            }
+        } else if (vx < 0) {
+            time = (radius - x) / vx;
+            type = CollisionType.LEFT_WALL;
+        }
+        if (vy > 0) {
+            double timeToMidUpper = ((M + L) / 2 - y - radius) / vy;
+            double midUpperX = x + vx * timeToMidUpper;
+            if (timeToMidUpper < 0 || midUpperX < M) {
+                double timeToCeiling = (M - y - radius) / vy;
+                //Choco con left horizontal
+                time = Math.min (time, timeToCeiling);
+                if (time == timeToCeiling)
+                    type = CollisionType.LEFT_HORIZONTAL_WALL;
+            } else if (timeToMidUpper > 0 && midUpperX > M) {
+                //Choco con right horizontal
+                time = Math.min(time, timeToMidUpper);
+                if (time == timeToMidUpper)
+                    type = CollisionType.RIGHT_HORIZONTAL_WALL;
+            }
+        } else if (vy < 0) {
+            double timeToMidLower = ((M - L) / 2 - y + radius) / vy;
+            double midLowerX = x + radius + vx * timeToMidLower;
+            if (timeToMidLower < 0 || midLowerX < M) {
+                double timeToFloor = (radius - y) / vy;
+                if (p.getId() == 6){
+                    System.out.println("##############################################");
+                    System.out.println("Time = " + time + " Time to floor = " + timeToFloor);
+                    System.out.println("##############################################");
+                }
+                //Choco con left horizontal
+                time = Math.min(time, timeToFloor);
+                if (time == timeToFloor)
+                    type = CollisionType.LEFT_HORIZONTAL_WALL;
+            } else if (timeToMidLower > 0 && midLowerX > M) {
+                /* Choco con right horizontal */
+                time = Math.min(time, timeToMidLower);
+                if (time == timeToMidLower)
+                    type = CollisionType.RIGHT_HORIZONTAL_WALL;
             }
         }
         return new Collision(p, time + currentTime, type);
