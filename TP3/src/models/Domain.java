@@ -83,16 +83,16 @@ public class Domain {
         double vx = p.getVx();
         double vy = p.getVy();
         double radius = p.getRadius();
-        time = this.upperCorner.timeToCollision(p);
-        /* //TODO: particles are leaving the grid through the corner. Handle times.
+        time = p.timeToCollision(this.upperCorner);
+        //TODO: particles are leaving the grid through the corner. Handle times.
         if (time >= 0) {
-            return new Collision(p, time, CollisionType.UPPER_CORNER);
+            return new Collision(p, time + currentTime, CollisionType.UPPER_CORNER);
         }
-        time = this.lowerCorner.timeToCollision(p);
+        time = p.timeToCollision(this.lowerCorner);
         if (time >= 0) {
-            return new Collision(p, time, CollisionType.LOWER_CORNER);
+            return new Collision(p, time + currentTime, CollisionType.LOWER_CORNER);
         }
-         */
+
         CollisionType type = null;
         /*
         if (vx > 0) {
