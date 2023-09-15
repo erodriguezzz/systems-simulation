@@ -44,8 +44,9 @@ public class Particle implements Comparable<Particle>{
         if (dvdr >= 0 || d < 0)
             return -1;
 
-        // double tolerance = 1E-2;
-        if (drdr < sigma * sigma) {
+        double tolerance = 1E-9;
+
+        if (drdr + tolerance < sigma * sigma) {
             System.out.println();
             System.out.println("Exception --------------------------------------------");
             System.out.println("p1 = " + this + "\np2 = " + b);
@@ -55,7 +56,6 @@ public class Particle implements Comparable<Particle>{
             throw new RuntimeException("overlapping particles for particles " + this.getId() + " and " + b.getId() + " at x = " + this.getX() + " y = " + this.getY() + " (" + b.getX() + " ; " + b.getY() + ")");
         }
 
-        double tolerance = 1E-9;
         if (drdr-sigma*sigma < tolerance) {
             System.out.println(id + " y " + b.getId() + " están en contacto");
         }
