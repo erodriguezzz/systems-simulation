@@ -95,8 +95,8 @@ public class DataManager {
                 data.append(n + "\n");
                 data.append("Frame: " + time + '\n');
                 for (Particle p : particles) {
-                    int green = p.getId()==152?255:0;
-                    int blue = p.getId()==37?0:255;
+                    int green = p.getId()==77?255:0;
+                    int blue = p.getId()==132?0:255;
                     data.append(p.getId() + " " + p.getX() + " " + p.getY() + " " + p.getVelocity().getVx() + " " + p.getVelocity().getVy()
                     + " " + green
                     + " " + blue

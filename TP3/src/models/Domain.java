@@ -87,12 +87,12 @@ public class Domain {
 
         double timeToUpperCorner = p.timeToCollision(this.upperCorner);
         double timeToLowerCorner = p.timeToCollision(this.lowerCorner);
-        if (p.getId() == 110) {
-            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            System.out.println("Time to upper corner = " + timeToUpperCorner);
-            System.out.println("Time to lower corner = " + timeToLowerCorner);
-            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        }
+        // if (p.getId() == 110) {
+        //     System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        //     System.out.println("Time to upper corner = " + timeToUpperCorner);
+        //     System.out.println("Time to lower corner = " + timeToLowerCorner);
+        //     System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        // }
         if (timeToUpperCorner >= 0) {
             time = Math.min(time, timeToUpperCorner);
             if (time == timeToUpperCorner) {
@@ -109,20 +109,26 @@ public class Domain {
         if (vx > 0) {
             //Chequeo si voy a chocar con mid o right
             double timeToMidWall = (M - x - radius) / vx;
-            double upperMidWallY = y + radius + vy * timeToMidWall; //TODO: check if we should add/substract radius here
-            double lowerMidWallY = y - radius + vy * timeToMidWall; //TODO: check if we should add/substract radius here
+            double upperMidWallY = y + vy * timeToMidWall; //TODO: check if we should add/substract radius here
+            double lowerMidWallY = y + vy * timeToMidWall; //TODO: check if we should add/substract radius here
             if (x < M && (upperMidWallY > (M + L) / 2 || lowerMidWallY < (M - L) / 2)) {
                 //Choco con mid
-                time = timeToMidWall;
-                type = CollisionType.MID_WALL;
+                if (timeToMidWall > 0) {
+                    time = Math.min(time, timeToMidWall);
+                    if (time == timeToMidWall)
+                        type = CollisionType.MID_WALL;
+                }
+                
             } else {
                 //Choco con right
-                time = (2 * M - x - radius) / vx;
-                type = CollisionType.RIGHT_WALL;
+                time = Math.min(time, (2 * M - x - radius) / vx);
+                if (time == (2 * M - x - radius) / vx)
+                    type = CollisionType.RIGHT_WALL;
             }
         } else if (vx < 0) {
-            time = (radius - x) / vx;
-            type = CollisionType.LEFT_WALL;
+            time = Math.min(time, (radius - x) / vx);
+            if (time == (radius - x) / vx)
+                type = CollisionType.LEFT_WALL;
         }
         if (vy > 0) {
             double timeToMidUpper = ((M + L) / 2 - y - radius) / vy;
