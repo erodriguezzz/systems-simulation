@@ -22,11 +22,11 @@ public class Collision implements Comparable<Collision> {
 
     public CollisionType collide(double M, double L) {
 
-        System.out.println("Type = " + type + " time = " + time);
-        System.out.println("Before collision:");
-        System.out.println("p1 = " + p1.getId() + " x = " + p1.getX() + " y = " + p1.getY() + " vx = " + p1.getVx() + " vy = " + p1.getVy() + " radius = " + p1.getRadius());
-        if (type == CollisionType.PARTICLE)
-            System.out.println("p2 = " + p2.getId() + " x = " + p2.getX() + " y = " + p2.getY() + " vx = " + p2.getVx() + " vy = " + p2.getVy() + " radius = " + p2.getRadius());
+        // System.out.println("Type = " + type + " time = " + time);
+        // System.out.println("Before collision:");
+        // System.out.println("p1 = " + p1.getId() + " x = " + p1.getX() + " y = " + p1.getY() + " vx = " + p1.getVx() + " vy = " + p1.getVy() + " radius = " + p1.getRadius());
+        // if (type == CollisionType.PARTICLE)
+            // System.out.println("p2 = " + p2.getId() + " x = " + p2.getX() + " y = " + p2.getY() + " vx = " + p2.getVx() + " vy = " + p2.getVy() + " radius = " + p2.getRadius());
         switch (type) {
             // TODO: handle pressure calculations
             case MID_WALL:
@@ -90,7 +90,7 @@ public class Collision implements Comparable<Collision> {
 
                 double sigma = radius1 + radius2;
                 double tolerance = 1E-6;
-                System.out.println(sigma - dist < tolerance ? "Ok" : "Sigma = " + sigma + " dist = " + dist);
+                // System.out.println(sigma - dist < tolerance ? "Ok" : "Sigma = " + sigma + " dist = " + dist);
                 double J;
 
                 if (p2.getMass() == Double.POSITIVE_INFINITY) {
@@ -142,10 +142,10 @@ public class Collision implements Comparable<Collision> {
                 throw new IllegalArgumentException("Invalid CollisionType");
 
         }
-        System.out.println("AFTER COLLISION:");
-        System.out.println("p1 = " + p1.getId() + " x = " + p1.getX() + " y = " + p1.getY() + " vx = " + p1.getVx() + " vy = " + p1.getVy() + " radius = " + p1.getRadius());
-        if (type == CollisionType.PARTICLE)
-            System.out.println("p2 = " + p2.getId() + " x = " + p2.getX() + " y = " + p2.getY() + " vx = " + p2.getVx() + " vy = " + p2.getVy() + " radius = " + p2.getRadius());
+        // System.out.println("AFTER COLLISION:");
+        // System.out.println("p1 = " + p1.getId() + " x = " + p1.getX() + " y = " + p1.getY() + " vx = " + p1.getVx() + " vy = " + p1.getVy() + " radius = " + p1.getRadius());
+        // if (type == CollisionType.PARTICLE)
+            // System.out.println("p2 = " + p2.getId() + " x = " + p2.getX() + " y = " + p2.getY() + " vx = " + p2.getVx() + " vy = " + p2.getVy() + " radius = " + p2.getRadius());
 
 
         // System.out.println();

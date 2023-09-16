@@ -66,7 +66,7 @@ public class Simulation {
     private void uniqueSimulation(int N, double L, int version){
         double time = 0, timeOfNextCollision;
         timeOfNextCollision = this.calculateCollisions(time);
-        this.showFirstThreeCollisions();
+        // this.showFirstThreeCollisions();
         if (timeOfNextCollision == Double.POSITIVE_INFINITY) {
             throw new RuntimeException("No collisions found");
         }
@@ -77,6 +77,18 @@ public class Simulation {
         while (time < totalSeconds && stationary < 50) {
             Collision next = this.collisions.first();
             this.moveParticles(timeOfNextCollision - time); //TODO: en post-procesamiento (python) hay que calcular el desplazamiento cuadrático medio
+
+            double leftPressure = domain.getLeftSidePressure(time);
+            double rightPressure = domain.getRightSidePressure(time);
+            // System.out.println("RIGHT PRESSURE: " + rightPressure);
+            // System.out.println("LEFT PRESSURE: " + leftPressure);
+            // System.out.println("DIF PRESSURE: " + Math.abs(leftPressure-rightPressure));
+            if (Math.abs(leftPressure-rightPressure) < 0.0001){
+                stationary++;
+            }
+            else if (next.getType() != CollisionType.PARTICLE){
+                stationary = 0;
+            }
             // time = timeOfNextCollision;
             if (next.getType() != CollisionType.PARTICLE) {
                 double collisionV;
@@ -87,7 +99,10 @@ public class Simulation {
                 domain.addPressure(collisionV, next.getType()); // TODO: add deltaT
             }
             next.collide(this.domain.getM(), this.domain.getL());
-            this.dm.writeDynamicFile(this.particles, this.limits, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
+            if(frame % 100 == 0){
+                this.dm.writeDynamicFile(this.particles, this.limits, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
+                System.out.println("FRAME" + frame);
+            }
 
             /* TODO: Verificar si tenemos que agregar un chequeo para elimiar las colisiones en las que forma parte alguna de las esquinas */
             this.collisions.removeIf(c -> c.getP1().equals(next.getP1()) ||
@@ -113,13 +128,13 @@ public class Simulation {
              */
 
             time = timeOfNextCollision;
-            if (next.getP1().getId() == 6 || (next.getP2() != null && next.getP2().getId() == 6)) {
-                counter6++;
-                System.out.println();
-                System.out.println("Counter6 = " + counter6);
-                System.out.print("p1 = " + next.getP1().getId() + " p2 = " + (next.getP2() == null ? "wall" : next.getP2().getId()));
-                System.out.println("\n");
-            }
+            // if (next.getP1().getId() == 6 || (next.getP2() != null && next.getP2().getId() == 6)) {
+            //     counter6++;
+            //     System.out.println();
+            //     System.out.println("Counter6 = " + counter6);
+            //     System.out.print("p1 = " + next.getP1().getId() + " p2 = " + (next.getP2() == null ? "wall" : next.getP2().getId()));
+            //     System.out.println("\n");
+            // }
             if (next.getP1() != domain.getUpperCorner() && next.getP1() != domain.getLowerCorner())
                 this.calculateCollisions(next.getP1(), time);
             if (next.getP2() != null && next.getP2() != domain.getUpperCorner() && next.getP2() != domain.getLowerCorner()) {
@@ -138,7 +153,7 @@ public class Simulation {
              */
 
             // System.out.println();
-            this.showFirstThreeCollisions();
+            // this.showFirstThreeCollisions();
 
             /*
             double aux = this.collisions.first().getTime();
@@ -150,14 +165,14 @@ public class Simulation {
             timeOfNextCollision = aux;
              */
             timeOfNextCollision = this.collisions.first().getTime();
-            System.out.println("FRAME: " + frame + "\nTime: " + time + "\nTime of next collision: " + timeOfNextCollision + "\n");
+            // System.out.println("FRAME: " + frame + "\nTime: " + time + "\nTime of next collision: " + timeOfNextCollision + "\n");
             frame++;
             /*
             collisions = new TreeSet<>();
              time = timeOfNextCollision;
              timeOfNextCollision = calculateCollisions(time);
              */
-            System.out.println();
+            // System.out.println();
         }
         return;
     }
