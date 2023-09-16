@@ -71,35 +71,32 @@ public class Simulation {
             throw new RuntimeException("No collisions found");
         }
         int stationary = 0;
-        double previousPressure = 0;
         int frame = 0;
-        int counter6 = 0;
         while (time < totalSeconds && stationary < 50) {
             Collision next = this.collisions.first();
             this.moveParticles(timeOfNextCollision - time); //TODO: en post-procesamiento (python) hay que calcular el desplazamiento cuadrático medio
 
-            double leftPressure = domain.getLeftSidePressure(time);
-            double rightPressure = domain.getRightSidePressure(time);
-            // System.out.println("RIGHT PRESSURE: " + rightPressure);
-            // System.out.println("LEFT PRESSURE: " + leftPressure);
-            // System.out.println("DIF PRESSURE: " + Math.abs(leftPressure-rightPressure));
-            if (Math.abs(leftPressure-rightPressure) < 0.0001){
-                stationary++;
-            }
-            else if (next.getType() != CollisionType.PARTICLE){
-                stationary = 0;
-            }
-            // time = timeOfNextCollision;
             if (next.getType() != CollisionType.PARTICLE) {
                 double collisionV;
                 if (next.getType() == CollisionType.LEFT_HORIZONTAL_WALL || next.getType() == CollisionType.RIGHT_HORIZONTAL_WALL)
                     collisionV = next.getP1().getVy();
                 else
                     collisionV = next.getP1().getVx();
-                domain.addPressure(collisionV, next.getType()); // TODO: add deltaT
+                domain.addPressure(collisionV, next.getType(), timeOfNextCollision); // TODO: add deltaT
             }
+
+            double leftPressure = domain.getLeftSidePressure(timeOfNextCollision, time);
+            double rightPressure = domain.getRightSidePressure(timeOfNextCollision, time);
+            if (rightPressure != 0 && Math.abs(leftPressure-rightPressure) < 0.0001){
+                stationary++;
+            }
+            else if (next.getType() != CollisionType.PARTICLE){
+                stationary = 0;
+            }
+            // time = timeOfNextCollision;
+
             next.collide(this.domain.getM(), this.domain.getL());
-            if(frame % 100 == 0){
+            if(frame % 25 == 0){
                 this.dm.writeDynamicFile(this.particles, this.limits, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
                 System.out.println("FRAME" + frame);
             }
@@ -116,63 +113,15 @@ public class Simulation {
                                                  !c.getP1().equals(this.domain.getLowerCorner()) &&
                                                  !c.getP2().equals(this.domain.getLowerCorner())
                                              ));
-            /*
-            if (next.getP1().getId() == 121) {
-                collisions.forEach(c -> {
-                    if (c.getP1().getId() == 121 || (c.getP2() != null && c.getP2().getId() == 121)) {
-                        System.out.println("-------------------------------------------------------------------------");
-                        System.out.println(c);
-                    }
-                });
-            }
-             */
 
             time = timeOfNextCollision;
-            // if (next.getP1().getId() == 6 || (next.getP2() != null && next.getP2().getId() == 6)) {
-            //     counter6++;
-            //     System.out.println();
-            //     System.out.println("Counter6 = " + counter6);
-            //     System.out.print("p1 = " + next.getP1().getId() + " p2 = " + (next.getP2() == null ? "wall" : next.getP2().getId()));
-            //     System.out.println("\n");
-            // }
             if (next.getP1() != domain.getUpperCorner() && next.getP1() != domain.getLowerCorner())
                 this.calculateCollisions(next.getP1(), time);
             if (next.getP2() != null && next.getP2() != domain.getUpperCorner() && next.getP2() != domain.getLowerCorner()) {
                 this.calculateCollisions(next.getP2(), time);
             }
-            /*
-            if (next.getP1().getId() == 121) {
-                System.out.println("Particle 121 collisions:");
-                collisions.forEach(c -> {
-                    if (c.getP1().getId() == 121 || (c.getP2() != null && c.getP2().getId() == 121)) {
-                        System.out.println(c);
-                    }
-                });
-                System.out.println();
-            }
-             */
-
-            // System.out.println();
-            // this.showFirstThreeCollisions();
-
-            /*
-            double aux = this.collisions.first().getTime();
-            while (aux < time) {
-                System.out.println("Error en el set");
-                this.collisions.remove(this.collisions.first());
-                aux = this.collisions.first().getTime();
-            }
-            timeOfNextCollision = aux;
-             */
             timeOfNextCollision = this.collisions.first().getTime();
-            // System.out.println("FRAME: " + frame + "\nTime: " + time + "\nTime of next collision: " + timeOfNextCollision + "\n");
             frame++;
-            /*
-            collisions = new TreeSet<>();
-             time = timeOfNextCollision;
-             timeOfNextCollision = calculateCollisions(time);
-             */
-            // System.out.println();
         }
         return;
     }
@@ -180,7 +129,7 @@ public class Simulation {
     public static void main(String[] args) {
         int[] Ns = {200, 500};
         double[] Ls = {0.03, 0.05, 0.07, 0.09};
-        boolean unique = true;
+        boolean unique = false;
         if(!unique){
             for (int N : Ns) {
                 for(double L : Ls ){

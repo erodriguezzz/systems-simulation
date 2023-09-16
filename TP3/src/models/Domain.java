@@ -2,6 +2,8 @@ package models;
 
 // import sun.java2d.xr.MutableInteger;
 
+import java.util.TreeMap;
+
 /**
  * This class represents the domain of the simulation as specified in the assignment.
  */
@@ -25,6 +27,9 @@ public class Domain {
     private final double leftPerimeter;
     private final double rightPerimeter;
     private final double totalPerimeter;
+    private final TreeMap<Double, Double> leftSideImpulses = new TreeMap<>();
+    private final TreeMap<Double, Double> rightSideImpulses = new TreeMap<>();
+    private final TreeMap<Double, Double> totalImpulses = new TreeMap<>();
 
     public Domain(double l) {
         if (l > DOMAIN_LENGTH) {
@@ -34,21 +39,31 @@ public class Domain {
         this.L = l;
         this.upperCorner = new Particle(0, new Velocity(0,0), M, (L+M)/2, Double.POSITIVE_INFINITY);
         this.lowerCorner = new Particle(0, new Velocity(0,0), M, (M-L)/2, Double.POSITIVE_INFINITY);
-        this.leftPerimeter = 3*M + ((M-L)/2);
+        this.leftPerimeter = 4*M - L;
         this.rightPerimeter = 2*M + L;
         this.totalPerimeter = leftPerimeter + rightPerimeter;
     }
 
-    public void addPressure(double v, CollisionType type) {
+    public void addPressure(double v, CollisionType type, double timeOfCollision) {
         switch (type) {
             case LEFT_HORIZONTAL_WALL:
             case LEFT_WALL:
             case MID_WALL:
+                /*
                 leftSideI += Math.abs(v) / leftPerimeter;
+                totalI += Math.abs(v) / totalPerimeter;
+                 */
+                leftSideImpulses.put(timeOfCollision, Math.abs(v)/leftPerimeter);
+                totalImpulses.put(timeOfCollision, Math.abs(v)/totalPerimeter);
                 break;
             case RIGHT_HORIZONTAL_WALL:
             case RIGHT_WALL:
+                /*
                 rightSideI += Math.abs(v) / rightPerimeter;
+                totalI += Math.abs(v) / totalPerimeter;
+                 */
+                rightSideImpulses.put(timeOfCollision, Math.abs(v)/rightPerimeter);
+                totalImpulses.put(timeOfCollision, Math.abs(v)/totalPerimeter);
                 break;
             case UPPER_CORNER:
             case LOWER_CORNER:
@@ -59,16 +74,16 @@ public class Domain {
         totalI += v / totalPerimeter;
     }
 
-    public double getLeftSidePressure(double time) {
-        return leftSideI / time;
+    public double getLeftSidePressure(double finalTime, double initialTime) {
+        return leftSideImpulses.subMap(initialTime, finalTime).values().stream().mapToDouble(Double::doubleValue).sum() / (finalTime - initialTime);
     }
 
-    public double getRightSidePressure(double time) {
-        return rightSideI / time;
+    public double getRightSidePressure(double finalTime, double initialTime) {
+        return rightSideImpulses.subMap(initialTime, finalTime).values().stream().mapToDouble(Double::doubleValue).sum() / (finalTime - initialTime);
     }
 
-    public double getTotalPressure(double time) {
-        return totalI / time;
+    public double getTotalPressure(double finalTime, double initialTime) {
+        return totalImpulses.subMap(initialTime, finalTime).values().stream().mapToDouble(Double::doubleValue).sum() / (finalTime - initialTime);
     }
 
     /*
