@@ -4,6 +4,7 @@ import random
 DOMAIN_LENGTH = 0.09
 N=[200, 230, 240, 250]
 L=[0.03, 0.05, 0.07, 0.09]
+UNIQUE = True
 
 def generate_file(Nparticles, radius, v, mass, version):
     with open("./data/input/Static_N_" + str(Nparticles) +"_v_" + str(version) + ".dump", "w") as f:
@@ -42,7 +43,9 @@ def generate_file(Nparticles, radius, v, mass, version):
         #     f.write(f"{x}   {DOMAIN_LENGTH}   0   0   0.0001\n")
         #     x += 0.0001
 
-for i in range(len(N)):
-    for version in range(1, 5):
-        generate_file(N[i], 0.0015, 0.01, 1, version)
+if UNIQUE:
+    generate_file(N[0], 0.0015, 0.01, 1)
+else:
+    for i in range(len(N)):
+        generate_file(N[i], 0.0015, 0.01, 1)
 print("Files generated.")
