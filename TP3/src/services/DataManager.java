@@ -87,12 +87,12 @@ public class DataManager {
             }
     }
 
-    public void writeFinalPressure(double pressure, String filePath){
+    public void writeFinalPressure(double pressure, double stationary, String filePath){
         try {
             File file = new File(filePath);
             FileWriter writer = new FileWriter(file, true);
             StringBuilder data = new StringBuilder();
-            data.append(pressure + "\n");
+            data.append(pressure + " " + stationary + "\n");
             writer.write(data.toString());
             writer.close();
             }catch (Exception e) {

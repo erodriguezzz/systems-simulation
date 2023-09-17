@@ -9,9 +9,7 @@ REGRESION_SPACE = 0.0001
 INTERVAL_LENGTH = 100
 TOLERANCE_FOR_REGRESION_BREAKPOINT = 0.0001
 
-def process_simulation_output(input_file, considered_particles, interval):
-    with open(input_file, 'r') as f:
-        lines = f.readlines()
+def process_simulation_output(considered_particles, interval):
 
     displacements = {}
     base_values = []
@@ -57,19 +55,27 @@ def find_DCM_values_for_linear_regression(DCM_values, tolerance):
     return find_DCM_values_for_linear_regression(DCM_values, tolerance * 10)
 
 
-def calculate_diffusion_coefficient(DCM_values, frames):
+def encontrar_frame_con_igualdad(archivo):
+    with open(archivo, 'r') as file:
+        return float(file.readline().split()[1])
+
+def calculate_diffusion_coefficient(DCM_values, frames, n, l, v):
     # Crear un arreglo de tiempo desde 0 hasta el número de elementos en DCM_values
 
-    real_values, value = find_DCM_values_for_linear_regression(DCM_values, TOLERANCE_FOR_REGRESION_BREAKPOINT)
+    t0 = encontrar_frame_con_igualdad(f'./data/output/FP_{n}_L_{l}_v_{v}.dump')
+
+    stationary_frames = [value for value in frames if value > t0]
+
+    real_values, value = find_DCM_values_for_linear_regression(DCM_values[len(stationary_frames):], TOLERANCE_FOR_REGRESION_BREAKPOINT)
 
     tiempo = np.arange(len(real_values))
 
     # Realizar una regresión lineal para obtener la pendiente y el intercepto
-    pendiente, b = np.polyfit(frames[0:len(tiempo)], real_values, 1)
+    pendiente, b = np.polyfit(frames[:len(tiempo)], real_values, 1)
 
     return pendiente / 4, value, b
 
-def plot_DCM(dictionary, N_particles, Lsize):
+def plot_DCM(dictionary, N_particles, Lsize, version):
     frames = list(dictionary.keys())
     DCM_values = [value['DCM'] for value in dictionary.values()]
     STD_errors = [value['STD'] for value in dictionary.values()]
@@ -88,7 +94,7 @@ def plot_DCM(dictionary, N_particles, Lsize):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels, rotation=45, ha="right")
 
-    D, break_line, b = calculate_diffusion_coefficient(DCM_values[1:len(DCM_values)], frames[1:len(frames)])
+    D, break_line, b = calculate_diffusion_coefficient(DCM_values[1:len(DCM_values)], frames[1:len(frames)], N_particles, Lsize, version)
 
     # Agregar la línea de regresión solo hasta el punto de break_line
     y_regresion = np.array(frames[1:break_line]) * 4 * D + b # y = mx + b
@@ -103,11 +109,11 @@ def plot_DCM(dictionary, N_particles, Lsize):
 
 if UNIQUE:
     displacements = process_simulation_output(f"./data/output/Dynamic_N_{N[0]}_L_{L[0]}_v_1.dump", considered_particles=N[0], interval=INTERVAL_LENGTH)
-    plot_DCM(displacements, N[0], L[0])
+    plot_DCM(displacements, N[0], L[0], 1)
     print(f'N = {N[0]}, L = {L[0]}: Done')
 else:
     for i in range(len(N)):
         for j in range(len(L)):
             displacements = process_simulation_output(f"./data/output/Dynamic_N_{N[i]}_L_{L[j]}_v_1.dump", considered_particles=N[i], interval=INTERVAL_LENGTH)
-            plot_DCM(displacements, N[i], L[j])
+            plot_DCM(displacements, N[i], L[j], 1) # TODO: change
             print(f'N = {N[i]}, L = {L[j]}: Done')
