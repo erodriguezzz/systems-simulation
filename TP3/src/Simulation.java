@@ -5,7 +5,10 @@ import models.Collision;
 import models.Particle;
 import services.DataManager;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -66,6 +69,7 @@ public class Simulation {
     private void uniqueSimulation(int N, double L, int version){
         double time = 0, timeOfNextCollision;
         timeOfNextCollision = this.calculateCollisions(time);
+        List<Double> pressures = new ArrayList<>();
         // this.showFirstThreeCollisions();
         if (timeOfNextCollision == Double.POSITIVE_INFINITY) {
             throw new RuntimeException("No collisions found");
@@ -88,6 +92,7 @@ public class Simulation {
             double leftPressure = domain.getLeftSidePressure(timeOfNextCollision, 0);
             double rightPressure = domain.getRightSidePressure(timeOfNextCollision, 0);
             if (rightPressure != 0 && Math.abs(leftPressure-rightPressure) < 0.025){
+                pressures.add(leftPressure);
                 // stationary++;
             }
             else if (next.getType() != CollisionType.PARTICLE){
@@ -124,14 +129,20 @@ public class Simulation {
             timeOfNextCollision = this.collisions.first().getTime();
             frame++;
         }
-        double pressure = Math.abs(domain.getLeftSidePressure(time, 0));
-        dm.writeFinalPressure(pressure, "./data/output/FP_" + N + "_L_" + L +".txt");
+        // double pressure = Math.abs(domain.getLeftSidePressure(time, 0));
+        OptionalDouble average = pressures
+            .stream()
+            .mapToDouble(a -> a)
+            .average();
+        double pre = average.isPresent() ? average.getAsDouble() : 0; 
+        dm.writeFinalPressure(pre, "./data/output/FP_" + N + "_L_" + L +".txt");
         return ;
     }
 
     public static void main(String[] args) {
-        // int[] Ns = {200};
-        int[] Ns = {200, 230, 240, 250};
+        // int[] Ns = { 300};
+        int[] Ns = {200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300};
+        // double[] Ls = {0.05, 0.07, 0.09};
         double[] Ls = {0.03, 0.05, 0.07, 0.09};
 
         boolean unique = false;

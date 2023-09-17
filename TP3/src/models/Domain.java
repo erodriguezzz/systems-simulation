@@ -53,8 +53,8 @@ public class Domain {
                 leftSideI += Math.abs(v) / leftPerimeter;
                 totalI += Math.abs(v) / totalPerimeter;
                  */
-                leftSideImpulses.put(timeOfCollision, Math.abs(v)/leftPerimeter);
-                totalImpulses.put(timeOfCollision, Math.abs(v)/totalPerimeter);
+                leftSideImpulses.put(timeOfCollision, Math.abs(2*v)/leftPerimeter);
+                totalImpulses.put(timeOfCollision, Math.abs(2*v)/totalPerimeter);
                 break;
             case RIGHT_HORIZONTAL_WALL:
             case RIGHT_WALL:
@@ -62,8 +62,8 @@ public class Domain {
                 rightSideI += Math.abs(v) / rightPerimeter;
                 totalI += Math.abs(v) / totalPerimeter;
                  */
-                rightSideImpulses.put(timeOfCollision, Math.abs(v)/rightPerimeter);
-                totalImpulses.put(timeOfCollision, Math.abs(v)/totalPerimeter);
+                rightSideImpulses.put(timeOfCollision, Math.abs(2*v)/rightPerimeter);
+                totalImpulses.put(timeOfCollision, Math.abs(2*v)/totalPerimeter);
                 break;
             case UPPER_CORNER:
             case LOWER_CORNER:

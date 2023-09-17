@@ -2,7 +2,7 @@ import math
 import random
 
 DOMAIN_LENGTH = 0.09
-N=[200, 230, 240, 250]
+N=[200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300]
 L=[0.03, 0.05, 0.07, 0.09]
 
 def generate_file(Nparticles, radius, v, mass, version):
@@ -43,6 +43,6 @@ def generate_file(Nparticles, radius, v, mass, version):
         #     x += 0.0001
 
 for i in range(len(N)):
-    for version in range(1, 5):
+    for version in range(1, 11):
         generate_file(N[i], 0.0015, 0.01, 1, version)
 print("Files generated.")
