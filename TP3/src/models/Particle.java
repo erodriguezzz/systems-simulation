@@ -149,4 +149,9 @@ public class Particle implements Comparable<Particle>{
                 ") with velocity (" + this.velocity.getVx() +
                 ", " + this.velocity.getVy() + ")";
     }
+
+    public static void resetId() {
+        counter = 1;
+    }
+
 }

@@ -1,11 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+from static_generator import N, L
 
 LIMITS_PARTICLES_AMOUNT = 1080
 FRAME_STEPPER = LIMITS_PARTICLES_AMOUNT + 2
 
-def process_simulation_output(input_file, considered_particles, interval, L):
+def process_simulation_output(input_file, considered_particles, interval):
     with open(input_file, 'r') as f:
         lines = f.readlines()
 
@@ -44,7 +45,7 @@ def process_simulation_output(input_file, considered_particles, interval, L):
 
     return displacements
 
-def graficar_DCM(diccionario, N, L):
+def graficar_DCM(diccionario, Nparticles, Lsize):
     frames = list(diccionario.keys())
     valores_DCM = [valor['DCM'] for valor in diccionario.values()]
     errores_STD = [valor['STD'] for valor in diccionario.values()]
@@ -64,15 +65,11 @@ def graficar_DCM(diccionario, N, L):
     ax.set_xticklabels(x_labels, rotation=45, ha="right")
 
     # Guardar la figura
-    plt.savefig(f'./data/output/graphs/DCMvsTime_N_{N}_L_{L}.png')
+    plt.savefig(f'./data/output/graphs/DCMvsTime_N_{Nparticles}_L_{Lsize}.png')
     plt.close()
-
-# Usage of the function
-N=[200]
-L=[0.03]
 
 for i in range(len(N)):
     for j in range(len(L)):
-        displacements = process_simulation_output(f"./data/output/Dynamic_N_{N[i]}_L_{L[j]}.dump", considered_particles=N[i], interval=100, L=L[j])
+        displacements = process_simulation_output(f"./data/output/Dynamic_N_{N[i]}_L_{L[j]}.dump", considered_particles=N[i], interval=100)
         graficar_DCM(displacements, N[i], L[j])
         print(f'N = {N[i]}, L = {L[j]}: Done')

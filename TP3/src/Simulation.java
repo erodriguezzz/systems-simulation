@@ -127,7 +127,7 @@ public class Simulation {
     }
 
     public static void main(String[] args) {
-        int[] Ns = {200, 500};
+        int[] Ns = {200, 230, 240, 250};
         double[] Ls = {0.03, 0.05, 0.07, 0.09};
         boolean unique = false;
         if(!unique){
@@ -135,6 +135,7 @@ public class Simulation {
                 for(double L : Ls ){
                     Simulation sim = new Simulation(N, L, 1);
                     sim.uniqueSimulation(N, L, 1); //TODO: avoid hard coding
+                    Particle.resetId();
                 }
             }
         } else {
@@ -142,6 +143,7 @@ public class Simulation {
             double L = Ls[0];
             Simulation sim = new Simulation(N, L, 1);
             sim.uniqueSimulation(N, L, 1); //TODO: avoid hard coding
+            Particle.resetId();
         }
     }
 
