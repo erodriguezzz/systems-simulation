@@ -45,15 +45,15 @@ def process_simulation_output(input_file, considered_particles, interval):
 
     return displacements
 
-def graficar_DCM(diccionario, Nparticles, Lsize):
-    frames = list(diccionario.keys())
-    valores_DCM = [valor['DCM'] for valor in diccionario.values()]
-    errores_STD = [valor['STD'] for valor in diccionario.values()]
+def plot_DCM(dictionary, N_particles, L_size):
+    frames = list(dictionary.keys())
+    DCM_values = [value['DCM'] for value in dictionary.values()]
+    STD_errors = [value['STD'] for value in dictionary.values()]
 
-    x = np.arange(len(frames))  # Posiciones en el eje x
+    x = np.arange(len(frames))  # Positions on the x-axis
 
     fig, ax = plt.subplots(figsize=(15, 9))
-    barras_STD = ax.errorbar(x, valores_DCM, yerr=errores_STD, fmt='o', color=(random.random(),random.random(), random.random()), label='STD')
+    error_bars = ax.errorbar(x, DCM_values, yerr=STD_errors, fmt='o', color=(random.random(), random.random(), random.random()), label='STD')
 
     x_labels = []
     for frame in frames:
@@ -64,12 +64,13 @@ def graficar_DCM(diccionario, Nparticles, Lsize):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels, rotation=45, ha="right")
 
-    # Guardar la figura
-    plt.savefig(f'./data/output/graphs/DCMvsTime_N_{Nparticles}_L_{Lsize}.png')
+    # Save the figure
+    plt.savefig(f'./data/output/graphs/DCMvsTime_N_{N_particles}_L_{L_size}.png')
     plt.close()
+
 
 for i in range(len(N)):
     for j in range(len(L)):
         displacements = process_simulation_output(f"./data/output/Dynamic_N_{N[i]}_L_{L[j]}.dump", considered_particles=N[i], interval=100)
-        graficar_DCM(displacements, N[i], L[j])
+        plot_DCM(displacements, N[i], L[j])
         print(f'N = {N[i]}, L = {L[j]}: Done')
