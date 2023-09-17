@@ -32,7 +32,7 @@ def process_simulation_output(input_file, considered_particles, interval):
                 base_values.append((particle_id, x, y))
 
         for id, x, y in frame_data:
-            displacement = ((x - base_values[int(id) - 1][1])**2 + (y - base_values[int(id) - 1][2])**2)**0.5
+            displacement = ((x - base_values[int(id) - 1][1])**2 + (y - base_values[int(id) - 1][2])**2)
             frame_DCM += displacement**2
             frame_std.append(displacement**2)
 
@@ -64,10 +64,6 @@ def calculate_diffusion_coefficient(DCM_values, frames):
 
     tiempo = np.arange(len(real_values))
 
-    print(f"length of tiempo: {len(tiempo)} - tiempo = {str(tiempo)}")
-    print(f"length of real_values: {len(real_values)} - real_values = {str(real_values)}")
-    print(f"length of frames: {len(frames[0:len(tiempo)])} - frames = {str(frames[0:len(tiempo)])}")
-
     # Realizar una regresión lineal para obtener la pendiente y el intercepto
     pendiente, b = np.polyfit(frames[0:len(tiempo)], real_values, 1)
 
@@ -96,9 +92,6 @@ def plot_DCM(dictionary, N_particles, Lsize):
 
     # Agregar la línea de regresión solo hasta el punto de break_line
     y_regresion = np.array(frames[1:break_line]) * 4 * D + b # y = mx + b
-    print("breakline: " + str(break_line))
-    print("frames: " + str(frames[1:break_line]))
-    print("m: " + str(2 * D))
 
     ax.plot([i+1 for i in range(len(frames[1:break_line]))], y_regresion, color='red', label=f'Regresion Lineal (D={D:.4f})')
 
