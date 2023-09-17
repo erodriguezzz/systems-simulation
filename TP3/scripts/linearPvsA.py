@@ -35,9 +35,11 @@ for iteration in range(len(N_values)):
             for line in lines:
                 pressure.append( float(line.strip().split()[0]))
                 # va_per_error = (pressure)
-            pressure_perL.append(np.mean(pressure))
+            pressure_perL.append(2*np.mean(pressure))
             stds.append(np.std(pressure))
     # print(N[iteration], L[iteration], len(noise), (vas))
+    x=[]
+    x.append(0)
     x = [1/(0.09*0.09 + 0.09*L) for L in L_values]
     plt.scatter(x, pressure_perL, marker='o', linestyle='-', color=color_list[iteration], label=f'N= {N_values[iteration]} ')
     plt.errorbar(x, pressure_perL, yerr=stds, fmt='o', color=color_list[iteration], ecolor=color_list[iteration])
@@ -45,15 +47,15 @@ for iteration in range(len(N_values)):
     pendiente, b = calculate_diffusion_coefficient(x, pressure_perL)
     y_regresion = np.array(x) *  pendiente + b # y = mx + b
     print(pendiente)
-    plt.plot(x, y_regresion, color=color_list[iteration], label=f'Regresion Lineal (D={pendiente:.4f})')
+    plt.plot(x, y_regresion, color=color_list[iteration], label=f'Ajuste del modelo Lineal (m={pendiente:.4f})')
     pressurre=[]
     stds=[]
 
 
-plt.xlabel('A⁻¹')
-plt.ylabel('P')
+plt.xlabel('Inversa del área ($\\frac{1}{m^2}$)')
+plt.ylabel('Presion ($\\frac{kg}{m \\cdot s^2}$)')
 plt.legend()
 plt.grid(True)
-plt.savefig('./data/output/graphs/regresionPvsA.png')
+plt.savefig('./data/output/graphs/regresionPvsA-1.png')
 
 plt.cla()

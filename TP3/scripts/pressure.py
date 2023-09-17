@@ -14,24 +14,23 @@ def plot_pressure(N_particles, L_size, v):
                         x_values.append(float(parts[0]))
                         y1_values.append(float(parts[1]))
                         y2_values.append(float(parts[2]))
-                        if float(parts[0]) > 200:
-                            break
+                    
 
             # Create the plot
             plt.figure(figsize=(8, 6))
-            plt.plot(x_values, y1_values, label='left' + str(L))
-            plt.plot(x_values, y2_values, label='right'+ str(L))
-            plt.xlabel('Time')
-            plt.ylabel('Pressure')
+            plt.plot(x_values, y1_values, label='Recinto izquierdo' , color='b')
+            plt.plot(x_values, y2_values, label='Recinto derecho', color='gold')
+            plt.xlabel('Tiempo (s)')
+            plt.ylabel('Presion ($\\frac{kg}{m \\cdot s^2}$)')
             plt.legend()
-            plt.title('Pressure')
+            # plt.title('Pressure')
             plt.grid(True)
             plt.savefig(f'./data/output/graphs/PressurevsTime_N_{N}_L_{L}.png')
             plt.close()  # Close the current figure
 
 # N=[200, 230, 240, 250]
-N=[200]
-L=[0.03, 0.05, 0.07, 0.09]
+N=[200, 300]
+L=[0.03, 0.09]
 
 # for v in range(1, 5):
-plot_pressure(N, L, 1)
+plot_pressure(N, L, 2)
