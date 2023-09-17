@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.sound.midi.Soundbank;
+
 public class Simulation {
     private static final int totalSeconds = 400;
     private static final double timeStepper = 0.3;
@@ -22,14 +24,12 @@ public class Simulation {
 
     Simulation(int N, double L, int version){
         String[] outputs = {
-                    "./data/output/dynamic/Dynamic_N_" + N + "_L_" + L +"_v" +version+".dump",
-                    "./data/output/VaN_" + N + "_L_" + L + "_v" +version+".txt",
-                    "./data/output/VaN_" + N + "_L_" + L +"_v" +version+".txt",
-                    "./data/output/VaN_" + N + "_L_" + L +"_v" +version+".txt",
+                    // "./data/output/dynamic/Dynamic_N_" + N + "_L_" + L +"_v" +version+".dump",
+                    // "./data/output/Pressure_" + N + "_L_" + L + "_v" +version+".txt"
         };
         this.dm = new DataManager(
-                "./data/input/Static_N_" + N + ".dump",
-                "./data/input/Dynamic_N_" + N + ".dump",
+                "./data/input/Static_N_" + N + "_v_" + version + ".dump",
+                "./data/input/Dynamic_N_" + N + "_v_" + version + ".dump",
                 outputs);
         this.particles = dm.getParticles();
         this.collisions = new TreeSet<>();
@@ -70,9 +70,9 @@ public class Simulation {
         if (timeOfNextCollision == Double.POSITIVE_INFINITY) {
             throw new RuntimeException("No collisions found");
         }
-        int stationary = 0;
+        double stationary = 0;
         int frame = 0;
-        while (time < totalSeconds && stationary < 50) {
+        while (time < totalSeconds && time - stationary < 25) {
             Collision next = this.collisions.first();
             this.moveParticles(timeOfNextCollision - time); //TODO: en post-procesamiento (python) hay que calcular el desplazamiento cuadrático medio
 
@@ -85,21 +85,22 @@ public class Simulation {
                 domain.addPressure(collisionV, next.getType(), timeOfNextCollision); // TODO: add deltaT
             }
 
-            double leftPressure = domain.getLeftSidePressure(timeOfNextCollision, time);
-            double rightPressure = domain.getRightSidePressure(timeOfNextCollision, time);
-            if (rightPressure != 0 && Math.abs(leftPressure-rightPressure) < 0.0001){
-                stationary++;
+            double leftPressure = domain.getLeftSidePressure(timeOfNextCollision, 0);
+            double rightPressure = domain.getRightSidePressure(timeOfNextCollision, 0);
+            if (rightPressure != 0 && Math.abs(leftPressure-rightPressure) < 0.025){
+                // stationary++;
             }
             else if (next.getType() != CollisionType.PARTICLE){
-                stationary = 0;
+                stationary = time;
             }
             // time = timeOfNextCollision;
 
             next.collide(this.domain.getM(), this.domain.getL());
             if(frame % 25 == 0){
-                this.dm.writeDynamicFile(this.particles, this.limits, "./data/output/Dynamic_N_" + N + "_L_" + L + ".dump", time);
-                System.out.println("FRAME" + frame);
+                this.dm.writeDynamicFile(this.particles, this.limits, "./data/output/Dynamic_N_" + N + "_L_" + L + "_v_" + version + ".dump", time);
+                // System.out.println("FRAME" + frame);
             }
+            this.dm.writePressureFile(leftPressure, rightPressure, time, "./data/output/Pressure_" + N + "_L_" + L + "_v" +version+".txt");
 
             /* TODO: Verificar si tenemos que agregar un chequeo para elimiar las colisiones en las que forma parte alguna de las esquinas */
             this.collisions.removeIf(c -> c.getP1().equals(next.getP1()) ||
@@ -123,19 +124,27 @@ public class Simulation {
             timeOfNextCollision = this.collisions.first().getTime();
             frame++;
         }
-        return;
+        double pressure = Math.abs(domain.getLeftSidePressure(time, 0));
+        dm.writeFinalPressure(pressure, "./data/output/FP_" + N + "_L_" + L +".txt");
+        return ;
     }
 
     public static void main(String[] args) {
+        // int[] Ns = {200};
         int[] Ns = {200, 230, 240, 250};
         double[] Ls = {0.03, 0.05, 0.07, 0.09};
+
         boolean unique = false;
         if(!unique){
             for (int N : Ns) {
                 for(double L : Ls ){
-                    Simulation sim = new Simulation(N, L, 1);
-                    sim.uniqueSimulation(N, L, 1); //TODO: avoid hard coding
-                    Particle.resetId();
+                    for(int version = 1; version < 5; version++){
+                        Simulation sim = new Simulation(N, L, version);
+                        sim.uniqueSimulation(N, L, version); //TODO: avoid hard coding
+                        Particle.resetId();
+                        System.out.println("Finished simulation for N = " + N + " and L = " + L);
+                    }
+                    
                 }
             }
         } else {

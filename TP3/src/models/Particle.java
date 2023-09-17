@@ -60,7 +60,7 @@ public class Particle implements Comparable<Particle>{
         }
 
         if (drdr-sigma*sigma < tolerance) {
-            System.out.println(id + " y " + b.getId() + " están en contacto");
+            // System.out.println(id + " y " + b.getId() + " están en contacto");
         }
 
 

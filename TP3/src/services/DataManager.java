@@ -74,6 +74,32 @@ public class DataManager {
 
     }
 
+    public void writePressureFile(double left, double right, double time, String filePath){
+        try {
+            File file = new File(filePath);
+            FileWriter writer = new FileWriter(file, true);
+            StringBuilder data = new StringBuilder();
+            data.append(time + " " + left + " " + right + "\n");
+            writer.write(data.toString());
+            writer.close();
+            }catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+    }
+
+    public void writeFinalPressure(double pressure, String filePath){
+        try {
+            File file = new File(filePath);
+            FileWriter writer = new FileWriter(file, true);
+            StringBuilder data = new StringBuilder();
+            data.append(pressure + "\n");
+            writer.write(data.toString());
+            writer.close();
+            }catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+    }
+
     public void writeDynamicFile(Set<Particle> particles, Set<Limit> limits, String filePath, double time) {
         try {
             File file = new File(filePath);

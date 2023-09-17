@@ -5,8 +5,8 @@ DOMAIN_LENGTH = 0.09
 N=[200, 230, 240, 250]
 L=[0.03, 0.05, 0.07, 0.09]
 
-def generate_file(Nparticles, radius, v, mass):
-    with open("./data/input/Static_N_" + str(Nparticles) +".dump", "w") as f:
+def generate_file(Nparticles, radius, v, mass, version):
+    with open("./data/input/Static_N_" + str(Nparticles) +"_v_" + str(version) + ".dump", "w") as f:
         positions = set()
         for _ in range(Nparticles):
             counter = 0
@@ -23,7 +23,7 @@ def generate_file(Nparticles, radius, v, mass):
             positions.add(position)
             f.write(f"{radius}   {mass}\n")
 
-    with open("./data/input/Dynamic_N_" + str(Nparticles) + ".dump", "w") as f:
+    with open("./data/input/Dynamic_N_" + str(Nparticles) +"_v_" + str(version) + ".dump", "w") as f:
         f.write(str(Nparticles) + "\n")
         f.write(str(Nparticles + 4*900) + "\n")
         id = 1
@@ -43,5 +43,6 @@ def generate_file(Nparticles, radius, v, mass):
         #     x += 0.0001
 
 for i in range(len(N)):
-    generate_file(N[i], 0.0015, 0.01, 1)
+    for version in range(1, 5):
+        generate_file(N[i], 0.0015, 0.01, 1, version)
 print("Files generated.")
