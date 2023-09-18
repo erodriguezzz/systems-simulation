@@ -141,7 +141,7 @@ public class Simulation {
 
     public static void main(String[] args) {
         // int[] Ns = { 300};
-        int[] Ns = {200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300};
+        int[] Ns = {200, 250,  300};
         // double[] Ls = {0.05, 0.07, 0.09};
         double[] Ls = {0.09, 0.05, 0.07, 0.09};
 
