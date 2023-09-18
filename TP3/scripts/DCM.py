@@ -55,7 +55,7 @@ def find_DCM_values_for_linear_regression(DCM_values, tolerance):
     mean = np.mean(DCM_values[len(DCM_values)//2:])
     # Find the first value that is closer to the mean's zone, in order to end linear regresion
     for i in range(3*len(DCM_values)//4):
-        if abs(DCM_values[i] - mean + REGRESION_SPACE) < tolerance:
+        if abs(DCM_values[i] - mean) < tolerance:
             return DCM_values[0:i+1], i + 1
     return find_DCM_values_for_linear_regression(DCM_values, tolerance * 10)
 
@@ -86,36 +86,24 @@ def calculate_diffusion_coefficient(DCM_values, frames, n, l, v):
     for frame in c:
         x_labels.append(f'{frame - frames[0]:.2f}')
 
-    # ax.set_xlabel('Tiempo (s)')
-    # ax.set_ylabel("$<z^2> (m^2)$")
-    fig, ax = plt.subplots(figsize=(8, 8))
-    # ax.set_xticks(np.arange(len(x_labels)))
-    # ax.set_xticklabels(x_labels, rotation=45, ha="right")
-    # plt.plot([tick +  0.000035 for tick in c], [e*3 for e in ec], marker='o', markersize=0.1 ,linestyle='-', color='b' , label='N=200')
-    # plt.plot([tick +  0.000025 for tick in c], [e*3 for e in ec], marker='o', markersize=0.1 ,linestyle='-', color='r' , label='N=300')
-    # plt.xlabel('C')
-    # plt.ylabel('E(c)')
-    # plt.legend()
-    # plt.grid(True)
-    # plt.savefig('./data/output/graphs/error4.png')
-    # plt.cla()
-    # plt.close()
-
     
     b = real_values[0] - pendiente*frames[:len(tiempo)][0]
 
-    # x = [item for item in frames[:len(tiempo)]]
-    # c = [x * 0.00001 for x in range(-500, 500)]
-    # ec = []
-    # y1 = real_values[0]
-    # for ci in c:
-    #     ec.append(sum([math.pow(yi - pendiente*xi - b, 2) for xi, yi in zip(x, real_values)]))
-    # for(eci, ci) in zip(ec, c):
-    #     if eci == min(ec):
-    #         b = ci
-    #         # print(ci)
-    # b = np.mean(real_values) - pendiente * np.mean(x)
-    # print('b gaspi2 ' + str(b))
+    f1 = frames[:len(tiempo)][0]
+    x = [item - f1 for item in frames[:len(tiempo)]]
+    c = [x * 0.00001 for x in range(-500, 500)]
+    ec = []
+    y1 = real_values[0]
+    for ci in c:
+        ec.append(sum([math.pow(yi - ci*xi, 2) for xi, yi in zip(x, real_values)]))
+    for(eci, ci) in zip(ec, c):
+        if eci == min(ec):
+            pendiente = ci
+    print('pendiente gaspi '+str(float(pendiente)))
+    # b=pressure_perL[3]-pendiente*x[3]
+    b = real_values[0] - pendiente*frames[:len(tiempo)][0]
+    b=0
+    print('b gaspi' + str(float(b)))
     return pendiente / 4, value, b
 
 def plot_DCM(dictionary, N_particles, Lsize, version):
