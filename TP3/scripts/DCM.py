@@ -1,13 +1,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import random
-from static_generator import N, L, UNIQUE
+import math
 
 LIMITS_PARTICLES_AMOUNT = 1080
 FRAME_STEPPER = LIMITS_PARTICLES_AMOUNT + 2
 REGRESION_SPACE = 0.0001
 INTERVAL_LENGTH = 10
 TOLERANCE_FOR_REGRESION_BREAKPOINT = 0.0001
+DOMAIN_LENGTH = 0.09
+N=[200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300]
+L=[0.09, 0.05, 0.07, 0.09]
+UNIQUE = True
 
 def process_simulation_output(input_file, considered_particles, interval, t0):
 
@@ -50,8 +54,8 @@ def process_simulation_output(input_file, considered_particles, interval, t0):
 def find_DCM_values_for_linear_regression(DCM_values, tolerance):
     mean = np.mean(DCM_values[len(DCM_values)//2:])
     # Find the first value that is closer to the mean's zone, in order to end linear regresion
-    for i in range(len(DCM_values)//2):
-        if abs(DCM_values[i] - (mean-REGRESION_SPACE)) < tolerance:
+    for i in range(3*len(DCM_values)//4):
+        if abs(DCM_values[i] - mean) < tolerance:
             return DCM_values[0:i+1], i + 1
     return find_DCM_values_for_linear_regression(DCM_values, tolerance * 10)
 
@@ -61,22 +65,30 @@ def encontrar_frame_con_igualdad(archivo):
         return float(file.readline().split()[1])
 
 def calculate_diffusion_coefficient(DCM_values, frames, n, l, v):
-    # Crear un arreglo de tiempo desde 0 hasta el número de elementos en DCM_values
-
-    # t0 = encontrar_frame_con_igualdad(f'./data/output/FP_{n}_L_{l}.txt')
-
-    # stationary_frames = [value for value in frames if value > t0]
 
     real_values, value = find_DCM_values_for_linear_regression(DCM_values, TOLERANCE_FOR_REGRESION_BREAKPOINT)
 
-    if real_values is None:
-        raise Exception('No se encontró un valor para realizar la regresión lineal')
-
     tiempo = np.arange(len(real_values))
 
-    # Realizar una regresión lineal para obtener la pendiente y el intercepto
-    pendiente, b = np.polyfit(frames[:len(tiempo)], real_values, 1)
-
+    # pendiente, b = np.polyfit(frames[:len(tiempo)], real_values, 1)
+    # print('pendiente pol' + str(float(pendiente)))
+    # print('b pol' + str(float(b)))
+    # m = 0.0001
+    f1 = frames[:len(tiempo)][0]
+    x = [item - f1 for item in frames[:len(tiempo)]]
+    c = [x * 0.00001 for x in range(-500, 500)]
+    ec = []
+    y1 = real_values[0]
+    for ci in c:
+        ec.append(sum([math.pow(yi - ci*xi, 2) for xi, yi in zip(x, real_values)]))
+    for(eci, ci) in zip(ec, c):
+        if eci == min(ec):
+            pendiente = ci
+    print('pendiente gaspi '+str(float(pendiente)))
+    # b=pressure_perL[3]-pendiente*x[3]
+    b = real_values[0] - pendiente*frames[:len(tiempo)][0]
+    b=0
+    print('b gaspi' + str(float(b)))
     return pendiente / 4, value, b
 
 def plot_DCM(dictionary, N_particles, Lsize, version):
@@ -93,8 +105,8 @@ def plot_DCM(dictionary, N_particles, Lsize, version):
     for frame in frames:
         x_labels.append(f'{frame:.2f}')
 
-    ax.set_xlabel('Time')
-    ax.set_ylabel('DCM')
+    ax.set_xlabel('Tiempo (s)')
+    ax.set_ylabel("$<z^2> (m^2)$")
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels, rotation=45, ha="right")
 
