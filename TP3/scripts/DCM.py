@@ -9,14 +9,20 @@ REGRESION_SPACE = 0.0001
 INTERVAL_LENGTH = 100
 TOLERANCE_FOR_REGRESION_BREAKPOINT = 0.0001
 
-def process_simulation_output(considered_particles, interval):
+def process_simulation_output(input_file, considered_particles, interval, t0):
+
+    with open(input_file, 'r') as file:
+        lines = file.readlines()
 
     displacements = {}
     base_values = []
+    found = False
 
     for i in range(1, len(lines), (FRAME_STEPPER + considered_particles) * interval):
         frame_info = lines[i].split()
         frame_number = float(frame_info[1])
+        if t0 > frame_number:
+            continue
         frame_data = []
         frame_DCM = 0
         frame_std = []
@@ -26,8 +32,9 @@ def process_simulation_output(considered_particles, interval):
             particle_id, x, y, _, _, _, _, _, _ = map(float, parts)
             if 1 <= particle_id <= considered_particles:
                 frame_data.append((particle_id, x, y))
-            if i == 1:
+            if not found:
                 base_values.append((particle_id, x, y))
+                found = True
 
         for id, x, y in frame_data:
             displacement = ((x - base_values[int(id) - 1][1])**2 + (y - base_values[int(id) - 1][2])**2)
@@ -37,12 +44,6 @@ def process_simulation_output(considered_particles, interval):
         DCM = frame_DCM/considered_particles
 
         displacements[frame_number] = {"DCM": DCM, "STD": np.std(frame_std)}
-
-        # Check if every particle_id in the frame is between 1 and considered_particles
-        for id, _, _ in frame_data:
-            if id < 1 or id > considered_particles:
-                print(f'Error: particle_id {id} is not between 1 and {considered_particles}')
-                raise Exception("Invalid particle_id")
 
     return displacements
 
