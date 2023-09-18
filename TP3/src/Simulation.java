@@ -76,7 +76,7 @@ public class Simulation {
         }
         double stationary = 0;
         int frame = 0;
-        while (time < totalSeconds && time - stationary < 25) {
+        while (time < totalSeconds && time - stationary < 100) {
             Collision next = this.collisions.first();
             this.moveParticles(timeOfNextCollision - time); //TODO: en post-procesamiento (python) hay que calcular el desplazamiento cuadrático medio
 
@@ -135,7 +135,7 @@ public class Simulation {
             .mapToDouble(a -> a)
             .average();
         double pre = average.isPresent() ? average.getAsDouble() : 0; 
-        dm.writeFinalPressure(pre, "./data/output/FP_" + N + "_L_" + L +".txt");
+        dm.writeFinalPressure(pre, stationary, "./data/output/FP_" + N + "_L_" + L +".txt");
         return ;
     }
 
@@ -143,9 +143,9 @@ public class Simulation {
         // int[] Ns = { 300};
         int[] Ns = {200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300};
         // double[] Ls = {0.05, 0.07, 0.09};
-        double[] Ls = {0.03, 0.05, 0.07, 0.09};
+        double[] Ls = {0.09, 0.05, 0.07, 0.09};
 
-        boolean unique = false;
+        boolean unique = true;
         if(!unique){
             for (int N : Ns) {
                 for(double L : Ls ){

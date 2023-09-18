@@ -3,7 +3,7 @@ import random
 
 DOMAIN_LENGTH = 0.09
 N=[200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300]
-L=[0.03, 0.05, 0.07, 0.09]
+L=[0.09, 0.05, 0.07, 0.09]
 UNIQUE = True
 
 def generate_file(Nparticles, radius, v, mass, version):
@@ -17,7 +17,6 @@ def generate_file(Nparticles, radius, v, mass, version):
                 y = random.uniform(radius, DOMAIN_LENGTH - radius)
                 position = (x, y)
                 if all(math.sqrt(math.pow((x - px),2) + math.pow((y - py),2)) >= 2 * radius + 0.001 for px, py in positions):
-                    print(f"({id} {counter})")
                     break
                 counter = counter + 1
                 id = id + 1

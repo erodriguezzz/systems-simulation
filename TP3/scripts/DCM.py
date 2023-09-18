@@ -6,7 +6,7 @@ from static_generator import N, L, UNIQUE
 LIMITS_PARTICLES_AMOUNT = 1080
 FRAME_STEPPER = LIMITS_PARTICLES_AMOUNT + 2
 REGRESION_SPACE = 0.0001
-INTERVAL_LENGTH = 100
+INTERVAL_LENGTH = 10
 TOLERANCE_FOR_REGRESION_BREAKPOINT = 0.0001
 
 def process_simulation_output(input_file, considered_particles, interval, t0):
@@ -34,10 +34,10 @@ def process_simulation_output(input_file, considered_particles, interval, t0):
                 frame_data.append((particle_id, x, y))
             if not found:
                 base_values.append((particle_id, x, y))
-                found = True
+        found = True
 
         for id, x, y in frame_data:
-            displacement = ((x - base_values[int(id) - 1][1])**2 + (y - base_values[int(id) - 1][2])**2)
+            displacement = ((x - base_values[int(id) - 1][1])**2 + (y - base_values[int(id) - 1][2])**2)**0.5
             frame_DCM += displacement**2
             frame_std.append(displacement**2)
 
@@ -63,11 +63,14 @@ def encontrar_frame_con_igualdad(archivo):
 def calculate_diffusion_coefficient(DCM_values, frames, n, l, v):
     # Crear un arreglo de tiempo desde 0 hasta el número de elementos en DCM_values
 
-    t0 = encontrar_frame_con_igualdad(f'./data/output/FP_{n}_L_{l}_v_{v}.dump')
+    # t0 = encontrar_frame_con_igualdad(f'./data/output/FP_{n}_L_{l}.txt')
 
-    stationary_frames = [value for value in frames if value > t0]
+    # stationary_frames = [value for value in frames if value > t0]
 
-    real_values, value = find_DCM_values_for_linear_regression(DCM_values[len(stationary_frames):], TOLERANCE_FOR_REGRESION_BREAKPOINT)
+    real_values, value = find_DCM_values_for_linear_regression(DCM_values, TOLERANCE_FOR_REGRESION_BREAKPOINT)
+
+    if real_values is None:
+        raise Exception('No se encontró un valor para realizar la regresión lineal')
 
     tiempo = np.arange(len(real_values))
 
@@ -95,7 +98,7 @@ def plot_DCM(dictionary, N_particles, Lsize, version):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels, rotation=45, ha="right")
 
-    D, break_line, b = calculate_diffusion_coefficient(DCM_values[1:len(DCM_values)], frames[1:len(frames)], N_particles, Lsize, version)
+    D, break_line, b = calculate_diffusion_coefficient(DCM_values, frames, N_particles, Lsize, version)
 
     # Agregar la línea de regresión solo hasta el punto de break_line
     y_regresion = np.array(frames[1:break_line]) * 4 * D + b # y = mx + b
@@ -109,12 +112,12 @@ def plot_DCM(dictionary, N_particles, Lsize, version):
 
 
 if UNIQUE:
-    displacements = process_simulation_output(f"./data/output/Dynamic_N_{N[0]}_L_{L[0]}_v_1.dump", considered_particles=N[0], interval=INTERVAL_LENGTH)
+    displacements = process_simulation_output(f"./data/output/Dynamic_N_{N[0]}_L_{L[0]}_v_1.dump", considered_particles=N[0], interval=INTERVAL_LENGTH, t0=encontrar_frame_con_igualdad(f'./data/output/FP_{N[0]}_L_{L[0]}.txt'))
     plot_DCM(displacements, N[0], L[0], 1)
     print(f'N = {N[0]}, L = {L[0]}: Done')
 else:
     for i in range(len(N)):
         for j in range(len(L)):
-            displacements = process_simulation_output(f"./data/output/Dynamic_N_{N[i]}_L_{L[j]}_v_1.dump", considered_particles=N[i], interval=INTERVAL_LENGTH)
+            displacements = process_simulation_output(f"./data/output/Dynamic_N_{N[i]}_L_{L[j]}_v_1.dump", considered_particles=N[i], interval=INTERVAL_LENGTH, t0=encontrar_frame_con_igualdad(f'./data/output/FP_{N[i]}_L_{L[j]}.txt'))
             plot_DCM(displacements, N[i], L[j], 1) # TODO: change
             print(f'N = {N[i]}, L = {L[j]}: Done')
