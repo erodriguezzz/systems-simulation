@@ -1,7 +1,14 @@
 package models;
 
-public class CircleDomain {
-    private static double DOMAIN_RADIUS = 21.49;
+import java.util.TreeSet;
+
+/**
+ * This class represents the domain of the simulation as specified in the assignment.
+ */
+public class Domain {
+    private final double L;
+
+    private final TreeSet<Particle> particles;
 
     public Domain(double L, TreeSet<Particle> particles) {
         this.L = L;
@@ -72,6 +79,5 @@ public class CircleDomain {
     private void gear(double deltaTime) {
 
     }
-
 
 }
