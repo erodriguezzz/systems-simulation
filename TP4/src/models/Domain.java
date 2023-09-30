@@ -1,6 +1,7 @@
 package models;
 
 import java.util.TreeSet;
+import java.util.function.BiFunction;
 
 /**
  * This class represents the domain of the simulation as specified in the assignment.
@@ -10,9 +11,12 @@ public class Domain {
 
     private final TreeSet<Particle> particles;
 
-    public Domain(double L, TreeSet<Particle> particles) {
+    private final Integrator integrator;
+
+    public Domain(double L, TreeSet<Particle> particles, Integrator integrator) {
         this.L = L;
         this.particles = particles;
+        this.integrator = integrator;
     }
 
     public double getL() {
@@ -33,8 +37,8 @@ public class Domain {
         }
     }
 
-    public void moveParticles (double deltaTime) {
-        throw new UnsupportedOperationException("Not implemented");
+    public void moveParticles (double deltaTime, BiFunction<Double, Double, Double> force) {
+        integrator.solve(deltaTime, particles, force);
     }
 
     public TreeSet<Particle> getParticles() {
@@ -47,7 +51,7 @@ public class Domain {
             double v = p.getSpeed();
             double f = getForce(p);
 
-            double previous = p.getPreviousX() == null ? euler(-1E-5, p) : p.getPreviousX();
+            double previous = p.getPreviousX() == null ? (x - v * deltaTime) : p.getPreviousX();
             // double previous = p.getPreviousX() == null ? 1 : p.getPreviousX();
             double x_new = 2*x - previous + f * deltaTime * deltaTime / p.getMass();
             double v_new = v + f * deltaTime / p.getMass();
@@ -56,24 +60,32 @@ public class Domain {
         }
     }
 
-    protected double getForce(Particle p) {
-        return p.getAcceleration();
+    public Integrator getIntegrator() {
+        return integrator;
     }
 
+    protected double getForce(Particle p) {
+        // return p.getAcceleration();
+        return 0;
+    }
+
+    /*
     private double euler(double deltaTime, Particle p) {
         double x = p.getX();
         double v = p.getSpeed();
         double f = getForce(p);
-        System.out.println("Euler f: " + f);
         double v_new = v + f * deltaTime / p.getMass();
         double x_new = x + v_new * deltaTime + f / p.getMass() * deltaTime * deltaTime / 2 ;
         System.out.println("Euler x_new: " + x_new + "---------------------------------------------------");
         return x_new;
     }
+     */
 
     private void beeman(double deltaTime) {
+        // Implement Beeman predictor-corrector algorithm
+        for (Particle p : particles) {
 
-
+        }
     }
 
     private void gear(double deltaTime) {
