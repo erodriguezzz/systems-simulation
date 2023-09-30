@@ -9,7 +9,7 @@ public class Particle implements Comparable<Particle>{
     private final double mass;
     private double speed;
     private final double radius;
-    private double acceleration;
+    // private double acceleration;
     private double x;
     private Double previousX = null;
 
@@ -54,13 +54,13 @@ public class Particle implements Comparable<Particle>{
         return Double.compare(this.x, p2.x);
     }
 
-    public double getAcceleration() {
-        return acceleration;
-    }
-
-    public void setAcceleration(double acceleration) {
-        this.acceleration = acceleration;
-    }
+//    public double getAcceleration() {
+//        return acceleration;
+//    }
+//
+//    public void setAcceleration(double acceleration) {
+//        this.acceleration = acceleration;
+//    }
 
     public Double getPreviousX() {
         return previousX;
@@ -86,7 +86,7 @@ public class Particle implements Comparable<Particle>{
                 ", mass=" + mass +
                 ", speed=" + speed +
                 ", radius=" + radius +
-                ", acceleration=" + acceleration +
+//                ", acceleration=" + acceleration +
                 ", x=" + x +
                 ", previousX=" + previousX +
                 '}';
