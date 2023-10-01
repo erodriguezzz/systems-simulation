@@ -1,18 +1,17 @@
 package services;
 
-import models.LinearParticle;
-import models.Particle;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.util.*;
+
+import models2.Particle;
 
 public class DataManager2 {
     private double max_radius = 0;
     private float L;
     private int N;
     private float time;
-    private HashSet<LinearParticle> particles = new HashSet<>();
+    private List<Particle> particles = new ArrayList<>();
 
     public DataManager2(String staticPath, String dynamicPath) {
         readParticlesFiles(staticPath, dynamicPath);
@@ -40,21 +39,21 @@ public class DataManager2 {
             this.N = dynamicScanner.nextInt();
             this.time = dynamicScanner.nextFloat();
 
-            int counter = 0;
             while (staticScanner.hasNext() && dynamicScanner.hasNext()) {
                 int id = dynamicScanner.nextInt();
                 float x = dynamicScanner.nextFloat();
                 float y = dynamicScanner.nextFloat();
                 float speed = dynamicScanner.nextFloat();
+                float speedy = dynamicScanner.nextFloat();
+                float auxU = dynamicScanner.nextFloat();
                 double radius = dynamicScanner.nextFloat();
                 double mass = dynamicScanner.nextFloat();
-                double force = dynamicScanner.nextFloat();
 
-                counter++;
-                System.out.println("ID" + particles.size());
-                particles.add(new LinearParticle(id, x, speed, radius, mass)); //TODO: avoid hard coding
+                Random random = new Random();
+                double u = random.nextDouble() * 3 + 9;
+
+                particles.add(new Particle(id, x, speed, u, radius, mass)); //TODO: avoid hard coding
             }
-            System.out.println("COUNTER" + counter);
             staticScanner.close();
             dynamicScanner.close();
         } catch (Exception e) {
@@ -63,30 +62,24 @@ public class DataManager2 {
 
     }
 
-    public static void writeDynamicFile(Set<LinearParticle> particles, String filePath, double time) {
+    public void writeDynamicFile(List<Particle> particles, String filePath, double time) {
         try {
             File file = new File(filePath);
             FileWriter writer = new FileWriter(file, true);
-            if (file.createNewFile()) {
-                int id = 1;
-                File startingFile = new File("./data/input/dynamic.txt");
-                Scanner scanner = new Scanner(startingFile);
-                while (scanner.hasNext()) {
-                    String line = scanner.nextLine();
-                    writer.write(id + " " + line + "\n");
-                    id++;
-                }
-                scanner.close();
-                System.out.println("File created successfully");
-            } else {
-                StringBuilder data = new StringBuilder();
-                data.append(10 + "\n");
-                data.append("Frame: " + time + '\n');
-                for (LinearParticle p : particles) {
-                    data.append(p.getId() + " " + p.getX() + " 0 " + p.getVx() + " " + p.getRadius() + " " + p.getMass() + " " + p.getForce() + "\n");
-                }
-                writer.write(data.toString());
+            
+            StringBuilder data = new StringBuilder();
+            data.append(particles.size() + "\n");
+            data.append("Frame: " + time + '\n');
+            for (Particle p : particles) {
+                data.append(p.getId() + " " + 
+                p.getX() + " 0 " + 
+                p.getVx() + " 0 " + 
+                p.getU() + " " +
+                p.getRadius() + " " + 
+                p.getMass() + "\n");
             }
+            writer.write(data.toString());
+            
             writer.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -102,8 +95,7 @@ public class DataManager2 {
         return N;
     }
 
-    public HashSet<LinearParticle> getParticles() {
-        System.out.println("PARTICLES" + particles.size());
+    public List<Particle> getParticles() {
         return particles;
     }
 
