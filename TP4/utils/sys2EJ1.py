@@ -7,14 +7,12 @@ file_list = []
 color_list = ['b', 'g', 'r', 'c', 'y']
 
 
-# K = ['0.1', '0.01', '0.001', '1.0E-4', '1.0E-5']
-K = [  '0.001', '1.0E-4', '1.0E-5']
+K = ['0.1', '0.01', '0.001', '1.0E-4', '1.0E-5']
+# K = [  '0.001', '1.0E-4', '1.0E-5']
 ks = [1, 2, 3, 4]
 N = [25]
 
-k_thetas = []
-FRAMEMAX = 1600
-# DALE BOOOOOOOOOOOOOOOOOOOOOO
+FRAMEMAX = 1798
 
 # noise = [i*0.2 for i in range(1, 30)]
 for iteration in range(len(K)-1):
@@ -37,7 +35,7 @@ for iteration in range(len(K)-1):
                     sum += min(abs(x1 - x2), 135 - abs(x1 - x2))
                 values.append(sum)
     print(iteration)
-    plt.scatter(range(0, FRAMEMAX), values, marker='o', linestyle='-', color=color_list[iteration], label=f'K= {ks[iteration]}')
+    plt.scatter([i*0.1 for i in range(0, FRAMEMAX)], values, marker='o', s=1 ,linestyle='-', color=color_list[iteration], label=f'K= {ks[iteration]}')
     vas=[]
     stds=[]
 

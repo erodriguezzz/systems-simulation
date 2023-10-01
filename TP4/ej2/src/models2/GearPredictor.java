@@ -9,20 +9,22 @@ import services.DataManager2;
 public class GearPredictor {
     
     static double L = 135;
-    public static double totalTime = 180;
+    public static double totalTime = 180.01;
     private DataManager2 dm;
 
 
     private List<Particle> particles;
     private double dt;
+    private int v;
     
     private List<List<Double>> particeDerivatives = new ArrayList<>();
     private static final double[] coefficients = {3.0/16, 251.0/360, 1, 11.0/18, 1.0/6, 1.0/60};
 
-    public GearPredictor(List<Particle> particles, double dt, DataManager2 dm) {
+    public GearPredictor(List<Particle> particles, double dt, DataManager2 dm, int v) {
         this.particles = particles;
         this.dt = dt;
         this.dm = dm;
+        this.v = v;
     }
 
     public void run() throws IOException {
@@ -44,16 +46,17 @@ public class GearPredictor {
 
         double currentTime = dT;
         List<List<Double>> iteration = particeDerivatives;
-        double frames=0;
+        int frames=0;
+        int iterationsPerFrame = (int) (0.1/dT);
         while(currentTime <= totalTime) {
-            frames +=dT;
+            frames++;
             for (Particle particle: particles) {
                 particle.setX(iteration.get(particle.getId()).get(0));
                 particle.setVx(iteration.get(particle.getId()).get(1));
                 particle.setAx(iteration.get(particle.getId()).get(2));
             }
-            if(frames >= 0.1) {
-                dm.writeDynamicFile(particles, "./data/output/Dynamic2_N_" + particles.size() + "_dt_" + dT + ".dump", currentTime);
+            if(frames == iterationsPerFrame) {
+                dm.writeDynamicFile(particles, "./data/output/Dynamic2_N_" + particles.size() + "_dt_" + dT + "_v_" + v +".dump", currentTime);
                 frames = 0;
             }
             List<List<Double>> newDerivatives = gearPredict(iteration, dT, particles);

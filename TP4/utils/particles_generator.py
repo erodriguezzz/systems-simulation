@@ -1,10 +1,10 @@
 import random
 import math
 
-DOMAIN_LENGTH = 135;
+DOMAIN_LENGTH = 135
 
-def generate_particles(N, radius, mass):
-    with open(f"./data/input/Static2_N_{N}.dump", "w") as f:
+def generate_particles(N, radius, mass, v):
+    with open(f"./data/input/Static2_N_{N}_v_{v}.dump", "w") as f:
         positions = set()
         for _ in range(N):
             while True:
@@ -24,7 +24,7 @@ def generate_particles(N, radius, mass):
             positions.add(position)
             f.write(f"{radius}   {mass}\n")
 
-        with open(f"./data/input/Dynamic2_N_{N}.dump", "w") as f:
+        with open(f"./data/input/Dynamic2_N_{N}_v_{v}.dump", "w") as f:
             f.write(str(N) + "\n")
             f.write("0" + "\n")
             id = 0 
@@ -37,10 +37,11 @@ def generate_particles(N, radius, mass):
                 f.write(f"{id} {x} {y} {vx} {0} {0} {radius} {mass} \n")
                 id  = id + 1
 
-N_values = [30]
+N_values = [5, 10, 15, 20, 25, 30]
 
 for N in N_values:
-    generate_particles(N, 2.25, 25)
-    print("N:" + str(N)+ "finished")
+    for v in range(0, 20):
+        generate_particles(N, 2.25, 25, v)
+        print("N:" + str(N)+ "finished")
 
 print("Files generated.")
