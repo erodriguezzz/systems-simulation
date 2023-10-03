@@ -12,9 +12,11 @@ public class DataManager {
     private int N;
     private float time;
     private Set<Particle> particles = new HashSet<>();
+    private String output;
 
-    public DataManager(String staticPath, String dynamicPath, String[] output) {
+    public DataManager(String staticPath, String dynamicPath, String output) {
         readParticlesFiles(staticPath, dynamicPath);
+        this.output = output;
         // TODO: should we include the clear of OutputFiles?
     }
 
@@ -37,7 +39,7 @@ public class DataManager {
             Scanner staticScanner = new Scanner(staticFile);
             Scanner dynamicScanner = new Scanner(dynamicFile);
             this.N = dynamicScanner.nextInt();
-            this.time = dynamicScanner.nextFloat();
+            // this.time = dynamicScanner.nextFloat();
 
             while (staticScanner.hasNext() && dynamicScanner.hasNext()) {
                 float x = dynamicScanner.nextFloat();
@@ -57,6 +59,32 @@ public class DataManager {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public void writeOscilatorFile(double[] solution, double timeStepper) {
+        try {
+            File file = new File(output);
+            FileWriter writer = new FileWriter(file, true);
+            if (file.createNewFile()) {
+                double time = 0;
+                for (double r : solution) {
+                    writer.write("Frame: " + time + '\n');
+                    writer.write(String.format("%.10g\n", r));
+                    time += timeStepper;
+                }
+            } else {
+                clearOutputFile(output);
+                double time = 0;
+                for (double r : solution) {
+                    writer.write("Frame: " + time + '\n');
+                    writer.write(String.format("%.10g\n", r));
+                    time += timeStepper;
+                }
+            }
+            writer.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void writeDynamicFile(Set<Particle> particles, String filePath, double time) {

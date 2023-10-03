@@ -1,0 +1,16 @@
+from utils.utils import read_oscillator_data
+from plotter.plotter import plot_oscillator, plot_error
+
+if __name__ == '__main__':
+    algs = ['verlet', 'beeman', 'gear']
+    data = {}
+    for alg in algs:
+        data[alg] = []
+        for i in range(1, 7):
+            timestepper = 10 ** -i
+            if timestepper <= 0.0001:
+                timestepper = "1.0E-" + str(i)
+            data[alg].append([timestepper, 5, read_oscillator_data(f'./data/output/Dynamic_Int_{alg}_TS_{timestepper}.dump')])
+
+    plot_error(data, 'error_vs_dt')
+    plot_oscillator(data, 1, 'solution')

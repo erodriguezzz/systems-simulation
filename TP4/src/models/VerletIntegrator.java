@@ -1,23 +1,28 @@
 package models;
 
-import java.util.Collection;
 import java.util.function.BiFunction;
 
 public class VerletIntegrator implements Integrator {
 
     @Override
-    public void solve(double dt, Collection<Particle> particles, BiFunction<Double, Double, Double> force) {
-        for (Particle p : particles) {
-            double x = p.getX();
-            double v = p.getSpeed();
-            double f = force.apply(x, v);
+    public double[] solve(Particle p, double dt, double tf, BiFunction<Double, Double, Double> force) {
+        double v0 = p.getSpeed(), r0 = p.getX(), mass = p.getMass();
+        int size = (int) Math.floor(tf / dt);
+        double[] r = new double[size];
+        double v = v0;
+        r[0] = r0;
+        r[1] = 2 * r[0] - (r[0] - v0 * dt) + (dt * dt * force.apply(r[0], v)) / mass;
 
-            double previous = p.getPreviousX() == null ? (x - v * dt) : p.getPreviousX();
-            // double previous = p.getPreviousX() == null ? 1 : p.getPreviousX();
-            double x_new = 2*x - previous + f * dt * dt / p.getMass();
-            double v_new = v + f * dt / p.getMass();
-            p.setX(x_new);
-            p.setSpeed(v_new);
+        for(int i = 2; i < size; i++) {
+            v = v + (dt /mass) * force.apply(r[i - 1], v);
+            r[i] = 2 * r[i - 1] - r[i - 2] + (dt * dt * force.apply(r[i - 1], v)) / mass;
         }
+
+        return r;
+    }
+
+    @Override
+    public String toString() {
+        return "verlet";
     }
 }

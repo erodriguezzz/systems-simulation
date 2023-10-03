@@ -1,45 +1,62 @@
 package models;
 
-import java.util.Collection;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Random;
 import java.util.function.BiFunction;
 
 public class GearIntegrator implements Integrator {
 
-    private static final double[] coefficients = {3 / 16.0, 251 / 360.0, 1, 11 / 18.0, 1 / 6.0, 1 / 60.0};
-    private static final double[] A = {0, 0, 0, 0, 0, 0};
+    private final static double[] FACTORIAL = {1.0, 1.0, 2.0, 6.0, 24.0, 120.0};
+    private final static double[] ALPHA = {3.0 / 16.0, 251.0 / 360.0, 1.0, 11.0 / 18.0, 1.0 / 6.0, 1.0 / 60.0};
 
     @Override
-    public void solve(double dt, Collection<Particle> particles, BiFunction<Double, Double, Double> force) {
-        for (Particle p : particles) {
-            double mass = p.getMass();
+    public double[] solve(Particle p, double dt, double tf, BiFunction<Double, Double, Double> force) {
+        double v0 = p.getSpeed(), r0 = p.getX(), mass = p.getMass();
+        int size = (int) Math.floor(tf / dt);
+        final double[] position = new double[size];
 
-            double x = p.getX();
-            double v = p.getSpeed();
-            double a = A[2] == 0 ? force.apply(x, v) / mass : A[2];
-            double x3 = A[3] == 0 ? force.apply(v, a) / mass : A[3];
-            double x4 = A[4] == 0 ? force.apply(a, x3) / mass : A[4];
-            double x5 = A[5] == 0 ? force.apply(x3, x4) / mass : A[5];
+        final double[] r = new double[6], rpred = new double[6]; // Order 5
+        position[0] = r[0] = r0;
+        r[1] = v0;
+        r[2] = force.apply(r0, v0) / mass;
 
-            double xPredict = x + v * dt + a * Math.pow(dt,2) / 2 + x3 * Math.pow(dt,3) / 6 + x4 * Math.pow(dt, 4) / 24 + x5 * Math.pow(dt, 5) / 120;
-            double x1Predict = v + a * dt + x3 * Math.pow(dt,2) / 2 + x4 * Math.pow(dt,3) / 6 + x5 * Math.pow(dt, 4) / 24;
-            double x2Predict = a + x3 * dt + x4 * Math.pow(dt,2) / 2 + x5 * Math.pow(dt,3) / 6;
-            double x3Predict = x3 + x4 * dt + x5 * Math.pow(dt,2) / 2;
-            double x4Predict = x4 + x5 * dt;
+        for (int i = 1; i < size; i++) {
+            // Predict
+            for (int j = 0; j < rpred.length; j++) {
+                rpred[j] = taylorExpansion(r, dt, j);
+            }
 
-            double deltaA = force.apply(xPredict, x1Predict) / mass - x2Predict;
-            double deltaR2 = deltaA * Math.pow(dt, 2) / 2;
+            // Evaluate
+            final double da = (force.apply(rpred[0], rpred[1]) / mass) - rpred[2];
+            final double dR2 = da * dt * dt * 0.5;
 
-            A[0] = xPredict + deltaR2 * coefficients[0];
-            A[1] = x1Predict + deltaR2 * coefficients[1] / dt;
-            A[2] = x2Predict + deltaR2 * coefficients[2] / Math.pow(dt, 2) * 2;
-            A[3] = x3Predict + deltaR2 * coefficients[3] / Math.pow(dt, 3) * 6;
-            A[4] = x4Predict + deltaR2 * coefficients[4] / Math.pow(dt, 4) * 24;
-            A[5] = x5 + deltaR2 * coefficients[5] / Math.pow(dt, 5) * 120;
+            // Correct
+            for (int j = 0; j < r.length; j++) {
+                r[j] = correct(rpred[j], dR2, dt, j);
+            }
 
-            p.setX(A[0]);
-            p.setSpeed(A[1]);
+            position[i] = r[0];
         }
 
+        return position;
+    }
+
+    private double taylorExpansion(double[] values, double dt, int startFrom) {
+        double sum = values[startFrom];
+        for (int i = startFrom + 1; i < values.length; i++) {
+            sum += values[i] * Math.pow(dt, i - startFrom) / FACTORIAL[i - startFrom];
+        }
+        return sum;
+    }
+
+    private double correct(double predicted, double dR2, double dt, int index) {
+        return predicted + ALPHA[index] * dR2 * FACTORIAL[index] / Math.pow(dt, index);
+    }
+
+    @Override
+    public String toString() {
+        return "gear";
     }
 
 }
