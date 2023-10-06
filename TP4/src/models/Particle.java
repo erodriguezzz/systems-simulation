@@ -10,7 +10,7 @@ public class Particle implements Comparable<Particle>{
     private double speed;
     private final double radius;
     // private double acceleration;
-    private double x;
+    private double x, ax, x3, x4, x5;
     private Double previousX = null;
 
     public Particle(double radius, double x, double speed, double mass) {
@@ -20,6 +20,9 @@ public class Particle implements Comparable<Particle>{
         this.speed = speed;
         this.mass = mass;
         counter++;
+        this.x3=0;
+        this.x4=0;
+        this.x5=0;
     }
 
     public double getRadius() {
@@ -51,16 +54,9 @@ public class Particle implements Comparable<Particle>{
 
     @Override
     public int compareTo(Particle p2) {
-        return Double.compare(this.x, p2.x);
+      return Double.compare(this.x, p2.x);
     }
-
-//    public double getAcceleration() {
-//        return acceleration;
-//    }
-//
-//    public void setAcceleration(double acceleration) {
-//        this.acceleration = acceleration;
-//    }
+  
 
     public Double getPreviousX() {
         return previousX;
@@ -90,5 +86,71 @@ public class Particle implements Comparable<Particle>{
                 ", x=" + x +
                 ", previousX=" + previousX +
                 '}';
+    }
+
+
+
+    public static int getCounter() {
+        return counter;
+    }
+
+
+
+    public static void setCounter(int counter) {
+        Particle.counter = counter;
+    }
+
+
+
+    public double getAx() {
+        return ax;
+    }
+
+
+
+    public void setAx(double ax) {
+        this.ax = ax;
+    }
+
+
+
+    public double getX3() {
+        return x3;
+    }
+
+
+
+    public void setX3(double x3) {
+        this.x3 = x3;
+    }
+
+
+
+    public double getX4() {
+        return x4;
+    }
+
+
+
+    public void setX4(double x4) {
+        this.x4 = x4;
+    }
+
+
+
+    public double getX5() {
+        return x5;
+    }
+
+
+
+    public void setX5(double x5) {
+        this.x5 = x5;
+    }
+
+
+
+    public void setPreviousX(Double previousX) {
+        this.previousX = previousX;
     }
 }

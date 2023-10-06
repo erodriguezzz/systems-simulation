@@ -34,15 +34,12 @@ public class Gear {
             double[] predictedValues = gearPredictor(particle.getX() % L, p1.getVx(), p1.getX2(), p1.getX3(),
                     p1.getX4(), p1.getX5(), particle.getXnoPeriodic());
 
-            // predictor
+                    
             // evaluator
-
             double R2 = gearEvaluator(particle, predictedValues);
 
-            // evaluator
 
             // corrector
-
             particle.setX((predictedValues[0] + gearCoefficients[0] * R2) % L);
             particle.setXnoPeriodic((predictedValues[6] + gearCoefficients[0] * R2));
             particle.setVx(predictedValues[1] + gearCoefficients[1] * R2 / dt);
