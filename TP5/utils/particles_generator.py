@@ -9,8 +9,8 @@ def generate_particles(N, mass, v):
         positions = set()
         for _ in range(N):
             while True:
-                x = random.uniform(0, DOMAIN_WIDTH)
-                y = random.uniform(0, DOMAIN_HEIGHT)
+                x = random.uniform(1.15, DOMAIN_WIDTH - 1.15)
+                y = random.uniform(1.15, DOMAIN_HEIGHT - 1.15)
                 radius = random.uniform(0.85, 1.15)
                 position = (x, y, radius)
                 if all(

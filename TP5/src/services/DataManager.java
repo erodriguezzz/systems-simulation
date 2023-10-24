@@ -49,13 +49,14 @@ public class DataManager {
 
     }
 
-    public void writeDynamicFile(List<Particle> particles, String filePath, BigDecimal time) {
+    public void writeDynamicFile(List<Particle> particles, String filePath, BigDecimal time, List<Particle> limits) {
         try {
             File file = new File(filePath);
             FileWriter writer = new FileWriter(file, true);
             
             StringBuilder data = new StringBuilder();
-            data.append(particles.size() + "\n");
+            int size = particles.size() + limits.size();
+            data.append(size + "\n");
             data.append("Frame: " + time.stripTrailingZeros().toString() + '\n');
             for (Particle p : particles) {
                 data.append(p.getId() + " " + 
@@ -64,7 +65,19 @@ public class DataManager {
                 p.getVx() + " " + 
                 p.getVy() + " 0 " +
                 p.getRadius() + " " + 
-                p.getMass() + "\n");
+                p.getMass() + 
+                " 255 0 0" +
+                "\n");
+            }
+            for(Particle l : limits){
+                data.append(l.getId() + " " + 
+                l.getX() + " " +
+                l.getY() + " " +
+                l.getVx() + " " + 
+                l.getVy() + " 0 " +
+                l.getRadius() + " " + 
+                l.getMass() + 
+                " 255 255 255" +"\n");
             }
             writer.write(data.toString());
             
