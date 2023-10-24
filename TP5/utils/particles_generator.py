@@ -31,7 +31,7 @@ def generate_particles(N, mass, v):
                 # if N == 25:
                     # f.write(f"{id} {DOMAIN_LENGTH/25*id} {y} {vx} {0} {0} {radius} {mass} \n")
                 # else:
-                f.write(f"{id} {x} {y} {vx} {0} {0} {radius} {mass} \n")
+                f.write(f"{id} {x} {y} {0} {0} {0} {radius} {mass} \n")
                 id  = id + 1
 
 N_values = [200]

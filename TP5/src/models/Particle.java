@@ -1,55 +1,65 @@
 package models;
 
 import java.math.BigDecimal;
+import java.security.PublicKey;
 import java.util.Objects;
 
 public class Particle implements Comparable<Particle> {
     private int id;
     private BigDecimal vx, vy, fx, fy;
     private BigDecimal x, y;
-    private double x2, x3, x4, x5, XnoPeriodic;
-    private double radius;
+    private BigDecimal prevAx, prevAy;
+    private BigDecimal ax, ay;
+    private BigDecimal radius;
     private BigDecimal mass;
     // private double vx;
     private double u;
 
-    public Particle(int id, BigDecimal x, double vx, double u, double radius, BigDecimal mass, double XnoPeriodic) {
+    public Particle(int id, BigDecimal x, BigDecimal y, BigDecimal mass, BigDecimal radius){
         this.id = id;
         this.x = x;
-        this.x2 = 0;
-        this.x3 = 0;
-        this.x4 = 0;
-        this.x5 = 0;
-        this.XnoPeriodic = XnoPeriodic;
+        this.y = y;
+        this.mass = mass;
+        this.radius = radius;
+        this.vx = BigDecimal.ZERO;
+        this.vy = BigDecimal.ZERO;
+        this.fx = BigDecimal.ZERO;
+        this.fy = BigDecimal.ZERO;
+        this.prevAx = BigDecimal.ZERO;
+        this.prevAy = BigDecimal.valueOf(-9.8);
+        this.ax = BigDecimal.ZERO;
+        this.ay = BigDecimal.ZERO;
+    }
+
+    public Particle(int id, BigDecimal x, double vx, double u, BigDecimal radius, BigDecimal mass, double XnoPeriodic) {
+        this.id = id;
+        this.x = x;
         this.radius = radius;
         this.mass = mass;
         // this.vx = vx;
         this.u = u;
     }
 
-    public Particle(int id, BigDecimal x, double vx, double u, double radius, BigDecimal mass, double x2, double x3, double x4,
+    public Particle(int id, BigDecimal x, double vx, double u, BigDecimal radius, BigDecimal mass, double x2, double x3,
+            double x4,
             double x5, double XnoPeriodic) {
         this.id = id;
         this.x = x;
-        this.x2 = x2;
-        this.x3 = x3;
-        this.x4 = x4;
-        this.x5 = x5;
         this.radius = radius;
         this.mass = mass;
         // this.vx = vx;
         this.u = u;
-        this.XnoPeriodic = XnoPeriodic;
     }
 
     // public double collision(Particle p2) {
-    //     return 2500 * (Math.abs(this.getX() - p2.getX()) - (2 * this.getRadius()))
-    //             * (Math.signum(this.getX() - p2.getX()));
+    // return 2500 * (Math.abs(this.getX() - p2.getX()) - (2 * this.getRadius()))
+    // * (Math.signum(this.getX() - p2.getX()));
     // }
 
     public BigDecimal getX() {
         return x;
     }
+
     public BigDecimal getY() {
         return y;
     }
@@ -62,7 +72,7 @@ public class Particle implements Comparable<Particle> {
         this.y = y;
     }
 
-    public double getRadius() {
+    public BigDecimal getRadius() {
         return radius;
     }
 
@@ -82,38 +92,6 @@ public class Particle implements Comparable<Particle> {
         return u;
     }
 
-    public double getX2() {
-        return x2;
-    }
-
-    public void setX2(double x2) {
-        this.x2 = x2;
-    }
-
-    public double getX3() {
-        return x3;
-    }
-
-    public void setX3(double x3) {
-        this.x3 = x3;
-    }
-
-    public double getX4() {
-        return x4;
-    }
-
-    public void setX4(double x4) {
-        this.x4 = x4;
-    }
-
-    public double getX5() {
-        return x5;
-    }
-
-    public void setX5(double x5) {
-        this.x5 = x5;
-    }
-
     public int getId() {
         return id;
     }
@@ -123,13 +101,57 @@ public class Particle implements Comparable<Particle> {
         this.fy = BigDecimal.ZERO;
     }
 
-    
+    public BigDecimal evaluateAx() {
+        return fx.divide(mass);
+    }
+
+    public BigDecimal evaluateAy() {
+        return fy.divide(mass);
+    }
+
+    public BigDecimal getPrevAx() {
+        return prevAx;
+    }
+
+    public void setPrevAx(BigDecimal prevAx) {
+        this.prevAx = prevAx;
+    }
+
+    public BigDecimal getPrevAy() {
+        return prevAy;
+    }
+
+    public void setPrevAy(BigDecimal prevAy) {
+        this.prevAy = prevAy;
+    }
+
+    public BigDecimal distance(Particle p) {
+        return BigDecimal.valueOf(Math.sqrt(Math.pow(this.getX().subtract(p.getX()).doubleValue(), 2)
+                + Math.pow(this.getY().subtract(p.getY()).doubleValue(), 2)));
+    }
+
+    public void addForces(BigDecimal Fn, BigDecimal Ft, Particle otherP) {
+        BigDecimal distance = this.distance(otherP);
+        BigDecimal forceX = Fn.multiply(this.getX().subtract(otherP.getX())).divide(distance); //TODO check if vectors are correct
+        BigDecimal forceY = Fn.multiply(this.getY().subtract(otherP.getY())).divide(distance);
+        this.setFx(this.getFx().add(forceX));
+        this.setFy(this.getFy().add(forceY));
+        otherP.setFx(otherP.getFx().subtract(forceX));
+        otherP.setFy(otherP.getFy().subtract(forceY));
+
+        BigDecimal forceXt = Ft.multiply(this.getY().subtract(otherP.getY())).divide(distance);
+        BigDecimal forceYt = Ft.multiply(this.getX().subtract(otherP.getX())).divide(distance);
+        this.setFx(this.getFx().add(forceXt));
+        this.setFy(this.getFy().add(forceYt));
+        otherP.setFx(otherP.getFx().subtract(forceXt));
+        otherP.setFy(otherP.getFy().subtract(forceYt));
+    }
 
     public boolean collidesWith(Particle p, Double dt) {
         double dr = this.getX().compareTo(p.getX());
         double dv = this.getVx().compareTo(p.getVx());
 
-        double sigma = this.radius + p.getRadius();
+        double sigma = this.radius.add(p.getRadius()).doubleValue();
 
         double dvdr = (dr * dv);
         if (dvdr >= 0) {
@@ -150,15 +172,7 @@ public class Particle implements Comparable<Particle> {
         this.id = id;
     }
 
-    public double getXnoPeriodic() {
-        return XnoPeriodic;
-    }
-
-    public void setXnoPeriodic(double xnoPeriodic) {
-        XnoPeriodic = xnoPeriodic;
-    }
-
-    public void setRadius(double radius) {
+    public void setRadius(BigDecimal radius) {
         this.radius = radius;
     }
 
@@ -222,6 +236,22 @@ public class Particle implements Comparable<Particle> {
 
     public void setFy(BigDecimal fy) {
         this.fy = fy;
+    }
+
+    public BigDecimal getAx() {
+        return ax;
+    }
+
+    public void setAx(BigDecimal ax) {
+        this.ax = ax;
+    }
+
+    public BigDecimal getAy() {
+        return ay;
+    }
+
+    public void setAy(BigDecimal ay) {
+        this.ay = ay;
     }
 
 }

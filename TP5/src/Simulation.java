@@ -15,7 +15,7 @@ import models.Particle;
 public class Simulation {
 
     // static double L = 135;
-    static BigDecimal finalTime = BigDecimal.valueOf(1000);
+    static BigDecimal finalTime = BigDecimal.valueOf(10);
 
     private static void uniqueSimulation(int N, BigDecimal dt, int v) throws IOException {
 
@@ -24,7 +24,8 @@ public class Simulation {
                 "./data/input/Dynamic_N_" + N + "_v_" + v + ".dump");
         List<Particle> particles = dm.getParticles();
         BigDecimal currentTime = dt;
-        int iterationPerFrame = (int) Math.ceil(0.1 / dt.doubleValue());
+        // int iterationPerFrame = (int) Math.ceil(0.1 / dt.doubleValue());
+        int iterationPerFrame = 10;
         int frame = 0;
         BeemanIntegrator beemanIntegrator = new BeemanIntegrator(particles, dt);
 
@@ -37,7 +38,7 @@ public class Simulation {
                         currentTime);
                 frame = 0;
             }
-            currentTime.add(dt);
+            currentTime = currentTime.add(dt);
         }
         System.out.println("N " + N + " dt " + dt + " version " + v + " finished!");
     }

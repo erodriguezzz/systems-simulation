@@ -32,11 +32,14 @@ public class DataManager {
             while (staticScanner.hasNext() && dynamicScanner.hasNext()) {
                 int id = dynamicScanner.nextInt();
                 float x = dynamicScanner.nextFloat();
+                float y = dynamicScanner.nextFloat();
                 float speed = dynamicScanner.nextFloat();
+                float speed2 = dynamicScanner.nextFloat();
+                float speed3 = dynamicScanner.nextFloat();
                 double radius = dynamicScanner.nextFloat();
                 double mass = dynamicScanner.nextFloat();
 
-                particles.add(new Particle(id, x, speed, speed, radius, mass, x)); //TODO: avoid hard coding
+                particles.add(new Particle(id, BigDecimal.valueOf(x), BigDecimal.valueOf(y), BigDecimal.valueOf(mass), BigDecimal.valueOf(radius)));
             }
             staticScanner.close();
             dynamicScanner.close();
@@ -57,9 +60,9 @@ public class DataManager {
             for (Particle p : particles) {
                 data.append(p.getId() + " " + 
                 p.getX() + " " +
-                p.getXnoPeriodic() + " " +
-                p.getVx() + " 0 " + 
-                p.getU() + " " +
+                p.getY() + " " +
+                p.getVx() + " " + 
+                p.getVy() + " 0 " +
                 p.getRadius() + " " + 
                 p.getMass() + "\n");
             }
