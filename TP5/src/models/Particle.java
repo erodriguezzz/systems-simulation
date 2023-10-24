@@ -1,6 +1,7 @@
 package models;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.PublicKey;
 import java.util.Objects;
 
@@ -132,19 +133,26 @@ public class Particle implements Comparable<Particle> {
 
     public void addForces(BigDecimal Fn, BigDecimal Ft, Particle otherP) {
         BigDecimal distance = this.distance(otherP);
-        BigDecimal forceX = Fn.multiply(this.getX().subtract(otherP.getX())).divide(distance); //TODO check if vectors are correct
-        BigDecimal forceY = Fn.multiply(this.getY().subtract(otherP.getY())).divide(distance);
+        BigDecimal forceX = Fn.multiply(this.getX().subtract(otherP.getX())).divide(distance, 10, RoundingMode.HALF_UP); //TODO check if vectors are correct
+        BigDecimal forceY = Fn.multiply(this.getY().subtract(otherP.getY())).divide(distance, 10, RoundingMode.HALF_UP);
         this.setFx(this.getFx().add(forceX));
         this.setFy(this.getFy().add(forceY));
         otherP.setFx(otherP.getFx().subtract(forceX));
         otherP.setFy(otherP.getFy().subtract(forceY));
 
-        BigDecimal forceXt = Ft.multiply(this.getY().subtract(otherP.getY())).divide(distance);
-        BigDecimal forceYt = Ft.multiply(this.getX().subtract(otherP.getX())).divide(distance);
+        BigDecimal forceXt = Ft.multiply(this.getY().subtract(otherP.getY())).divide(distance, 10, RoundingMode.HALF_UP);
+        BigDecimal forceYt = Ft.multiply(this.getX().subtract(otherP.getX())).divide(distance, 10, RoundingMode.HALF_UP);
         this.setFx(this.getFx().add(forceXt));
         this.setFy(this.getFy().add(forceYt));
         otherP.setFx(otherP.getFx().subtract(forceXt));
         otherP.setFy(otherP.getFy().subtract(forceYt));
+    }
+
+    public void addWallForce(BigDecimal Fn, BigDecimal xMulti, BigDecimal yMulti){
+        BigDecimal forceX = Fn.multiply(xMulti); //TODO check if vectors are correct
+        BigDecimal forceY = Fn.multiply(yMulti);
+        this.setFx(this.getFx().add(forceX));
+        this.setFy(this.getFy().add(forceY));
     }
 
     public boolean collidesWith(Particle p, Double dt) {

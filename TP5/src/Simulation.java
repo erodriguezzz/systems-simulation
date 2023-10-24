@@ -25,17 +25,17 @@ public class Simulation {
         List<Particle> particles = dm.getParticles();
         BigDecimal currentTime = dt;
         // int iterationPerFrame = (int) Math.ceil(0.1 / dt.doubleValue());
-        int iterationPerFrame = 10;
+        int iterationPerFrame = 100;
         int frame = 0;
         BeemanIntegrator beemanIntegrator = new BeemanIntegrator(particles, dt);
         List<Particle> limits = new ArrayList<>();
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 20; i++){
             limits.add(new Particle(i, BigDecimal.valueOf(0), BigDecimal.valueOf(i*0.7), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
             limits.add(new Particle(i, BigDecimal.valueOf(20), BigDecimal.valueOf(i*0.7), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
 
             limits.add(new Particle(i, BigDecimal.valueOf(i*0.2), BigDecimal.valueOf(0), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
             limits.add(new Particle(i, BigDecimal.valueOf(i*0.2), BigDecimal.valueOf(70), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
-            limits.add(new Particle(i, BigDecimal.valueOf(i*0.2), BigDecimal.valueOf(-10), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
+            // limits.add(new Particle(i, BigDecimal.valueOf(i*0.2), BigDecimal.valueOf(-10), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
 
         }
 
