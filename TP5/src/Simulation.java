@@ -1,6 +1,5 @@
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -15,41 +14,42 @@ import models.Particle;
 public class Simulation {
 
     // static double L = 135;
-    static BigDecimal finalTime = BigDecimal.valueOf(10);
+    static double finalTime = 10;
 
-    private static void uniqueSimulation(int N, BigDecimal dt, int v) throws IOException {
+    private static void uniqueSimulation(int N, double dt, int v) throws IOException {
 
         DataManager dm = new DataManager(
                 "./data/input/Static_N_" + N + "_v_" + v + ".dump",
                 "./data/input/Dynamic_N_" + N + "_v_" + v + ".dump");
         List<Particle> particles = dm.getParticles();
-        BigDecimal currentTime = dt;
+        double currentTime = dt;
         // int iterationPerFrame = (int) Math.ceil(0.1 / dt.doubleValue());
         int iterationPerFrame = 100;
         int frame = 0;
         BeemanIntegrator beemanIntegrator = new BeemanIntegrator(particles, dt);
         List<Particle> limits = new ArrayList<>();
         for(int i = 0; i < 20; i++){
-            limits.add(new Particle(i, BigDecimal.valueOf(0), BigDecimal.valueOf(i*70/20), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
-            limits.add(new Particle(i, BigDecimal.valueOf(20), BigDecimal.valueOf(i*70/20), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
+            // TODO: change id schema to avoid problems
+            limits.add(new Particle(i, 0, i*70/20, 0, 0.3));
+            limits.add(new Particle(i, 20, i*70/20, 0, 0.3));
 
-            limits.add(new Particle(i, BigDecimal.valueOf(i*1), BigDecimal.valueOf(0), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
-            limits.add(new Particle(i, BigDecimal.valueOf(i*1), BigDecimal.valueOf(70), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
+            limits.add(new Particle(i, i*1, 0, 0, 0.3));
+            limits.add(new Particle(i, i*1, 70, 0, 0.3));
             // limits.add(new Particle(i, BigDecimal.valueOf(i*0.2), BigDecimal.valueOf(-10), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
 
         }
 
-        while (currentTime.compareTo(finalTime) < 0) {
+        while (currentTime - finalTime < 0) {
             frame++;
             beemanIntegrator.run();
             if (frame == iterationPerFrame) {
-                System.out.println("Frame: " + currentTime);
+                System.out.format("Frame: %.4f\n", currentTime);
                 dm.writeDynamicFile(beemanIntegrator.getParticles(),
                         "./data/output/Dynamic2_N_" + beemanIntegrator.getParticles().size() + "_dt_" + dt + "_v_" + v + ".dump",
                         currentTime, limits);
                 frame = 0;
             }
-            currentTime = currentTime.add(dt);
+            currentTime = currentTime + dt;
         }
         System.out.println("N " + N + " dt " + dt + " version " + v + " finished!");
     }
@@ -68,7 +68,7 @@ public class Simulation {
                     final int version = v;
                     Future<?> future = executor.submit(() -> {
                         try {
-                            uniqueSimulation(n, BigDecimal.valueOf(dt), version);
+                            uniqueSimulation(n, (dt), version);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

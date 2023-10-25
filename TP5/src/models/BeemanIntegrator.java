@@ -1,21 +1,19 @@
 package models;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public class BeemanIntegrator extends Integrator {
 
     private List<Particle> particles;
-    private BigDecimal dt;
-    private final BigDecimal frecuency = BigDecimal.valueOf(0.1);
-    private final BigDecimal d = BigDecimal.valueOf(0.1);
+    private double dt;
+    private final double frecuency = 0.1;
+    private final double d = 0.1;
     private Grid grid;
-    private BigDecimal[] beemanRConstants = { BigDecimal.valueOf(2 / 3), BigDecimal.valueOf(-1 / 6) };
-    private BigDecimal[] beemanVConstants = { BigDecimal.valueOf(3 / 2), BigDecimal.valueOf(-1 / 2) };
-    private BigDecimal[] beemanVConstantsCorrected = { BigDecimal.valueOf(1 / 3), BigDecimal.valueOf(5 / 6),
-            BigDecimal.valueOf(-1 / 6) };
+    private double[] beemanRConstants = { 2 / 3, -1 / 6 };
+    private double[] beemanVConstants = { 3 / 2, -1 / 2 };
+    private double[] beemanVConstantsCorrected = { 1 / 3, 5 / 6, -1 / 6 };
 
-    public BeemanIntegrator(List<Particle> particles, BigDecimal dt) {
+    public BeemanIntegrator(List<Particle> particles, double dt) {
         this.particles = particles;
         this.dt = dt;
         this.grid = new Grid();
@@ -77,37 +75,25 @@ public class BeemanIntegrator extends Integrator {
         p.setAy(p.evaluateAy());
             
         // BEGIN SETTING POSITIONS
-        BigDecimal ax = p.getAx();
-        BigDecimal prevAx = p.getPrevAx();
-        BigDecimal newX = p.getX().add(
-                p.getVx().multiply(dt)).add(
-                        ax.multiply(dt.pow(2).multiply(beemanRConstants[0])))
-                .add(
-                        prevAx.multiply(dt.pow(2).multiply(beemanRConstants[1])));
+        double ax = p.getAx();
+        double prevAx = p.getPrevAx();
+        double newX = p.getX() + p.getVx() * dt + ax * dt * dt * beemanRConstants[0] + prevAx * dt * dt * beemanRConstants[1];
         p.setX(newX);
 
-        BigDecimal ay = p.getAy();
-        BigDecimal prevAy = p.getPrevAy();
-        BigDecimal newY = p.getY().add(
-                p.getVy().multiply(dt)).add(
-                        ay.multiply(dt.pow(2).multiply(beemanRConstants[0])))
-                .add(
-                        prevAy.multiply(dt.pow(2).multiply(beemanRConstants[1])));
+        double ay = p.getAy();
+        double prevAy = p.getPrevAy();
+        double newY = p.getY() + p.getVy() * dt + ay * dt * dt * beemanRConstants[0] + prevAy * dt * dt * beemanRConstants[1];
         p.setY(newY);
         
 
         // BEGIN SETTING VELOCITY
 
-        BigDecimal vx = p.getVx();
-        BigDecimal newVx = vx.add(
-                ax.multiply(dt.multiply(beemanVConstants[0]))).add(
-                        prevAx.multiply(dt.multiply(beemanVConstants[1])));
+        double vx = p.getVx();
+        double newVx = vx + ax * dt * beemanVConstants[0] + prevAx * dt * beemanVConstants[1];
         p.setVx(newVx);
 
-        BigDecimal vy = p.getVy();
-        BigDecimal newVy = vy.add(
-                ay.multiply(dt.multiply(beemanVConstants[0]))).add(
-                        prevAy.multiply(dt.multiply(beemanVConstants[1])));
+        double vy = p.getVy();
+        double newVy = vy + ay * dt * beemanVConstants[0] + prevAy * dt * beemanVConstants[1];
         p.setVy(newVy);
         // if(p.getId() == 1){
         //         System.out.println(
@@ -124,20 +110,18 @@ public class BeemanIntegrator extends Integrator {
     }
 
     private void correct(Particle p) {
-        BigDecimal vx = p.getVx();
-        BigDecimal ax = p.getAx();
-        BigDecimal axP = p.evaluateAx();
-        BigDecimal prevAx = p.getPrevAx();
-        p.setVx(vx.add(axP.multiply(beemanVConstantsCorrected[0])).add(ax.multiply(beemanVConstantsCorrected[1]))
-                .add(prevAx.multiply(beemanVConstantsCorrected[2])));
+        double vx = p.getVx();
+        double ax = p.getAx();
+        double axP = p.evaluateAx();
+        double prevAx = p.getPrevAx();
+        p.setVx(vx + axP * beemanVConstantsCorrected[0] + ax * beemanVConstantsCorrected[1] + prevAx * beemanVConstantsCorrected[2]);
         p.setPrevAx(ax);
 
-        BigDecimal vy = p.getVy();
-        BigDecimal ay = p.getAy();
-        BigDecimal ayP = p.evaluateAy();
-        BigDecimal prevAy = p.getPrevAy();
-        p.setVy(vy.add(ayP.multiply(beemanVConstantsCorrected[0])).add(ay.multiply(beemanVConstantsCorrected[1]))
-                .add(prevAy.multiply(beemanVConstantsCorrected[2])));
+        double vy = p.getVy();
+        double ay = p.getAy();
+        double ayP = p.evaluateAy();
+        double prevAy = p.getPrevAy();
+        p.setVy(vy + ayP * beemanVConstantsCorrected[0] + ay * beemanVConstantsCorrected[1] + prevAy * beemanVConstantsCorrected[2]);
         p.setPrevAy(ay);
     }
 
@@ -145,7 +129,7 @@ public class BeemanIntegrator extends Integrator {
         return particles;
     }
 
-    public BigDecimal getDt() {
+    public double getDt() {
         return dt;
     }
 }

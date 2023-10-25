@@ -1,38 +1,30 @@
 package models;
 
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.PublicKey;
 import java.util.Objects;
 
 public class Particle implements Comparable<Particle> {
     private int id;
-    private BigDecimal vx, vy, fx, fy;
-    private BigDecimal x, y;
-    private BigDecimal prevAx, prevAy;
-    private BigDecimal ax, ay;
-    private BigDecimal radius;
-    private BigDecimal mass;
+    private double vx, vy, fx, fy;
+    private double x, y;
+    private double prevAx, prevAy;
+    private double ax, ay;
+    private double radius;
+    private double mass;
     // private double vx;
     private double u;
 
-    public Particle(int id, BigDecimal x, BigDecimal y, BigDecimal mass, BigDecimal radius){
+    public Particle(int id, double x, double y, double mass, double radius){
         this.id = id;
         this.x = x;
         this.y = y;
         this.mass = mass;
         this.radius = radius;
-        this.vx = BigDecimal.ZERO;
-        this.vy = BigDecimal.ZERO;
-        this.fx = BigDecimal.ZERO;
-        this.fy = BigDecimal.ZERO;
-        this.prevAx = BigDecimal.ZERO;
-        this.prevAy = BigDecimal.valueOf(-9.8);
-        this.ax = BigDecimal.ZERO;
-        this.ay = BigDecimal.ZERO;
+        this.prevAy = -9.8;
     }
 
-    public Particle(int id, BigDecimal x, double vx, double u, BigDecimal radius, BigDecimal mass, double XnoPeriodic) {
+    public Particle(int id, double x, double vx, double u, double radius, double mass, double XnoPeriodic) {
         this.id = id;
         this.x = x;
         this.radius = radius;
@@ -41,7 +33,7 @@ public class Particle implements Comparable<Particle> {
         this.u = u;
     }
 
-    public Particle(int id, BigDecimal x, double vx, double u, BigDecimal radius, BigDecimal mass, double x2, double x3,
+    public Particle(int id, double x, double vx, double u, double radius, double mass, double x2, double x3,
             double x4,
             double x5, double XnoPeriodic) {
         this.id = id;
@@ -57,35 +49,35 @@ public class Particle implements Comparable<Particle> {
     // * (Math.signum(this.getX() - p2.getX()));
     // }
 
-    public BigDecimal getX() {
+    public double getX() {
         return x;
     }
 
-    public BigDecimal getY() {
+    public double getY() {
         return y;
     }
 
-    public void setX(BigDecimal x) {
+    public void setX(double x) {
         this.x = x;
     }
 
-    public void setY(BigDecimal y) {
+    public void setY(double y) {
         this.y = y;
     }
 
-    public BigDecimal getRadius() {
+    public double getRadius() {
         return radius;
     }
 
-    public BigDecimal getMass() {
+    public double getMass() {
         return mass;
     }
 
-    public BigDecimal getVx() {
+    public double getVx() {
         return vx;
     }
 
-    public void setVx(BigDecimal vx) {
+    public void setVx(double vx) {
         this.vx = vx;
     }
 
@@ -98,68 +90,68 @@ public class Particle implements Comparable<Particle> {
     }
 
     public void resetForce() {
-        this.fx = BigDecimal.ZERO;
-        this.fy = BigDecimal.ZERO;
+        this.fx = 0;
+        this.fy = 0;
     }
 
-    public BigDecimal evaluateAx() {
-        return fx.divide(mass);
+    public double evaluateAx() {
+        return fx/mass;
     }
 
-    public BigDecimal evaluateAy() {
-        return fy.divide(mass);
+    public double evaluateAy() {
+        return fy/mass;
     }
 
-    public BigDecimal getPrevAx() {
+    public double getPrevAx() {
         return prevAx;
     }
 
-    public void setPrevAx(BigDecimal prevAx) {
+    public void setPrevAx(double prevAx) {
         this.prevAx = prevAx;
     }
 
-    public BigDecimal getPrevAy() {
+    public double getPrevAy() {
         return prevAy;
     }
 
-    public void setPrevAy(BigDecimal prevAy) {
+    public void setPrevAy(double prevAy) {
         this.prevAy = prevAy;
     }
 
-    public BigDecimal distance(Particle p) {
-        return BigDecimal.valueOf(Math.sqrt(Math.pow(this.getX().subtract(p.getX()).doubleValue(), 2)
-                + Math.pow(this.getY().subtract(p.getY()).doubleValue(), 2)));
+    public double distance(Particle p) {
+        return Math.sqrt(Math.pow(this.getX() - p.getX(), 2) + Math.pow(this.getY() - p.getY(), 2));
     }
 
-    public void addForces(BigDecimal Fn, BigDecimal Ft, Particle otherP) {
-        BigDecimal distance = this.distance(otherP);
-        BigDecimal forceX = Fn.multiply(this.getX().subtract(otherP.getX())).divide(distance, 10, RoundingMode.HALF_UP); //TODO check if vectors are correct
-        BigDecimal forceY = Fn.multiply(this.getY().subtract(otherP.getY())).divide(distance, 10, RoundingMode.HALF_UP);
-        this.setFx(this.getFx().add(forceX));
-        this.setFy(this.getFy().add(forceY));
-        otherP.setFx(otherP.getFx().subtract(forceX));
-        otherP.setFy(otherP.getFy().subtract(forceY));
+    public void addForces(double Fn, double Ft, Particle otherP) {
+        double distance = this.distance(otherP);
+        double forceX = Fn * (this.getX() - otherP.getX()) / distance; //TODO check if vectors are correct
+        double forceY = Fn * (this.getY() - otherP.getY()) / distance;
+        this.setFx(this.getFx() + forceX);
+        this.setFy(this.getFy() + forceY);
+        otherP.setFx(otherP.getFx() - forceX);
+        otherP.setFy(otherP.getFy() - forceY);
 
-        BigDecimal forceXt = Ft.multiply(this.getY().subtract(otherP.getY())).divide(distance, 10, RoundingMode.HALF_UP);
-        BigDecimal forceYt = Ft.multiply(this.getX().subtract(otherP.getX())).divide(distance, 10, RoundingMode.HALF_UP);
-        this.setFx(this.getFx().add(forceXt));
-        this.setFy(this.getFy().add(forceYt));
-        otherP.setFx(otherP.getFx().subtract(forceXt));
-        otherP.setFy(otherP.getFy().subtract(forceYt));
+        double forceXt = Ft * (this.getY() - otherP.getY()) / distance; //TODO check if vectors are correct
+        double forceYt = Ft * (this.getX() - otherP.getX()) / distance;
+        this.setFx(this.getFx() + forceXt);
+        this.setFy(this.getFy() + forceYt);
+        otherP.setFx(otherP.getFx() - forceXt);
+        otherP.setFy(otherP.getFy() - forceYt);
     }
 
-    public void addWallForce(BigDecimal Fn, BigDecimal xMulti, BigDecimal yMulti){
-        BigDecimal forceX = Fn.multiply(xMulti); //TODO check if vectors are correct
-        BigDecimal forceY = Fn.multiply(yMulti);
-        this.setFx(this.getFx().add(forceX));
-        this.setFy(this.getFy().add(forceY));
+    public void addWallForce(double Fn, double xMulti, double yMulti){
+        double forceX = Fn * xMulti; //TODO check if vectors are correct
+        double forceY = Fn * yMulti;
+        this.setFx(this.getFx() + forceX);
+        this.setFy(this.getFy() + forceY);
     }
 
     public boolean collidesWith(Particle p, Double dt) {
-        double dr = this.getX().compareTo(p.getX());
-        double dv = this.getVx().compareTo(p.getVx());
 
-        double sigma = this.radius.add(p.getRadius()).doubleValue();
+        double dr = Math.signum(this.getX() - p.getX());
+        double dv = Math.signum(this.getVx() - p.getVx());
+
+        double sigma = this.radius + p.getRadius();
 
         double dvdr = (dr * dv);
         if (dvdr >= 0) {
@@ -180,11 +172,11 @@ public class Particle implements Comparable<Particle> {
         this.id = id;
     }
 
-    public void setRadius(BigDecimal radius) {
+    public void setRadius(double radius) {
         this.radius = radius;
     }
 
-    public void setMass(BigDecimal mass) {
+    public void setMass(double mass) {
         this.mass = mass;
     }
 
@@ -202,7 +194,7 @@ public class Particle implements Comparable<Particle> {
 
     @Override
     public int compareTo(Particle p2) {
-        return this.x.compareTo(p2.getX());
+        return (int) Math.signum(this.x - p2.getX());
     }
 
     @Override
@@ -222,43 +214,43 @@ public class Particle implements Comparable<Particle> {
         return id == other.id;
     }
 
-    public BigDecimal getVy() {
+    public double getVy() {
         return vy;
     }
 
-    public void setVy(BigDecimal vy) {
+    public void setVy(double vy) {
         this.vy = vy;
     }
 
-    public BigDecimal getFx() {
+    public double getFx() {
         return fx;
     }
 
-    public void setFx(BigDecimal fx) {
+    public void setFx(double fx) {
         this.fx = fx;
     }
 
-    public BigDecimal getFy() {
+    public double getFy() {
         return fy;
     }
 
-    public void setFy(BigDecimal fy) {
+    public void setFy(double fy) {
         this.fy = fy;
     }
 
-    public BigDecimal getAx() {
+    public double getAx() {
         return ax;
     }
 
-    public void setAx(BigDecimal ax) {
+    public void setAx(double ax) {
         this.ax = ax;
     }
 
-    public BigDecimal getAy() {
+    public double getAy() {
         return ay;
     }
 
-    public void setAy(BigDecimal ay) {
+    public void setAy(double ay) {
         this.ay = ay;
     }
 

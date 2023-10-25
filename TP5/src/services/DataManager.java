@@ -2,7 +2,6 @@ package services;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.math.BigDecimal;
 import java.util.*;
 
 import models.Particle;
@@ -39,7 +38,7 @@ public class DataManager {
                 double radius = dynamicScanner.nextFloat();
                 double mass = dynamicScanner.nextFloat();
 
-                particles.add(new Particle(id, BigDecimal.valueOf(x), BigDecimal.valueOf(y), BigDecimal.valueOf(mass), BigDecimal.valueOf(radius)));
+                particles.add(new Particle(id, (x), (y), (mass), (radius)));
             }
             staticScanner.close();
             dynamicScanner.close();
@@ -49,7 +48,7 @@ public class DataManager {
 
     }
 
-    public void writeDynamicFile(List<Particle> particles, String filePath, BigDecimal time, List<Particle> limits) {
+    public void writeDynamicFile(List<Particle> particles, String filePath, double time, List<Particle> limits) {
         try {
             File file = new File(filePath);
             FileWriter writer = new FileWriter(file, true);
@@ -57,7 +56,8 @@ public class DataManager {
             StringBuilder data = new StringBuilder();
             int size = particles.size() + limits.size();
             data.append(size + "\n");
-            data.append("Frame: " + time.stripTrailingZeros().toString() + '\n');
+            data.append("Frame: " + time + '\n');
+            int lastId = 0;
             for (Particle p : particles) {
                 data.append(p.getId() + " " + 
                 p.getX() + " " +
@@ -68,9 +68,11 @@ public class DataManager {
                 p.getMass() + 
                 " 255 0 0" +
                 "\n");
+                lastId = p.getId();
             }
+            lastId++;
             for(Particle l : limits){
-                data.append(l.getId() + " " + 
+                data.append(lastId + " " +
                 l.getX() + " " +
                 l.getY() + " " +
                 l.getVx() + " " + 
@@ -78,6 +80,7 @@ public class DataManager {
                 l.getRadius() + " " + 
                 l.getMass() + 
                 " 255 255 255" +"\n");
+                lastId++;
             }
             writer.write(data.toString());
             

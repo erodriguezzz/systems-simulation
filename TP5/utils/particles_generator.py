@@ -39,6 +39,6 @@ N_values = [200]
 for N in N_values:
     for v in range(0, 1):
         generate_particles(N, 1, v)
-        print("N:" + str(N)+ "finished")
+        print("N:" + str(N)+ " finished")
 
 print("Files generated.")

@@ -1,38 +1,36 @@
 package models;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public class Grid {
-    private BigDecimal frequency;
-    private BigDecimal KN = BigDecimal.valueOf(-250);
-    private BigDecimal KT = BigDecimal.valueOf(-500);
-    private BigDecimal GAMMA = BigDecimal.valueOf(-2.5);
-    private BigDecimal MHU = BigDecimal.valueOf(-0.7);
-    private BigDecimal gravity = BigDecimal.valueOf(-9.8);
-    private BigDecimal bottom = BigDecimal.valueOf(0), top = BigDecimal.valueOf(70), left = BigDecimal.valueOf(0), right = BigDecimal.valueOf(20);
-    
+    private double frequency;
+    private double KN = -250;
+    private double KT = (-500);
+    private double GAMMA = (-2.5);
+    private double MHU = (-0.7);
+    private double gravity = (-9.8);
+    private double bottom = (0), top = (70), left = (0), right = (20);
     public void sin(){
 
     }
 
     public void updateForces(List<Particle> particles){
         for(Particle p : particles){
-            p.setFy(p.getFy().add(gravity));
+            p.setFy(p.getFy() + gravity);
 
             for (Particle otherP: particles){
                 if(!p.equals(otherP)){ //TODO adapt collides with?
-                    BigDecimal distance = p.distance(otherP);
-                    BigDecimal superposition = distance.subtract(p.getRadius()).subtract(otherP.getRadius());
-                    if(superposition.compareTo(BigDecimal.ZERO) < 0){
+                    double distance = p.distance(otherP);
+                    double superposition = distance - p.getRadius() - otherP.getRadius();
+                    if(superposition < 0){
                         // System.out.println("Collision!: "+p.getId()+" "+otherP.getId());
                         // System.out.println("Posititions "+p.getX()+" "+p.getY()+" "+otherP.getX()+" "+otherP.getY());
-                        BigDecimal Fn = KN.multiply(superposition).add(GAMMA.multiply(p.getVx().subtract(otherP.getVx())));
+                        double Fn = KN * superposition + GAMMA * (p.getVx() - otherP.getVx());
                         // BigDecimal Ft1 = KT.multiply(superposition).multiply(p.getVy().subtract(otherP.getVy())); //TODO: check if this is correct
-                        BigDecimal Ft1 = BigDecimal.valueOf(Double.MAX_VALUE);
-                        BigDecimal Ft2 = MHU.multiply(Fn).multiply(BigDecimal.valueOf(p.getVy().subtract(otherP.getVy()).signum()));
+                        double Ft1 = (Double.MAX_VALUE);
+                        double Ft2 = MHU * Fn * (int) Math.signum(p.getVy() - otherP.getVy());
 
-                        BigDecimal FtFinal = Ft1.min(Ft2);
+                        double FtFinal = Math.min(Ft1, Ft2);
                         p.addForces(Fn, FtFinal, otherP);
 
 
@@ -49,26 +47,26 @@ public class Grid {
     }
 
     public void borderForces(Particle p){
-        BigDecimal superpositionBottom = p.getY().subtract(p.getRadius()).subtract(bottom);
-        BigDecimal superpositionTop = top.subtract(p.getY()).subtract(p.getRadius());
-        BigDecimal superpositionLeft = p.getX().subtract(p.getRadius()).subtract(left);
-        BigDecimal superpositionRight = right.subtract(p.getX()).subtract(p.getRadius());
+        double superpositionBottom = p.getY() - p.getRadius() - bottom;
+        double superpositionTop = top - p.getY() - p.getRadius();
+        double superpositionLeft = p.getX() - p.getRadius() - left;
+        double superpositionRight = right - p.getX() - p.getRadius();
 
-        if(superpositionBottom.compareTo(BigDecimal.ZERO) < 0){
-            BigDecimal Fn = KN.multiply(superpositionBottom).add(GAMMA.multiply(p.getVy()));
-            p.addWallForce(Fn, BigDecimal.valueOf(0), BigDecimal.valueOf(1));
+        if(superpositionBottom < 0){
+            double Fn = KN * superpositionBottom + GAMMA * p.getVy();
+            p.addWallForce(Fn, 0, 1);
         }
-        if(superpositionTop.compareTo(BigDecimal.ZERO) < 0){
-            BigDecimal Fn = KN.multiply(superpositionTop).add(GAMMA.multiply(p.getVy()));
-            p.addWallForce(Fn, BigDecimal.valueOf(0), BigDecimal.valueOf(-1));
+        if(superpositionTop < 0){
+            double Fn = KN * superpositionTop + GAMMA * p.getVy();
+            p.addWallForce(Fn, 0, -1);
         }
-        if(superpositionLeft.compareTo(BigDecimal.ZERO) < 0){
-            BigDecimal Fn = KN.multiply(superpositionLeft).add(GAMMA.multiply(p.getVx()));
-            p.addWallForce(Fn, BigDecimal.valueOf(1), BigDecimal.valueOf(0));
+        if(superpositionLeft < 0){
+            double Fn = KN * superpositionLeft + GAMMA * p.getVx();
+            p.addWallForce(Fn, 1, 0);
         }
-        if(superpositionRight.compareTo(BigDecimal.ZERO) < 0){
-            BigDecimal Fn = KN.multiply(superpositionRight).add(GAMMA.multiply(p.getVx()));
-            p.addWallForce(Fn, BigDecimal.valueOf(-1), BigDecimal.valueOf(0));
+        if(superpositionRight < 0){
+            double Fn = KN * superpositionRight * GAMMA * p.getVx();
+            p.addWallForce(Fn, -1, 0);
         }
     }
 }
