@@ -19,18 +19,26 @@ public class BeemanIntegrator extends Integrator {
         this.grid = grid;
     }
 
-    public void run() {
+    public void run(double time) {
         // grid.sin();
-
-        particles.forEach(p -> predict(p));
+        // if(time > 0.224){
+        //     // System.out.println("hola");
+        // }
+        particles.forEach(p -> p.prediction(dt));
         particles.forEach(p -> p.resetForce());
 
-        grid.updateForces(particles);
+        grid.updateForces(particles, time);
 
-        particles.forEach(p -> correct(p));
+        particles.forEach(p -> p.correction(dt));
         particles.forEach(p -> p.resetForce());
 
-        grid.updateForces(particles);
+        grid.updateForces(particles, time);
+
+        // particles.forEach(p -> {
+        //     if(p.getId() == 1){ 
+        //         System.out.println(p);
+        //     }
+        // });
 
     }
 
@@ -75,25 +83,21 @@ public class BeemanIntegrator extends Integrator {
         p.setAy(p.evaluateAy());
             
         // BEGIN SETTING POSITIONS
-        double ax = p.getAx();
-        double prevAx = p.getPrevAx();
-        double newX = p.getX() + p.getVx() * dt + ax * dt * dt * beemanRConstants[0] + prevAx * dt * dt * beemanRConstants[1];
+        double newX = p.getX() + p.getVx() * dt + p.getAx() * dt * dt * beemanRConstants[0] + p.getPrevAx() * dt * dt * beemanRConstants[1];
         p.setX(newX);
 
-        double ay = p.getAy();
-        double prevAy = p.getPrevAy();
-        double newY = p.getY() + p.getVy() * dt + ay * dt * dt * beemanRConstants[0] + prevAy * dt * dt * beemanRConstants[1];
+        double newY = p.getY() + p.getVy() * dt + p.getAy() * dt * dt * beemanRConstants[0] + p.getPrevAy() * dt * dt * beemanRConstants[1];
         p.setY(newY);
         
 
         // BEGIN SETTING VELOCITY
 
         double vx = p.getVx();
-        double newVx = vx + ax * dt * beemanVConstants[0] + prevAx * dt * beemanVConstants[1];
+        double newVx = vx + p.getAx() * dt * beemanVConstants[0] + p.getPrevAx() * dt * beemanVConstants[1];
         p.setVx(newVx);
 
         double vy = p.getVy();
-        double newVy = vy + ay * dt * beemanVConstants[0] + prevAy * dt * beemanVConstants[1];
+        double newVy = vy + p.getAy() * dt * beemanVConstants[0] + p.getPrevAy() * dt * beemanVConstants[1];
         p.setVy(newVy);
         // if(p.getId() == 1){
         //         System.out.println(

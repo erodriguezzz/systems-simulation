@@ -15,7 +15,7 @@ import models.Particle;
 public class Simulation {
 
     // static double L = 135;
-    static double finalTime = 10;
+    static double finalTime = 2;
 
     private static void uniqueSimulation(int N, double dt, int v) throws IOException {
 
@@ -44,7 +44,7 @@ public class Simulation {
 
         while (currentTime - finalTime < 0) {
             frame++;
-            beemanIntegrator.run();
+            beemanIntegrator.run(currentTime);
             if (frame == iterationPerFrame) {
                 System.out.format("Frame: %.4f\n", currentTime);
                 dm.writeDynamicFile(beemanIntegrator.getParticles(),
@@ -60,7 +60,7 @@ public class Simulation {
     public static void main(String[] args) throws IOException {
 
         double[] dtValues = {  1.0E-3 };
-        int Ns[] = { 200 };
+        int Ns[] = { 2};
 
         ExecutorService executor = Executors.newFixedThreadPool(Ns.length * dtValues.length * 10);
         List<Future<?>> futures = new ArrayList<>();

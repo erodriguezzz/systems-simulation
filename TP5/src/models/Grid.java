@@ -4,12 +4,12 @@ import java.util.List;
 
 public class Grid {
     private double frequency;
-    private final static double KN = 0.25;
-    private final static double KT = (0.5);
-    private final static double GAMMA = (2.5);
+    private final static double KN = 25000;
+    private final static double KT = 50000;
+    private final static double GAMMA = (2.5/1000);
     private final static double MHU = (0.7);
     private final static double gravity = (-9.8);
-    private final static double bottom = (0), top = (77), left = (0), right = (20);
+    private final static double bottom = (0), top = (0.70), left = (0), right = (0.20);
     private Cell[][] cells;
     private List<Particle> particles;
 
@@ -36,9 +36,9 @@ public class Grid {
         this.particles = particles;
     }
 
-    public void updateForces(List<Particle> particles){
+    public void updateForces(List<Particle> particles, double time){
         for(Particle p : particles){
-            p.setFy(p.getFy() + gravity);
+            p.setFy(p.getFy() + gravity*p.getMass());
 
             for (Particle otherP: particles){
                 if(!p.equals(otherP)){ //TODO adapt collides with?
@@ -65,30 +65,38 @@ public class Grid {
                     }   
                 }
             }
-            borderForces(p);
+            borderForces(p, time);
         }
     }
 
-    public void borderForces(Particle p){
+    public void borderForces(Particle p, double time){
         double superpositionBottom = p.getY() - p.getRadius() - bottom;
         double superpositionTop = top - p.getY() - p.getRadius();
         double superpositionLeft = p.getX() - p.getRadius() - left;
         double superpositionRight = right - p.getX() - p.getRadius();
 
+        // TODO: fuerza tangencial con las paredes?
         if(superpositionBottom < 0){
-            double Fn = KN * superpositionBottom + GAMMA * p.getVy();
+            System.out.println("TIMEEEEEE: " + time);
+            
+            double fn1 = - KN * (superpositionBottom);
+            System.out.println("FN1: " + fn1 + "\tsuperposition: " + superpositionBottom + "\t");
+            double Fn = fn1 - GAMMA * p.getVy();
+            // 
+            System.out.println("Particle "+p+"\tbottom\tFn: " + Fn + " \tForcesx: " + p.getFx() + "\tForcesy: " + p.getFy());
             p.addWallForce(Fn, 0, 1);
+            System.out.println("FORCE Y " + p.getFy());
         }
         if(superpositionTop < 0){
-            double Fn = KN * superpositionTop + GAMMA * p.getVy();
+            double Fn = - KN * superpositionTop - GAMMA * p.getVy();
             p.addWallForce(Fn, 0, -1);
         }
         if(superpositionLeft < 0){
-            double Fn = KN * superpositionLeft + GAMMA * p.getVx();
+            double Fn = - KN * superpositionLeft - GAMMA * p.getVx();
             p.addWallForce(Fn, 1, 0);
         }
         if(superpositionRight < 0){
-            double Fn = KN * superpositionRight * GAMMA * p.getVx();
+            double Fn = - KN * superpositionRight - GAMMA * p.getVx();
             p.addWallForce(Fn, -1, 0);
         }
     }

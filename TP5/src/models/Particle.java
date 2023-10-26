@@ -7,6 +7,7 @@ import java.util.Objects;
 public class Particle implements Comparable<Particle> {
     private int id;
     private double vx, vy, fx, fy;
+    private double actualVx, actualVy;
     private double x, y;
     private double prevAx, prevAy;
     private double ax, ay;
@@ -15,13 +16,18 @@ public class Particle implements Comparable<Particle> {
     // private double vx;
     private double u;
 
-    public Particle(int id, double x, double y, double mass, double radius){
+    public Particle(int id, double x, double y, double mass, double radius) {
         this.id = id;
-        this.x = x;
-        this.y = y;
-        this.mass = mass;
-        this.radius = radius;
-        this.prevAy = -9.8;
+        this.x = x/100.0;
+        this.y = y/100.0;
+        this.mass = 1/1000.0;
+        this.radius = radius/100;
+        this.prevAy = -9.81;
+        this.prevAx = 0;
+        this.ax = 0;
+        this.ay = 0;
+        this.actualVx = 0;
+        this.actualVy = 0;
     }
 
     public Particle(int id, double x, double vx, double u, double radius, double mass, double XnoPeriodic) {
@@ -95,11 +101,11 @@ public class Particle implements Comparable<Particle> {
     }
 
     public double evaluateAx() {
-        return fx/mass;
+        return fx / mass;
     }
 
     public double evaluateAy() {
-        return fy/mass;
+        return fy / mass;
     }
 
     public double getPrevAx() {
@@ -127,7 +133,7 @@ public class Particle implements Comparable<Particle> {
         double eny = (getY() - otherP.getY()) / distance;
         double enx = (getX() - otherP.getX()) / distance;
 
-        double Fx = Fn * enx - Ft * eny; //TODO check if vectors are correct
+        double Fx = Fn * enx - Ft * eny; // TODO check if vectors are correct
         double Fy = Fn * eny + Ft * enx;
         this.setFx(this.getFx() + Fx);
         this.setFy(this.getFy() + Fy);
@@ -135,8 +141,8 @@ public class Particle implements Comparable<Particle> {
         otherP.setFy(otherP.getFy() - Fy);
     }
 
-    public void addWallForce(double Fn, double xMulti, double yMulti){
-        double forceX = Fn * xMulti; //TODO check if vectors are correct
+    public void addWallForce(double Fn, double xMulti, double yMulti) {
+        double forceX = Fn * xMulti; // TODO check if vectors are correct
         double forceY = Fn * yMulti;
         this.setFx(this.getFx() + forceX);
         this.setFy(this.getFy() + forceY);
@@ -185,6 +191,11 @@ public class Particle implements Comparable<Particle> {
         return "Particle{" +
                 "id=" + id +
                 ", x=" + x +
+                ", y=" + y +
+                // ", radius=" + radius +
+                ", Fx=" + fx +
+                ", Fy=" + fy +
+                ", vy=" + vy +
                 '}';
     }
 
@@ -248,6 +259,49 @@ public class Particle implements Comparable<Particle> {
 
     public void setAy(double ay) {
         this.ay = ay;
+    }
+
+    public void prediction(double dt) {
+        // this.actualAcceleration = this.getAcceleration();
+        ax = this.evaluateAx();
+        this.x = x +
+            vx * dt + 
+            ax * dt * dt * 2 / 3 - 
+            prevAx * dt * dt / 6;
+            
+        ay = this.evaluateAy();
+        this.y = y + 
+            vy * dt + 
+            ay * dt * dt * 2 / 3 - 
+            prevAy * dt * dt / 6;
+
+        this.actualVx = vx;
+        this.vx= actualVx + ax * dt * 3 / 2 - prevAx * dt / 2;
+
+        this.actualVy = vy;
+        this.vy= actualVy + ay * dt * 3 / 2 - prevAy * dt / 2;
+        
+
+    }
+
+    public void correction(double dt) {
+        // if (reInjected) {
+        //     this.velocity = new Pair(ZERO, ZERO);
+        //     reInjected = false;
+        //     prevAcceleration = new Pair(ZERO, ForcesUtils.GRAVITY);
+        // } else {
+        this.vx = actualVx + evaluateAx() * 1.0/3.0 * dt + ax * 5.0/6.0 * dt - prevAx * 1.0/6.0 * dt;
+        prevAx = ax;
+
+        this.vy = actualVy + evaluateAy() * 1.0/3.0 * dt + ay * 5.0/6.0 * dt - prevAy * 1.0/6.0 * dt;
+        prevAy = ay;
+
+        // this.vx = actualVelocity.sum(
+        //         this.getAcceleration().scale((1.0 / 3.0) * dt).sum(
+        //                 actualAcceleration.scale((5.0 / 6.0) * dt).sum(
+        //                         prevAcceleration.scale(-(1.0 / 6.0) * dt))));
+        // }
+
     }
 
 }
