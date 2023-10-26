@@ -1,307 +1,185 @@
 package models;
 
-import java.math.RoundingMode;
-import java.security.PublicKey;
+import models.Pair;
+import models.Color;
+import services.ForcesUtils;
+
 import java.util.Objects;
 
-public class Particle implements Comparable<Particle> {
-    private int id;
-    private double vx, vy, fx, fy;
-    private double actualVx, actualVy;
-    private double x, y;
-    private double prevAx, prevAy;
-    private double ax, ay;
-    private double radius;
-    private double mass;
-    // private double vx;
-    private double u;
+public class Particle {
+    private static final double ZERO = 0.0;
+    private final static double B = (2.0 / 3.0);
+    private final static double C = -(1.0 / 6.0);
+    private final Pair force;
+    private final Double radius;
+    private final Double mass;
+    private final int id;
+    private boolean reInjected = false;
+    private Color color = Color.RED;
 
-    public Particle(int id, double x, double y, double mass, double radius) {
-        this.id = id;
-        this.x = x/100.0;
-        this.y = y/100.0;
-        this.mass = 1/1000.0;
-        this.radius = radius/100;
-        this.prevAy = -9.81;
-        this.prevAx = 0;
-        this.ax = 0;
-        this.ay = 0;
-        this.actualVx = 0;
-        this.actualVy = 0;
+    // Beeman information
+    private final Double dt;
+    private final Double sqrDt;
+    private Pair position;
+    private Pair velocity;
+    private Pair prevAcceleration;
+    private Pair actualAcceleration;
+    private Pair actualVelocity;
+    private boolean gone = false;
+
+    public void resetForce() {
+        force.setX(ZERO);
+        force.setY(ZERO);
     }
 
-    public Particle(int id, double x, double vx, double u, double radius, double mass, double XnoPeriodic) {
+    public double getEnergy(){
+        return Math.pow(this.velocity.module(Pair.ZERO), 2) * mass / 2.0;
+    }
+
+    public void addToForce(double x, double y) {
+        force.setX(force.getX() + x);
+        force.setY(force.getY() + y);
+    }
+
+    public Particle(int id, Pair position, Double radius, Double mass, Double dt, Color color) {
         this.id = id;
-        this.x = x;
+        this.position = position;
         this.radius = radius;
         this.mass = mass;
-        // this.vx = vx;
-        this.u = u;
+        this.force = new Pair(ZERO, ZERO);
+        this.velocity = new Pair(ZERO, ZERO);
+        this.dt = dt;
+        this.sqrDt = Math.pow(dt, 2);
+        actualAcceleration = new Pair(ZERO, ZERO);
+        prevAcceleration = new Pair(ZERO, ForcesUtils.GRAVITY);
+        this.color = color;
     }
 
-    public Particle(int id, double x, double vx, double u, double radius, double mass, double x2, double x3,
-            double x4,
-            double x5, double XnoPeriodic) {
-        this.id = id;
-        this.x = x;
+    public Particle(double id, double x, double y, double mass, double radius){
+        this.id = (int) id;
+        this.position = new Pair(x, y);
         this.radius = radius;
         this.mass = mass;
-        // this.vx = vx;
-        this.u = u;
+        this.force = new Pair(ZERO, ZERO);
+        this.velocity = new Pair(ZERO, ZERO);
+        this.dt = 1.0E-3;
+        this.sqrDt = Math.pow(dt, 2);
+        actualAcceleration = new Pair(ZERO, ZERO);
+        prevAcceleration = new Pair(ZERO, ForcesUtils.GRAVITY);
+        this.color = Color.BLUE;
     }
 
-    // public double collision(Particle p2) {
-    // return 2500 * (Math.abs(this.getX() - p2.getX()) - (2 * this.getRadius()))
-    // * (Math.signum(this.getX() - p2.getX()));
+    // public Particle copy() {
+    //     return new Particle(id, position, radius, mass, dt, color);
     // }
 
-    public double getX() {
-        return x;
+    public void addToForce(Pair pair) {
+        force.setX(force.getX() + pair.getX());
+        force.setY(force.getY() + pair.getY());
     }
 
-    public double getY() {
-        return y;
+    public Pair getAcceleration() {
+        return force.scale(1.0 / mass);
     }
 
-    public void setX(double x) {
-        this.x = x;
+    public void reInject() {
+        reInjected = true;
+        setColor(Color.RED);
     }
 
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public double getRadius() {
+    public Double getRadius() {
         return radius;
     }
 
-    public double getMass() {
+    public Double getMass() {
         return mass;
     }
 
-    public double getVx() {
-        return vx;
+    public String toString() {
+        return position.getX() + " " + position.getY() + " " + velocity.getX() + " " + velocity.getY() + " " + radius + " " + color;
     }
 
-    public void setVx(double vx) {
-        this.vx = vx;
+    public void setColor(Color color){
+        this.color = color;
     }
 
-    public double getU() {
-        return u;
+    public Color getColor(){
+        return color;
+    }
+
+    public Pair getPosition() {
+        return position;
+    }
+
+    public Pair getVelocity() {
+        return velocity;
+    }
+
+    // BEEMAN
+    public void prediction() {
+//        this.actualAcceleration = this.getAcceleration();
+        actualAcceleration = this.getAcceleration();
+        this.position = position.sum(
+                velocity.scale(dt).sum(
+                        actualAcceleration.scale(B).sum(
+                                prevAcceleration.scale(C)
+                        ).scale(sqrDt)
+                )
+        );
+
+        this.actualVelocity = velocity;
+
+        this.velocity = this.actualVelocity.sum(
+                this.actualAcceleration.scale(1.5 * dt).sum(
+                        prevAcceleration.scale(-0.5 * dt)
+                )
+        );
+
+        // sout everything
+    //    System.out.println("Particle " + id + " position: " + position + " velocity: " + velocity + " acceleration: " + actualAcceleration);
+
+    }
+
+    public void correction(){
+        if (reInjected){
+            this.velocity = new Pair(ZERO, ZERO);
+            reInjected = false;
+            prevAcceleration = new Pair(ZERO, ForcesUtils.GRAVITY);
+        }else {
+            this.velocity = actualVelocity.sum(
+                    this.getAcceleration().scale((1.0 / 3.0) * dt).sum(
+                            actualAcceleration.scale((5.0 / 6.0) * dt).sum(
+                                    prevAcceleration.scale(-(1.0 / 6.0) * dt)
+                            )
+                    )
+            );
+            prevAcceleration = actualAcceleration;
+        }
+
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Particle)) return false;
+        Particle particle = (Particle) o;
+        return id == particle.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     public int getId() {
         return id;
     }
 
-    public void resetForce() {
-        this.fx = 0;
-        this.fy = 0;
+    public boolean isGone() {
+        return gone;
     }
 
-    public double evaluateAx() {
-        return fx / mass;
+    public void setGone(boolean gone) {
+        this.gone = gone;
     }
-
-    public double evaluateAy() {
-        return fy / mass;
-    }
-
-    public double getPrevAx() {
-        return prevAx;
-    }
-
-    public void setPrevAx(double prevAx) {
-        this.prevAx = prevAx;
-    }
-
-    public double getPrevAy() {
-        return prevAy;
-    }
-
-    public void setPrevAy(double prevAy) {
-        this.prevAy = prevAy;
-    }
-
-    public double distance(Particle p) {
-        return Math.sqrt(Math.pow(this.getX() - p.getX(), 2) + Math.pow(this.getY() - p.getY(), 2));
-    }
-
-    public void addForces(double Fn, double Ft, Particle otherP) {
-        double distance = this.distance(otherP);
-        double eny = (getY() - otherP.getY()) / distance;
-        double enx = (getX() - otherP.getX()) / distance;
-
-        double Fx = Fn * enx - Ft * eny; // TODO check if vectors are correct
-        double Fy = Fn * eny + Ft * enx;
-        this.setFx(this.getFx() + Fx);
-        this.setFy(this.getFy() + Fy);
-        otherP.setFx(otherP.getFx() - Fx);
-        otherP.setFy(otherP.getFy() - Fy);
-    }
-
-    public void addWallForce(double Fn, double xMulti, double yMulti) {
-        double forceX = Fn * xMulti; // TODO check if vectors are correct
-        double forceY = Fn * yMulti;
-        this.setFx(this.getFx() + forceX);
-        this.setFy(this.getFy() + forceY);
-    }
-
-    public boolean collidesWith(Particle p, Double dt) {
-
-        double dr = Math.signum(this.getX() - p.getX());
-        double dv = Math.signum(this.getVx() - p.getVx());
-
-        double sigma = this.radius + p.getRadius();
-
-        double dvdr = (dr * dv);
-        if (dvdr >= 0) {
-            return false;
-        }
-
-        double dv2 = (dv * dv);
-        double dr2 = (dr * dr);
-        double d = Math.pow(dvdr, 2) - dv2 * (dr2 - Math.pow(sigma, 2));
-        if (d < 0) {
-            return false;
-        }
-
-        return (-(dvdr + Math.sqrt(d)) / dv2) < dt;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setRadius(double radius) {
-        this.radius = radius;
-    }
-
-    public void setMass(double mass) {
-        this.mass = mass;
-    }
-
-    public void setU(double u) {
-        this.u = u;
-    }
-
-    @Override
-    public String toString() {
-        return "Particle{" +
-                "id=" + id +
-                ", x=" + x +
-                ", y=" + y +
-                // ", radius=" + radius +
-                ", Fx=" + fx +
-                ", Fy=" + fy +
-                ", vy=" + vy +
-                '}';
-    }
-
-    @Override
-    public int compareTo(Particle p2) {
-        return (int) Math.signum(this.x - p2.getX());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(x);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null)
-            return false;
-        if (getClass() != o.getClass())
-            return false;
-        Particle other = (Particle) o;
-        return id == other.id;
-    }
-
-    public double getVy() {
-        return vy;
-    }
-
-    public void setVy(double vy) {
-        this.vy = vy;
-    }
-
-    public double getFx() {
-        return fx;
-    }
-
-    public void setFx(double fx) {
-        this.fx = fx;
-    }
-
-    public double getFy() {
-        return fy;
-    }
-
-    public void setFy(double fy) {
-        this.fy = fy;
-    }
-
-    public double getAx() {
-        return ax;
-    }
-
-    public void setAx(double ax) {
-        this.ax = ax;
-    }
-
-    public double getAy() {
-        return ay;
-    }
-
-    public void setAy(double ay) {
-        this.ay = ay;
-    }
-
-    public void prediction(double dt) {
-        // this.actualAcceleration = this.getAcceleration();
-        ax = this.evaluateAx();
-        this.x = x +
-            vx * dt + 
-            ax * dt * dt * 2 / 3 - 
-            prevAx * dt * dt / 6;
-            
-        ay = this.evaluateAy();
-        this.y = y + 
-            vy * dt + 
-            ay * dt * dt * 2 / 3 - 
-            prevAy * dt * dt / 6;
-
-        this.actualVx = vx;
-        this.vx= actualVx + ax * dt * 3 / 2 - prevAx * dt / 2;
-
-        this.actualVy = vy;
-        this.vy= actualVy + ay * dt * 3 / 2 - prevAy * dt / 2;
-        
-
-    }
-
-    public void correction(double dt) {
-        // if (reInjected) {
-        //     this.velocity = new Pair(ZERO, ZERO);
-        //     reInjected = false;
-        //     prevAcceleration = new Pair(ZERO, ForcesUtils.GRAVITY);
-        // } else {
-        this.vx = actualVx + evaluateAx() * 1.0/3.0 * dt + ax * 5.0/6.0 * dt - prevAx * 1.0/6.0 * dt;
-        prevAx = ax;
-
-        this.vy = actualVy + evaluateAy() * 1.0/3.0 * dt + ay * 5.0/6.0 * dt - prevAy * 1.0/6.0 * dt;
-        prevAy = ay;
-
-        // this.vx = actualVelocity.sum(
-        //         this.getAcceleration().scale((1.0 / 3.0) * dt).sum(
-        //                 actualAcceleration.scale((5.0 / 6.0) * dt).sum(
-        //                         prevAcceleration.scale(-(1.0 / 6.0) * dt))));
-        // }
-
-    }
-
 }

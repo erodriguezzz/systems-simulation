@@ -15,7 +15,7 @@ import models.Particle;
 public class Simulation {
 
     // static double L = 135;
-    static double finalTime = 2;
+    static double finalTime = 20;
 
     private static void uniqueSimulation(int N, double dt, int v) throws IOException {
 
@@ -27,17 +27,17 @@ public class Simulation {
         // int iterationPerFrame = (int) Math.ceil(0.1 / dt.doubleValue());
         int iterationPerFrame = 100;
         int frame = 0;
-        Grid grid = new Grid(particles);
-        BeemanIntegrator beemanIntegrator = new BeemanIntegrator(grid, dt);
+        // Grid grid = new Grid(particles);
+        BeemanIntegrator beemanIntegrator = new BeemanIntegrator( dt, 0.03, 0, particles);
 
         List<Particle> limits = new ArrayList<>();
         for(int i = 0; i < 20; i++){
             // TODO: change id schema to avoid problems
-            limits.add(new Particle(i, 0, i*70/20, 0, 0.3));
-            limits.add(new Particle(i, 20, i*70/20, 0, 0.3));
+            // limits.add(new Particle(i, 0, i*77/20, 0, 0.003));
+            // limits.add(new Particle(i, 20, i*77/20, 0, 0.003));
 
-            limits.add(new Particle(i, i*1, 0, 0, 0.3));
-            limits.add(new Particle(i, i*1, 70, 0, 0.3));
+            // limits.add(new Particle(i, i*1, 7, 0, 0.003));
+            // limits.add(new Particle(i, i*1, 77, 0, 0.003));
             // limits.add(new Particle(i, BigDecimal.valueOf(i*0.2), BigDecimal.valueOf(-10), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
 
         }
@@ -60,7 +60,7 @@ public class Simulation {
     public static void main(String[] args) throws IOException {
 
         double[] dtValues = {  1.0E-3 };
-        int Ns[] = { 2};
+        int Ns[] = { 200};
 
         ExecutorService executor = Executors.newFixedThreadPool(Ns.length * dtValues.length * 10);
         List<Future<?>> futures = new ArrayList<>();

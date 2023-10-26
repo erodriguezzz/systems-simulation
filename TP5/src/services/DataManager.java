@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.*;
 
+import models.Pair;
 import models.Particle;
+import models.Color;
 
 public class DataManager {
     private double max_radius = 0;
@@ -30,15 +32,15 @@ public class DataManager {
 
             while (staticScanner.hasNext() && dynamicScanner.hasNext()) {
                 int id = dynamicScanner.nextInt();
-                float x = dynamicScanner.nextFloat();
-                float y = dynamicScanner.nextFloat();
+                double x = dynamicScanner.nextDouble();
+                double y = dynamicScanner.nextDouble() + 7;
                 float speed = dynamicScanner.nextFloat();
                 float speed2 = dynamicScanner.nextFloat();
                 float speed3 = dynamicScanner.nextFloat();
-                double radius = dynamicScanner.nextFloat();
-                double mass = dynamicScanner.nextFloat();
+                double radius = dynamicScanner.nextDouble();
+                double mass = dynamicScanner.nextDouble();
 
-                particles.add(new Particle(id, (x), (y), (mass), (radius)));
+                particles.add(new Particle(id, new Pair(x/100, y/100), (radius/100), (mass/1000), 1.0E-3, Color.RED));
             }
             staticScanner.close();
             dynamicScanner.close();
@@ -60,10 +62,10 @@ public class DataManager {
             int lastId = 0;
             for (Particle p : particles) {
                 data.append(p.getId() + " " + 
-                p.getX() + " " +
-                p.getY() + " " +
-                p.getVx() + " " + 
-                p.getVy() + " 0 " +
+                p.getPosition().getX() + " " +
+                p.getPosition().getY() + " " +
+                p.getVelocity().getX() + " " + 
+                p.getVelocity().getY() + " 0 " +
                 p.getRadius() + " " + 
                 p.getMass() + 
                 " 255 0 0" +
@@ -73,10 +75,10 @@ public class DataManager {
             lastId++;
             for(Particle l : limits){
                 data.append(lastId + " " +
-                l.getX() + " " +
-                l.getY() + " " +
-                l.getVx() + " " + 
-                l.getVy() + " 0 " +
+                l.getPosition().getX() + " " +
+                l.getPosition().getY() + " " +
+                l.getVelocity().getX() + " " + 
+                l.getVelocity().getY() + " 0 " +
                 l.getRadius() + " " + 
                 l.getMass() + 
                 " 255 255 255" +"\n");
