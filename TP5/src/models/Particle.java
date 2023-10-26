@@ -124,19 +124,15 @@ public class Particle implements Comparable<Particle> {
 
     public void addForces(double Fn, double Ft, Particle otherP) {
         double distance = this.distance(otherP);
-        double forceX = Fn * (this.getX() - otherP.getX()) / distance; //TODO check if vectors are correct
-        double forceY = Fn * (this.getY() - otherP.getY()) / distance;
-        this.setFx(this.getFx() + forceX);
-        this.setFy(this.getFy() + forceY);
-        otherP.setFx(otherP.getFx() - forceX);
-        otherP.setFy(otherP.getFy() - forceY);
+        double eny = (getY() - otherP.getY()) / distance;
+        double enx = (getX() - otherP.getX()) / distance;
 
-        double forceXt = Ft * (this.getY() - otherP.getY()) / distance; //TODO check if vectors are correct
-        double forceYt = Ft * (this.getX() - otherP.getX()) / distance;
-        this.setFx(this.getFx() + forceXt);
-        this.setFy(this.getFy() + forceYt);
-        otherP.setFx(otherP.getFx() - forceXt);
-        otherP.setFy(otherP.getFy() - forceYt);
+        double Fx = Fn * enx - Ft * eny; //TODO check if vectors are correct
+        double Fy = Fn * eny + Ft * enx;
+        this.setFx(this.getFx() + Fx);
+        this.setFy(this.getFy() + Fy);
+        otherP.setFx(otherP.getFx() - Fx);
+        otherP.setFy(otherP.getFy() - Fy);
     }
 
     public void addWallForce(double Fn, double xMulti, double yMulti){

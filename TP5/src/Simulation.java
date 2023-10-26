@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import models.Grid;
 import services.DataManager;
 import models.BeemanIntegrator;
 import models.Particle;
@@ -26,7 +27,9 @@ public class Simulation {
         // int iterationPerFrame = (int) Math.ceil(0.1 / dt.doubleValue());
         int iterationPerFrame = 100;
         int frame = 0;
-        BeemanIntegrator beemanIntegrator = new BeemanIntegrator(particles, dt);
+        Grid grid = new Grid(particles);
+        BeemanIntegrator beemanIntegrator = new BeemanIntegrator(grid, dt);
+
         List<Particle> limits = new ArrayList<>();
         for(int i = 0; i < 20; i++){
             // TODO: change id schema to avoid problems

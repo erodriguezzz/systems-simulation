@@ -13,10 +13,10 @@ public class BeemanIntegrator extends Integrator {
     private double[] beemanVConstants = { 3 / 2, -1 / 2 };
     private double[] beemanVConstantsCorrected = { 1 / 3, 5 / 6, -1 / 6 };
 
-    public BeemanIntegrator(List<Particle> particles, double dt) {
-        this.particles = particles;
+    public BeemanIntegrator(Grid grid, double dt) {
+        this.particles = grid.getParticles();
         this.dt = dt;
-        this.grid = new Grid();
+        this.grid = grid;
     }
 
     public void run() {
