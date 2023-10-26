@@ -15,7 +15,7 @@ import models.Particle;
 public class Simulation {
 
     // static double L = 135;
-    static double finalTime = 20;
+    static double finalTime = 50;
 
     private static void uniqueSimulation(int N, double dt, int v) throws IOException {
 
@@ -28,16 +28,16 @@ public class Simulation {
         int iterationPerFrame = 100;
         int frame = 0;
         // Grid grid = new Grid(particles);
-        BeemanIntegrator beemanIntegrator = new BeemanIntegrator( dt, 0.03, 0, particles);
+        BeemanIntegrator beemanIntegrator = new BeemanIntegrator( dt, 3, 0, particles);
 
         List<Particle> limits = new ArrayList<>();
         for(int i = 0; i < 20; i++){
             // TODO: change id schema to avoid problems
-            // limits.add(new Particle(i, 0, i*77/20, 0, 0.003));
-            // limits.add(new Particle(i, 20, i*77/20, 0, 0.003));
+            limits.add(new Particle(i, 0, i*77/20, 0, 0.3));
+            limits.add(new Particle(i, 20, i*77/20, 0, 0.3));
 
-            // limits.add(new Particle(i, i*1, 7, 0, 0.003));
-            // limits.add(new Particle(i, i*1, 77, 0, 0.003));
+            limits.add(new Particle(i, i*1, 7, 0, 0.3));
+            limits.add(new Particle(i, i*1, 77, 0, 0.3));
             // limits.add(new Particle(i, BigDecimal.valueOf(i*0.2), BigDecimal.valueOf(-10), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
 
         }
@@ -48,7 +48,8 @@ public class Simulation {
             if (frame == iterationPerFrame) {
                 System.out.format("Frame: %.4f\n", currentTime);
                 dm.writeDynamicFile(beemanIntegrator.getParticles(),
-                        "./data/output/Dynamic2_N_" + beemanIntegrator.getParticles().size() + "_dt_" + dt + "_v_" + v + ".dump",
+                        "./data/output/g=980_Kn=2500_N" + N +".dump",
+                        // "./data/output/Dynamic2_N_" + beemanIntegrator.getParticles().size() + "_dt_" + dt + "_v_" + v + ".dump",
                         currentTime, limits);
                 frame = 0;
             }
@@ -59,8 +60,8 @@ public class Simulation {
 
     public static void main(String[] args) throws IOException {
 
-        double[] dtValues = {  1.0E-3 };
-        int Ns[] = { 200};
+        double[] dtValues = {  1.0E-4 };
+        int Ns[] = { 2, 200};
 
         ExecutorService executor = Executors.newFixedThreadPool(Ns.length * dtValues.length * 10);
         List<Future<?>> futures = new ArrayList<>();

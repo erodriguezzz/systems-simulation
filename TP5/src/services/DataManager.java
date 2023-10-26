@@ -40,7 +40,7 @@ public class DataManager {
                 double radius = dynamicScanner.nextDouble();
                 double mass = dynamicScanner.nextDouble();
 
-                particles.add(new Particle(id, new Pair(x/100, y/100), (radius/100), (mass/1000), 1.0E-3, Color.RED));
+                particles.add(new Particle(id, new Pair(x, y), (radius), (mass), 1.0E-4, Color.RED));
             }
             staticScanner.close();
             dynamicScanner.close();
@@ -81,7 +81,7 @@ public class DataManager {
                 l.getVelocity().getY() + " 0 " +
                 l.getRadius() + " " + 
                 l.getMass() + 
-                " 255 255 255" +"\n");
+                " 0 0 255" +"\n");
                 lastId++;
             }
             writer.write(data.toString());

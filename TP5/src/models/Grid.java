@@ -13,8 +13,8 @@ import static services.ForcesUtils.*;
 public class Grid {
     private static final double A = 0.0015;
     private static final double ZERO = 0.0;
-    private static final double DIM_X = 0.2;
-    private static final double DIM_Y = 0.77; // se tiene en cuenta el espacio fuera de la "caja"
+    private static final double DIM_X = 20;
+    private static final double DIM_Y = 77; // se tiene en cuenta el espacio fuera de la "caja"
     private static final int cols = 8;
     private static final int rowsInside = 30;
     private static final int rowsTotal = 33;
@@ -22,11 +22,11 @@ public class Grid {
     private static final double CELL_DIMENSION_X = DIM_X / (double) cols;
     // private final Limit topRightLimit;
     // private final Limit bottomLeftLimit;
-    private final double topRightLimitInitialY = 0.77; // TODO
-    private final double bottomLeftLimitInitialY = 0.07;
+    private final double topRightLimitInitialY = 77; // TODO
+    private final double bottomLeftLimitInitialY = 7;
     private final double leftLimitHole;
     private final double rightLimitHole ;
-    private double bottom = 0.07, top = 0.77, left = 0, right = 0.2;
+    private double bottom = 7, top = 77, left = 0, right = 20;
     private double movement;
 
     private final Cell[][] cells;
@@ -95,10 +95,10 @@ public class Grid {
                                 if (diff < sumRad && !n.equals(p)) {
 
                                     Pair normalVersor = n.getPosition().subtract(p.getPosition()).scale(1.0 / diff);
-                                    p.addToForce(getNormalForce(sumRad - diff, 0, normalVersor)); //p.getVelocity().module(n.getVelocity())
+                                    p.addToForce(getNormalForce(sumRad - diff, normalVersor, p, n)); //p.getVelocity().module(n.getVelocity())
 
                                     Pair relativeVelocity = p.getVelocity().subtract(n.getVelocity());
-                                    p.addToForce(getTangencialForce(sumRad - diff, relativeVelocity, normalVersor));
+                                    p.addToForce(getTangencialForce(sumRad - diff, relativeVelocity, normalVersor, p, n));
                                 }
                             });
 
@@ -114,14 +114,14 @@ public class Grid {
                                             Pair normalVersor = n.getPosition().subtract(p.getPosition())
                                                     .scale(1.0 / diff);
 
-                                            Pair normalForce = getNormalForce(superposition, 0, normalVersor);
+                                            Pair normalForce = getNormalForce(superposition, normalVersor, p, n);
 
                                             p.addToForce(normalForce);
                                             n.addToForce(normalForce.scale(-1.0));
 
                                             Pair relativeVelocity = p.getVelocity().subtract(n.getVelocity());
                                             Pair tangencialForce = getTangencialForce(superposition, relativeVelocity,
-                                                    normalVersor);
+                                                    normalVersor, p, n);
 
                                             p.addToForce(tangencialForce);
                                             n.addToForce(tangencialForce.scale(-1.0));
@@ -158,7 +158,7 @@ public class Grid {
         double superposition = particle.getRadius() - (particle.getPosition().getY() - bottom);
         if (superposition > ZERO)
             particle.addToForce(
-                    getWallForce(superposition, particle.getVelocity(), FloorNormalVersor));
+                    getWallForce(superposition,  particle.getVelocity(), FloorNormalVersor, particle, null));
     }
 
     private void updateForceTop(List<Particle> particles) {
@@ -169,7 +169,7 @@ public class Grid {
         double superposition = p.getRadius() - (top - p.getPosition().getY());
         if (superposition > ZERO)
             p.addToForce(
-                    getWallForce(superposition, p.getVelocity(), TopNormalVector));
+                    getWallForce(superposition, p.getVelocity(), TopNormalVector, p, null));
     }
 
     private void updateForceLeftWall(List<Particle> particles) {
@@ -180,7 +180,7 @@ public class Grid {
         double superposition = p.getRadius() - (p.getPosition().getX() - left);
         if (superposition > ZERO)
             p.addToForce(
-                    getWallForce(superposition, p.getVelocity(), LeftNormalVector));
+                    getWallForce(superposition, p.getVelocity(), LeftNormalVector, p, null));
     }
 
     private void updateForceRightWall(List<Particle> particles) {
@@ -191,7 +191,7 @@ public class Grid {
         double superposition = p.getRadius() - (right - p.getPosition().getX());
         if (superposition > ZERO)
             p.addToForce(
-                    getWallForce(superposition, p.getVelocity(), RightNormalVector));
+                    getWallForce(superposition, p.getVelocity(), RightNormalVector, p ,null));
     }
 
     private List<Particle> getNeighbours(int row, int col) {
@@ -273,9 +273,10 @@ public class Grid {
                 int c, r;
                 do {
                     overlap = false;
+                    // set random x between 0 and 20, considering p radius
                     particle.getPosition()
                             .setX(particle.getRadius() + Math.random() * (DIM_X - 2.0 * particle.getRadius()));
-                    particle.getPosition().setY(0.4 + 0.7 / 10 + Math.random() * ((0.7 - 0.4) - particle.getRadius()));
+                    particle.getPosition().setY(40 + 70 / 10 + Math.random() * ((70 - 40) - particle.getRadius()));
                     c = getIndexX(particle.getPosition().getX());
                     r = getIndexY(particle.getPosition().getY());
 
