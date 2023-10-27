@@ -65,8 +65,8 @@ public class Simulation {
 
         double[] dtValues = { 1.0E-4 };
         int Ns[] = { 200 };
-        double ws[] = { 5, 10, 15, 20, 30, 50 };
-        // double ws[] = { 5, 10, 15};
+        // double ws[] = { 5, 10, 15, 20, 30, 50 };
+        double ws[] = { 5, 15, 50};
 
         ExecutorService executor = Executors.newFixedThreadPool(Ns.length * dtValues.length * 10);
         List<Future<?>> futures = new ArrayList<>();

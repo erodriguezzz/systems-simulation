@@ -9,7 +9,7 @@ public class ForcesUtils {
 //    public static final double K_NORMAL = 25000;
     public static final double GRAVITY = -4.80;
     public static final double GAMMA = 2.5;
-    public static final double MU =  0.1;
+    public static final double MU =  0.5;
     public static final double K_TAN = 2 * K_NORMAL;
     public static final double dt = 10E-4;
 
