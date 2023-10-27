@@ -11,7 +11,7 @@ import java.util.List;
 import static services.ForcesUtils.*;
 
 public class Grid {
-    private static final double A = 0.0015;
+    private static final double A = 0.15;
     private static final double ZERO = 0.0;
     private static final double DIM_X = 20;
     private static final double DIM_Y = 77; // se tiene en cuenta el espacio fuera de la "caja"
@@ -49,9 +49,8 @@ public class Grid {
     }
 
     public void shake(double t, double w) {
-        // movement = A * Math.sin(w * t);
-        // bottom = (bottomLeftLimitInitialY + movement);
-        // top = (topRightLimitInitialY + movement);
+        movement = A * Math.sin(w * t);
+        bottom = (bottomLeftLimitInitialY + movement);
     }
 
     public void add(Particle particle) {

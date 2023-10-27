@@ -34,7 +34,7 @@ def generate_particles(N, mass, v):
                 f.write(f"{id} {x} {y} {0} {0} {0} {radius} {mass} \n")
                 id  = id + 1
 
-N_values = [2]
+N_values = [200]
 
 for N in N_values:
     for v in range(0, 1):

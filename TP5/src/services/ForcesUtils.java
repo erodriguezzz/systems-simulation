@@ -5,12 +5,21 @@ import models.Particle;
 
 public class ForcesUtils {
 //    TODO: Parametros en m
-    public static final double K_NORMAL = 2500;
+    public static final double K_NORMAL = 250;
 //    public static final double K_NORMAL = 25000;
-    public static final double GRAVITY = -980;
+    public static final double GRAVITY = -4.80;
     public static final double GAMMA = 2.5;
-    public static final double MU = 0.7;
+    public static final double MU =  0.7;
     public static final double K_TAN = 2 * K_NORMAL;
+
+
+
+//     public static final double K_NORMAL = 2000;
+// //    public static final double K_NORMAL = 25000;
+//     public static final double GRAVITY = -5.80;
+//     public static final double GAMMA = 2.5;
+//     public static final double MU = 0.3;
+//     public static final double K_TAN = 2 * K_NORMAL;
 
 //    TODO: Parametros en cm
 //    public static final double K_NORMAL = 250;
