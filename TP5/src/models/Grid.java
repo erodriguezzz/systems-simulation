@@ -99,6 +99,9 @@ public class Grid {
                                     Pair relativeVelocity = p.getVelocity().subtract(n.getVelocity());
                                     p.addToForce(getTangencialForce(sumRad - diff, relativeVelocity, normalVersor, p, n));
                                 }
+                                else {
+                                    n.resetAcumVel(p);
+                                }
                             });
 
                             // Add particle forces
@@ -124,6 +127,9 @@ public class Grid {
 
                                             p.addToForce(tangencialForce);
                                             n.addToForce(tangencialForce.scale(-1.0));
+                                        }
+                                        else {
+                                            p.resetAcumVel(n);
                                         }
                                     });
                         });
@@ -158,6 +164,9 @@ public class Grid {
         if (superposition > ZERO)
             particle.addToForce(
                     getWallForce(superposition,  particle.getVelocity(), FloorNormalVersor, particle, null));
+        else {
+            particle.resetAcummWall(0);
+        }
     }
 
     private void updateForceTop(List<Particle> particles) {
@@ -169,6 +178,9 @@ public class Grid {
         if (superposition > ZERO)
             p.addToForce(
                     getWallForce(superposition, p.getVelocity(), TopNormalVector, p, null));
+        else {
+            p.resetAcummWall(1);
+        }
     }
 
     private void updateForceLeftWall(List<Particle> particles) {
@@ -180,6 +192,9 @@ public class Grid {
         if (superposition > ZERO)
             p.addToForce(
                     getWallForce(superposition, p.getVelocity(), LeftNormalVector, p, null));
+        else {
+            p.resetAcummWall(2);
+        }
     }
 
     private void updateForceRightWall(List<Particle> particles) {
@@ -191,6 +206,9 @@ public class Grid {
         if (superposition > ZERO)
             p.addToForce(
                     getWallForce(superposition, p.getVelocity(), RightNormalVector, p ,null));
+        else{
+            p.resetAcummWall(3);
+        }
     }
 
     private List<Particle> getNeighbours(int row, int col) {

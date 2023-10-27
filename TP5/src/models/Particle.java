@@ -4,6 +4,8 @@ import models.Pair;
 import models.Color;
 import services.ForcesUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Particle {
@@ -16,6 +18,11 @@ public class Particle {
     private final int id;
     private boolean reInjected = false;
     private Color color = Color.RED;
+    public Map<Particle, Double> acumVelocity = new HashMap<>();
+    public Double[] wallAcum = {0.0,0.0,0.0,0.0};
+    // BOOOOOOKE
+    // DO AS I SAY, NOT AS I DO
+    // BOTOTM, TOP, LEFT, RIGHT
 
     // Beeman information
     private final Double dt;
@@ -39,6 +46,35 @@ public class Particle {
     public void addToForce(double x, double y) {
         force.setX(force.getX() + x);
         force.setY(force.getY() + y);
+    }
+
+    public double getAccumVel(Particle p){
+        return acumVelocity.get(p);
+    }
+
+    public double getAccumVelWall(int index){
+        return wallAcum[index];
+    }
+
+    public void addAcumVel(Particle b, double relativeVel){
+        double currentAcumVel = acumVelocity.get(b);
+        this.acumVelocity.put(b, currentAcumVel + relativeVel);
+
+        b.acumVelocity.put(this, currentAcumVel + relativeVel);
+    }
+
+    public void addAcumVelWall(int index, double relativeVel){
+        double currentAcumVel = this.wallAcum[index];
+        this.wallAcum[index] = currentAcumVel + relativeVel;
+    }
+
+    public void resetAcumVel(Particle b){
+        this.acumVelocity.put(b, 0.0);
+        b.acumVelocity.put(this, 0.0);
+    }
+
+    public void resetAcummWall(int index){
+        this.wallAcum[index] = 0.0;
     }
 
     public Particle(int id, Pair position, Double radius, Double mass, Double dt, Color color) {
