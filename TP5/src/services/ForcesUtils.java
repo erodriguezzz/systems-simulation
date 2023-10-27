@@ -64,6 +64,7 @@ public class ForcesUtils {
 
     public static Pair getTangencialForce(double superposition, Pair relativeTangencialVelocity, Pair normalVersor, Particle A, Particle B) {
         Pair tan = new Pair(-normalVersor.getY(), normalVersor.getX());
+        A.addAcumVel(B, relativeTangencialVelocity.dot(tan));
         double forceT3 = getTangencialForceT3(superposition, A.getAccumVel(B));
         // double forceT3 = getTangencialForceT3(superposition, relativeTangencialVelocity.dot(tan));
         double forceT1 = getTangencialForceT1(superposition, relativeTangencialVelocity.dot(tan), A, B);
@@ -87,6 +88,7 @@ public class ForcesUtils {
             index = 3;
         }
         // la septima se viene 7777777777777
+        A.addAcumVelWall(index, relativeTangencialVelocity.dot(tan));
         double forceT3 = getTangencialForceT3(superposition, A.getAccumVelWall(index));
         double forceT1 = getTangencialForceT1(superposition, relativeTangencialVelocity.dot(tan), A, B);
         double forceT = Math.min(forceT1, forceT3);
