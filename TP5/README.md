@@ -1,4 +1,9 @@
 # Vibrating Silo
+
+## Execution
+Remember to run the python script `particles_generator.py` before running any simulation.
+You should be in `/TP5/src/main/python` when running the script.
+
 ## Input
 You can change the configuration parameters in the file `config.json`. The parameters are:
 ```json
