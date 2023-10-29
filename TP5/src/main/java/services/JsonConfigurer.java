@@ -22,7 +22,7 @@ public class JsonConfigurer {
     private final Double G;
 
 
-    private final List<Double> dt;
+    private final List<Double> dts;
     private final List<Double> Ws;
     private final List<Double> Ns;
     private final List<Double> Ds;
@@ -46,7 +46,7 @@ public class JsonConfigurer {
             this.A = (Double) json.get("A");
 
             this.Ds = (List<Double>) json.get("Ds");
-            this.dt = (List<Double>) json.get("dt");
+            this.dts = (List<Double>) json.get("dts");
             this.Ws = (List<Double>) json.get("Ws");
             this.Ns = (List<Double>) json.get("Ns");
 
@@ -92,8 +92,8 @@ public class JsonConfigurer {
         return Rmax;
     }
 
-    public List<Double> getDt() {
-        return dt;
+    public List<Double> getDts() {
+        return dts;
     }
 
     public Double getA() {

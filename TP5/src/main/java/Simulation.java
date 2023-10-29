@@ -68,7 +68,7 @@ public class Simulation {
 
         JsonConfigurer config = new JsonConfigurer("./config.json");
 
-        double[] dtValues = config.getDt().stream().mapToDouble(Double::doubleValue).toArray();
+        double[] dtValues = config.getDts().stream().mapToDouble(Double::doubleValue).toArray();
         int[] Ns = config.getNs().stream().mapToInt(Double::intValue).toArray();
         double[] ws= config.getWs().stream().mapToDouble(Double::doubleValue).toArray();
         double[] Ds= config.getDs().stream().mapToDouble(Double::doubleValue).toArray();

@@ -1,7 +1,5 @@
 package models;
 
-import models.Pair;
-import models.Color;
 import services.ForcesUtils;
 
 import java.util.HashMap;

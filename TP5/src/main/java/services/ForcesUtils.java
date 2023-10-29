@@ -4,9 +4,7 @@ import models.Pair;
 import models.Particle;
 
 public class ForcesUtils {
-//    TODO: Parametros en m
     public static final double K_NORMAL = 250;
-//    public static final double K_NORMAL = 25000;
     public static final double GRAVITY = -4.80;
     public static final double GAMMA = 2.5;
     public static final double MU =  0.5;
@@ -32,10 +30,6 @@ public class ForcesUtils {
 //    public static final double GAMMA = 2.5;
 //    public static final double MU = 0.7;
 //    public static final double K_TAN = 2 * K_NORMAL;
-
-    public ForcesUtils() {
-
-    }
 
     public static double getNormalForce(double superposition, Particle A, Particle B) {
         Pair relativeVelocity;

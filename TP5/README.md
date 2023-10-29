@@ -15,7 +15,7 @@ You can change the configuration parameters in the file `config.json`. The param
     "G": // Acceleration of gravity,
     "iterationPerFrame": // Number of iterations per frame,
     "Ds": // Array of possible diameter of the silo,
-    "dt": // Array of possible time steps,
+    "dts": // Array of possible time steps,
     "Ws": // Array of possible angular velocities,
     "Ns": // Array of possible number of particles,
 }
