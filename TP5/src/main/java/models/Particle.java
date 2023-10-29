@@ -20,8 +20,6 @@ public class Particle {
     private Color color = Color.RED;
     public Map<Particle, Double> acumVelocity = new HashMap<>();
     public Double[] wallAcum = {0.0,0.0,0.0,0.0};
-    // BOOOOOOKE
-    // DO AS I SAY, NOT AS I DO
     // BOTOTM, TOP, LEFT, RIGHT
 
     // Beeman information

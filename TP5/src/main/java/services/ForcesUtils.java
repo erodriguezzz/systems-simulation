@@ -33,6 +33,9 @@ public class ForcesUtils {
 //    public static final double MU = 0.7;
 //    public static final double K_TAN = 2 * K_NORMAL;
 
+    public ForcesUtils() {
+
+    }
 
     public static double getNormalForce(double superposition, Particle A, Particle B) {
         Pair relativeVelocity;

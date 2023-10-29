@@ -1,2 +1,3 @@
 *.dump
-./data/*
+./main/data/*
+target/*
