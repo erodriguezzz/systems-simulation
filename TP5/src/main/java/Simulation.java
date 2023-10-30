@@ -9,7 +9,6 @@ import java.util.concurrent.Future;
 
 import models.Grid;
 import models.Pair;
-import services.ForcesUtils;
 import services.DataManager;
 import models.BeemanIntegrator;
 import models.Particle;

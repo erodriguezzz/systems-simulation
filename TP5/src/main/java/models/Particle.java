@@ -1,6 +1,5 @@
 package models;
 
-import services.ForcesUtils;
 import services.JsonConfigurer;
 
 import java.util.HashMap;
@@ -16,7 +15,7 @@ public class Particle {
     private final Double mass;
     private final int id;
     private boolean reInjected = false;
-    private Color color = Color.RED;
+    private Color color;
     public Map<Particle, Double> acumVelocity = new HashMap<>();
     public Double[] wallAcum = {0.0,0.0,0.0,0.0};
     // BOTOTM, TOP, LEFT, RIGHT
@@ -180,7 +179,7 @@ public class Particle {
         if (reInjected){
             this.velocity = new Pair(ZERO, ZERO);
             reInjected = false;
-            prevAcceleration = new Pair(ZERO, ForcesUtils.GRAVITY);
+            prevAcceleration = new Pair(ZERO, config.getG());
         }else {
             this.velocity = actualVelocity.sum(
                     this.getAcceleration().scale((1.0 / 3.0) * dt).sum(

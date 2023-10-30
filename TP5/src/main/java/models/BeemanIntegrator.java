@@ -2,6 +2,7 @@ package models;
 
 import models.Grid;
 import models.Particle;
+import services.ForcesUtils;
 import services.JsonConfigurer;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class BeemanIntegrator{
         this.particles = particles;
         this.config = config;
         
-        this.grid = new Grid(d, config);
+        this.grid = new Grid(d, config, new ForcesUtils(dt, config));
 
         grid.addAll(this.particles);
 

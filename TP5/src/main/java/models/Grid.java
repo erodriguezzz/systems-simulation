@@ -32,9 +32,11 @@ public class Grid {
 
     private final Cell[][] cells;
     private final JsonConfigurer config;
+    private final ForcesUtils forcesUtils;
 
-    public Grid(double holeSize, JsonConfigurer config){
+    public Grid(double holeSize, JsonConfigurer config, ForcesUtils forcesUtils){
         this.config = config;
+        this.forcesUtils = forcesUtils;
         this.DIM_Y = config.getM() + FREE_SPACE; // se tiene en cuenta el espacio fuera de la "caja"
         this.CELL_DIMENSION_X = config.getL() / (double) cols;
         this.CELL_DIMENSION_Y = DIM_Y / (double) rowsTotal;
@@ -91,7 +93,7 @@ public class Grid {
                         p -> {
                             // System.out.println("ROW: " + newRow + " COL: " + newCol + " PARTICLE: " + p.getId() + " POSITION: " + p.getPosition() + " VELOCITY: " + p.getVelocity() + " ACCELERATION: " + p.getAcceleration());
                             // Add gravity
-                            p.addToForce(ZERO, p.getMass() * ForcesUtils.GRAVITY);
+                            p.addToForce(ZERO, p.getMass() * config.getG());
 
                             current.forEach(n -> {
                                 double diff = p.getPosition().module(n.getPosition());
@@ -100,10 +102,10 @@ public class Grid {
                                 if (diff < sumRad && !n.equals(p)) {
 
                                     Pair normalVersor = n.getPosition().subtract(p.getPosition()).scale(1.0 / diff);
-                                    p.addToForce(getNormalForce(sumRad - diff, normalVersor, p, n)); //p.getVelocity().module(n.getVelocity())
+                                    p.addToForce(forcesUtils.getNormalForce(sumRad - diff, normalVersor, p, n)); //p.getVelocity().module(n.getVelocity())
 
                                     Pair relativeVelocity = p.getVelocity().subtract(n.getVelocity());
-                                    p.addToForce(getTangencialForce(sumRad - diff, relativeVelocity, normalVersor, p, n));
+                                    p.addToForce(forcesUtils.getTangencialForce(sumRad - diff, relativeVelocity, normalVersor, p, n));
                                 }
                                 else {
                                     n.resetAcumVel(p);
@@ -122,13 +124,13 @@ public class Grid {
                                             Pair normalVersor = n.getPosition().subtract(p.getPosition())
                                                     .scale(1.0 / diff);
 
-                                            Pair normalForce = getNormalForce(superposition, normalVersor, p, n);
+                                            Pair normalForce = forcesUtils.getNormalForce(superposition, normalVersor, p, n);
 
                                             p.addToForce(normalForce);
                                             n.addToForce(normalForce.scale(-1.0));
 
                                             Pair relativeVelocity = p.getVelocity().subtract(n.getVelocity());
-                                            Pair tangencialForce = getTangencialForce(superposition, relativeVelocity,
+                                            Pair tangencialForce = forcesUtils.getTangencialForce(superposition, relativeVelocity,
                                                     normalVersor, p, n);
 
                                             p.addToForce(tangencialForce);
@@ -169,7 +171,7 @@ public class Grid {
         double superposition = particle.getRadius() - (particle.getPosition().getY() - bottom);
         if (superposition > ZERO)
             particle.addToForce(
-                    getWallForce(superposition,  particle.getVelocity(), FloorNormalVersor, particle, null));
+                    forcesUtils.getWallForce(superposition,  particle.getVelocity(), FloorNormalVersor, particle, null));
         else {
             particle.resetAcummWall(0);
         }
@@ -183,7 +185,7 @@ public class Grid {
         double superposition = p.getRadius() - (top - p.getPosition().getY());
         if (superposition > ZERO)
             p.addToForce(
-                    getWallForce(superposition, p.getVelocity(), TopNormalVector, p, null));
+                    forcesUtils.getWallForce(superposition, p.getVelocity(), TopNormalVector, p, null));
         else {
             p.resetAcummWall(1);
         }
@@ -197,7 +199,7 @@ public class Grid {
         double superposition = p.getRadius() - (p.getPosition().getX() - left);
         if (superposition > ZERO)
             p.addToForce(
-                    getWallForce(superposition, p.getVelocity(), LeftNormalVector, p, null));
+                    forcesUtils.getWallForce(superposition, p.getVelocity(), LeftNormalVector, p, null));
         else {
             p.resetAcummWall(2);
         }
@@ -211,7 +213,7 @@ public class Grid {
         double superposition = p.getRadius() - (right - p.getPosition().getX());
         if (superposition > ZERO)
             p.addToForce(
-                    getWallForce(superposition, p.getVelocity(), RightNormalVector, p ,null));
+                    forcesUtils.getWallForce(superposition, p.getVelocity(), RightNormalVector, p ,null));
         else{
             p.resetAcummWall(3);
         }
