@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import models.Grid;
+import models.Pair;
 import services.ForcesUtils;
 import services.DataManager;
 import models.BeemanIntegrator;
@@ -18,12 +19,15 @@ public class Simulation {
 
     // static double L = 135;
     static double finalTime = 50;
+    static double LIMIT_MASS = 0;
+    static double LIMIT_RADIUS = 0.3;
 
     private static void uniqueSimulation(int N, double dt, double w, int v, double D, JsonConfigurer config) throws IOException {
 
         DataManager dm = new DataManager(
                 "../data/input/Static_N_" + N + "_v_" + v + ".dump",
                 "../data/input/Dynamic_N_" + N + "_v_" + v + ".dump",
+                dt,
                 config);
         List<Particle> particles = dm.getParticles();
         double currentTime = dt;
@@ -37,11 +41,11 @@ public class Simulation {
         for (int i = 0; i < 20; i++) {
             // TODO: change id schema to avoid problems
             // TODO: change domain design to match with config file
-            limits.add(new Particle(i, 0, i * 77 / 20, 0, 0.3));
-            limits.add(new Particle(i, 20, i * 77 / 20, 0, 0.3));
+            limits.add(new Particle(i, new Pair(0.0, i * (config.getM() + 7) / config.getL()), LIMIT_MASS, LIMIT_RADIUS, dt, config));
+            limits.add(new Particle(i, new Pair(config.getL(), i * (config.getM() + 7) / config.getL()), LIMIT_MASS, LIMIT_RADIUS, dt, config));
 
-            limits.add(new Particle(i, i * 1, 7, 0, 0.3));
-            limits.add(new Particle(i, i * 1, 77, 0, 0.3));
+            limits.add(new Particle(i, new Pair(i/1.0, 7.0), LIMIT_MASS, LIMIT_RADIUS, dt, config));
+            limits.add(new Particle(i, new Pair(i/1.0, (config.getM() + 7)), LIMIT_MASS, LIMIT_RADIUS, dt, config));
             // limits.add(new Particle(i, BigDecimal.valueOf(i*0.2),
             // BigDecimal.valueOf(-10), BigDecimal.valueOf(0), BigDecimal.valueOf(0.3)));
 
@@ -53,7 +57,7 @@ public class Simulation {
             if (frame == iterationPerFrame) {
                 System.out.format("Frame: %.4f\n", currentTime);
                 dm.writeDynamicFile(beemanIntegrator.getParticles(),
-                        "../data/output/g=" + config.getG() + "_Kn="+ config.getKn() +"_w=" + w+"_N=" + N + ".dump",
+                        "../data/output/g=" + config.getG() + "_dt=" + dt + "_Kn="+ config.getKn() +"_w=" + w+"_N=" + N + ".dump",
                         // "./data/output/Dynamic2_N_" + beemanIntegrator.getParticles().size() + "_dt_"
                         // + dt + "_v_" + v + ".dump",
                         currentTime, limits);
@@ -73,7 +77,7 @@ public class Simulation {
         double[] ws= config.getWs().stream().mapToDouble(Double::doubleValue).toArray();
         double[] Ds= config.getDs().stream().mapToDouble(Double::doubleValue).toArray();
 
-        ExecutorService executor = Executors.newFixedThreadPool(Ns.length * dtValues.length * 10);
+        ExecutorService executor = Executors.newFixedThreadPool(Ns.length * dtValues.length * ws.length * Ds.length * 10);
         List<Future<?>> futures = new ArrayList<>();
 
         for (double dt : dtValues) {
