@@ -3,6 +3,7 @@ package models;
 import models.Particle;
 import models.Color;
 import services.ForcesUtils;
+import services.JsonConfigurer;
 import services.ParticleUtils;
 
 import java.util.ArrayList;
@@ -11,15 +12,15 @@ import java.util.List;
 import static services.ForcesUtils.*;
 
 public class Grid {
-    private static final double A = 0.15;
     private static final double ZERO = 0.0;
-    private static final double DIM_X = 20;
-    private static final double DIM_Y = 77; // se tiene en cuenta el espacio fuera de la "caja"
+    private static final double FREE_SPACE = 7;
+    private static final double GENERATION_LIMIT = 40;
+    private double DIM_Y;
     private static final int cols = 8;
     private static final int rowsInside = 30;
     private static final int rowsTotal = 33;
-    private static final double CELL_DIMENSION_Y = DIM_Y / (double) rowsTotal;
-    private static final double CELL_DIMENSION_X = DIM_X / (double) cols;
+    private final double CELL_DIMENSION_Y;
+    private final double CELL_DIMENSION_X;
     // private final Limit topRightLimit;
     // private final Limit bottomLeftLimit;
     private final double topRightLimitInitialY = 77; // TODO
@@ -30,16 +31,23 @@ public class Grid {
     private double movement;
 
     private final Cell[][] cells;
+    private final JsonConfigurer config;
+    private final ForcesUtils forcesUtils;
 
-    public Grid(double holeSize) {
+    public Grid(double holeSize, JsonConfigurer config, ForcesUtils forcesUtils){
+        this.config = config;
+        this.forcesUtils = forcesUtils;
+        this.DIM_Y = config.getM() + FREE_SPACE; // se tiene en cuenta el espacio fuera de la "caja"
+        this.CELL_DIMENSION_X = config.getL() / (double) cols;
+        this.CELL_DIMENSION_Y = DIM_Y / (double) rowsTotal;
         cells = new Cell[rowsTotal][cols];
         for (int row = 0; row < rowsTotal; row++) {
             for (int col = 0; col < cols; col++) {
                 cells[row][col] = new Cell();
             }
         }
-        leftLimitHole = DIM_X / 2 - holeSize / 2;
-        rightLimitHole = DIM_X / 2 + holeSize / 2;
+        leftLimitHole = config.getL() / 2 - holeSize / 2;
+        rightLimitHole = config.getL() / 2 + holeSize / 2;
         // this.bottomLeftLimit = bottomLeftLimit;
         // this.topRightLimit = topRightLimit;
         // this.bottomLeftLimitInitialY = bottomLeftLimit.getY();
@@ -49,7 +57,7 @@ public class Grid {
     }
 
     public void shake(double t, double w) {
-        movement = A * Math.sin(w * t);
+        movement = config.getA() * Math.sin(w * t);
         bottom = (bottomLeftLimitInitialY + movement);
     }
 
@@ -85,7 +93,7 @@ public class Grid {
                         p -> {
                             // System.out.println("ROW: " + newRow + " COL: " + newCol + " PARTICLE: " + p.getId() + " POSITION: " + p.getPosition() + " VELOCITY: " + p.getVelocity() + " ACCELERATION: " + p.getAcceleration());
                             // Add gravity
-                            p.addToForce(ZERO, p.getMass() * ForcesUtils.GRAVITY);
+                            p.addToForce(ZERO, p.getMass() * config.getG());
 
                             current.forEach(n -> {
                                 double diff = p.getPosition().module(n.getPosition());
@@ -94,10 +102,10 @@ public class Grid {
                                 if (diff < sumRad && !n.equals(p)) {
 
                                     Pair normalVersor = n.getPosition().subtract(p.getPosition()).scale(1.0 / diff);
-                                    p.addToForce(getNormalForce(sumRad - diff, normalVersor, p, n)); //p.getVelocity().module(n.getVelocity())
+                                    p.addToForce(forcesUtils.getNormalForce(sumRad - diff, normalVersor, p, n)); //p.getVelocity().module(n.getVelocity())
 
                                     Pair relativeVelocity = p.getVelocity().subtract(n.getVelocity());
-                                    p.addToForce(getTangencialForce(sumRad - diff, relativeVelocity, normalVersor, p, n));
+                                    p.addToForce(forcesUtils.getTangencialForce(sumRad - diff, relativeVelocity, normalVersor, p, n));
                                 }
                                 else {
                                     n.resetAcumVel(p);
@@ -116,13 +124,13 @@ public class Grid {
                                             Pair normalVersor = n.getPosition().subtract(p.getPosition())
                                                     .scale(1.0 / diff);
 
-                                            Pair normalForce = getNormalForce(superposition, normalVersor, p, n);
+                                            Pair normalForce = forcesUtils.getNormalForce(superposition, normalVersor, p, n);
 
                                             p.addToForce(normalForce);
                                             n.addToForce(normalForce.scale(-1.0));
 
                                             Pair relativeVelocity = p.getVelocity().subtract(n.getVelocity());
-                                            Pair tangencialForce = getTangencialForce(superposition, relativeVelocity,
+                                            Pair tangencialForce = forcesUtils.getTangencialForce(superposition, relativeVelocity,
                                                     normalVersor, p, n);
 
                                             p.addToForce(tangencialForce);
@@ -163,7 +171,7 @@ public class Grid {
         double superposition = particle.getRadius() - (particle.getPosition().getY() - bottom);
         if (superposition > ZERO)
             particle.addToForce(
-                    getWallForce(superposition,  particle.getVelocity(), FloorNormalVersor, particle, null));
+                    forcesUtils.getWallForce(superposition,  particle.getVelocity(), FloorNormalVersor, particle, null));
         else {
             particle.resetAcummWall(0);
         }
@@ -177,7 +185,7 @@ public class Grid {
         double superposition = p.getRadius() - (top - p.getPosition().getY());
         if (superposition > ZERO)
             p.addToForce(
-                    getWallForce(superposition, p.getVelocity(), TopNormalVector, p, null));
+                    forcesUtils.getWallForce(superposition, p.getVelocity(), TopNormalVector, p, null));
         else {
             p.resetAcummWall(1);
         }
@@ -191,7 +199,7 @@ public class Grid {
         double superposition = p.getRadius() - (p.getPosition().getX() - left);
         if (superposition > ZERO)
             p.addToForce(
-                    getWallForce(superposition, p.getVelocity(), LeftNormalVector, p, null));
+                    forcesUtils.getWallForce(superposition, p.getVelocity(), LeftNormalVector, p, null));
         else {
             p.resetAcummWall(2);
         }
@@ -205,7 +213,7 @@ public class Grid {
         double superposition = p.getRadius() - (right - p.getPosition().getX());
         if (superposition > ZERO)
             p.addToForce(
-                    getWallForce(superposition, p.getVelocity(), RightNormalVector, p ,null));
+                    forcesUtils.getWallForce(superposition, p.getVelocity(), RightNormalVector, p ,null));
         else{
             p.resetAcummWall(3);
         }
@@ -265,7 +273,7 @@ public class Grid {
     }
 
     private Cell getCell(double x, double y) {
-        if (x >= DIM_X || x < 0 || y < 0 || y >= DIM_Y)
+        if (x >= config.getL() || x < 0 || y < 0 || y >= DIM_Y)
             throw new IllegalStateException();
         int row = getIndexY(y);
         int col = getIndexX(x);
@@ -292,8 +300,8 @@ public class Grid {
                     overlap = false;
                     // set random x between 0 and 20, considering p radius
                     particle.getPosition()
-                            .setX(particle.getRadius() + Math.random() * (DIM_X - 2.0 * particle.getRadius()));
-                    particle.getPosition().setY(40 + 70 / 10 + Math.random() * ((70 - 40) - particle.getRadius()));
+                            .setX(particle.getRadius() + Math.random() * (config.getL() - 2.0 * particle.getRadius()));
+                    particle.getPosition().setY(GENERATION_LIMIT + FREE_SPACE + Math.random() * ((config.getM() - GENERATION_LIMIT) - particle.getRadius()));
                     c = getIndexX(particle.getPosition().getX());
                     r = getIndexY(particle.getPosition().getY());
 

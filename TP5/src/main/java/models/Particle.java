@@ -1,8 +1,6 @@
 package models;
 
-import models.Pair;
-import models.Color;
-import services.ForcesUtils;
+import services.JsonConfigurer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,11 +15,9 @@ public class Particle {
     private final Double mass;
     private final int id;
     private boolean reInjected = false;
-    private Color color = Color.RED;
+    private Color color;
     public Map<Particle, Double> acumVelocity = new HashMap<>();
     public Double[] wallAcum = {0.0,0.0,0.0,0.0};
-    // BOOOOOOKE
-    // DO AS I SAY, NOT AS I DO
     // BOTOTM, TOP, LEFT, RIGHT
 
     // Beeman information
@@ -33,6 +29,7 @@ public class Particle {
     private Pair actualAcceleration;
     private Pair actualVelocity;
     private boolean gone = false;
+    private final JsonConfigurer config;
 
     public void resetForce() {
         force.setX(ZERO);
@@ -77,7 +74,7 @@ public class Particle {
         this.wallAcum[index] = 0.0;
     }
 
-    public Particle(int id, Pair position, Double radius, Double mass, Double dt, Color color) {
+    public Particle(int id, Pair position, Double radius, Double mass, Double dt, Color color, JsonConfigurer config) {
         this.id = id;
         this.position = position;
         this.radius = radius;
@@ -87,22 +84,24 @@ public class Particle {
         this.dt = dt;
         this.sqrDt = Math.pow(dt, 2);
         actualAcceleration = new Pair(ZERO, ZERO);
-        prevAcceleration = new Pair(ZERO, ForcesUtils.GRAVITY);
+        prevAcceleration = new Pair(ZERO, config.getG());
         this.color = color;
+        this.config = config;
     }
 
-    public Particle(double id, double x, double y, double mass, double radius){
+    public Particle(double id, Pair position, double mass, double radius, double dt, JsonConfigurer config){
         this.id = (int) id;
-        this.position = new Pair(x, y);
+        this.position = position;
         this.radius = radius;
         this.mass = mass;
         this.force = new Pair(ZERO, ZERO);
         this.velocity = new Pair(ZERO, ZERO);
-        this.dt = 1.0E-3;
+        this.dt = dt;
         this.sqrDt = Math.pow(dt, 2);
         actualAcceleration = new Pair(ZERO, ZERO);
-        prevAcceleration = new Pair(ZERO, ForcesUtils.GRAVITY);
+        prevAcceleration = new Pair(ZERO, config.getG());
         this.color = Color.BLUE;
+        this.config = config;
     }
 
     // public Particle copy() {
@@ -180,7 +179,7 @@ public class Particle {
         if (reInjected){
             this.velocity = new Pair(ZERO, ZERO);
             reInjected = false;
-            prevAcceleration = new Pair(ZERO, ForcesUtils.GRAVITY);
+            prevAcceleration = new Pair(ZERO, config.getG());
         }else {
             this.velocity = actualVelocity.sum(
                     this.getAcceleration().scale((1.0 / 3.0) * dt).sum(

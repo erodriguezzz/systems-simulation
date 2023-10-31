@@ -2,6 +2,8 @@ package models;
 
 import models.Grid;
 import models.Particle;
+import services.ForcesUtils;
+import services.JsonConfigurer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +17,15 @@ public class BeemanIntegrator{
     private final Grid grid;
     private final List<Double> times = new ArrayList<>();
     private final List<Double> energy = new ArrayList<>();
+    private final JsonConfigurer config;
 
-    public BeemanIntegrator(double dt, double d, double frequency, List<Particle> particles) {
+    public BeemanIntegrator(double dt, double d, double frequency, List<Particle> particles, JsonConfigurer config) {
         this.dt = dt;
         this.frequency = frequency;
         this.particles = particles;
+        this.config = config;
         
-        this.grid = new Grid(d);
+        this.grid = new Grid(d, config, new ForcesUtils(dt, config));
 
         grid.addAll(this.particles);
 

@@ -13,9 +13,13 @@ public class DataManager {
     private float L;
     private int N;
     private float time;
+    private double dt;
+    private final JsonConfigurer config;
     private List<Particle> particles = new ArrayList<>();
 
-    public DataManager(String staticPath, String dynamicPath) {
+    public DataManager(String staticPath, String dynamicPath, double dt, JsonConfigurer config) {
+        this.config = config;
+        this.dt = dt;
         readParticlesFiles(staticPath, dynamicPath);
         // TODO: should we include the clear of OutputFiles?
     }
@@ -40,7 +44,8 @@ public class DataManager {
                 double radius = dynamicScanner.nextDouble();
                 double mass = dynamicScanner.nextDouble();
 
-                particles.add(new Particle(id, new Pair(x, y), (radius), (mass), 1.0E-4, Color.RED));
+                // TODO: why is 1.e-4 hardcoded? why are there multiple constructors in BeemanIntegrator class with different values of dt?
+                particles.add(new Particle(id, new Pair(x, y), (radius), (mass), dt, Color.RED, config));
             }
             staticScanner.close();
             dynamicScanner.close();

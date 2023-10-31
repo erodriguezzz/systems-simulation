@@ -4,14 +4,12 @@ import models.Pair;
 import models.Particle;
 
 public class ForcesUtils {
-//    TODO: Parametros en m
-    public static final double K_NORMAL = 250;
-//    public static final double K_NORMAL = 25000;
-    public static final double GRAVITY = -4.80;
-    public static final double GAMMA = 2.5;
-    public static final double MU =  0.5;
-    public static final double K_TAN = 2 * K_NORMAL;
-    public static final double dt = 10E-4;
+    public double Knormal;
+    public double Gravity;
+    public double Gamma;
+    public double Mu;
+    public double Ktan;
+    public double dt;
 
 
 
@@ -19,22 +17,30 @@ public class ForcesUtils {
     private static final Pair TopNormalVector = new Pair(0.0, 1.0);
     private static final Pair LeftNormalVector = new Pair(-1.0, 0.0);
     private static final Pair RightNormalVector = new Pair(1.0, 0.0);
-//     public static final double K_NORMAL = 2000;
-// //    public static final double K_NORMAL = 25000;
-//     public static final double GRAVITY = -5.80;
-//     public static final double GAMMA = 2.5;
-//     public static final double MU = 0.3;
-//     public static final double K_TAN = 2 * K_NORMAL;
+//     public static final double Knormal = 2000;
+// //    public static final double Knormal = 25000;
+//     public static final double Gravity = -5.80;
+//     public static final double Gamma = 2.5;
+//     public static final double Mu = 0.3;
+//     public static final double Ktan = 2 * Knormal;
 
 //    TODO: Parametros en cm
-//    public static final double K_NORMAL = 250;
-//    public static final double GRAVITY = -5.0;
-//    public static final double GAMMA = 2.5;
-//    public static final double MU = 0.7;
-//    public static final double K_TAN = 2 * K_NORMAL;
+//    public static final double Knormal = 250;
+//    public static final double Gravity = -5.0;
+//    public static final double Gamma = 2.5;
+//    public static final double Mu = 0.7;
+//    public static final double Ktan = 2 * Knormal;
 
+    public ForcesUtils(double dt, JsonConfigurer config) {
+        this.dt = dt;
+        this.Knormal = config.getKn();
+        this.Gravity = config.getG();
+        this.Gamma = config.getGamma();
+        this.Mu = config.getMu();
+        this.Ktan = 2 * Knormal;
+    }
 
-    public static double getNormalForce(double superposition, Particle A, Particle B) {
+    public double getNormalForce(double superposition, Particle A, Particle B) {
         Pair relativeVelocity;
         if(B == null) {
             relativeVelocity = A.getVelocity();
@@ -42,27 +48,27 @@ public class ForcesUtils {
             relativeVelocity = A.getVelocity().subtract(B.getVelocity());
         }
 
-        return -K_NORMAL * (superposition) - GAMMA * (relativeVelocity.getX() + relativeVelocity.getY());
+        return -Knormal * (superposition) - Gamma * (relativeVelocity.getX() + relativeVelocity.getY());
 
     }
 
 
-    public static Pair getNormalForce(double superposition, Pair versor, Particle A, Particle B) {
+    public Pair getNormalForce(double superposition, Pair versor, Particle A, Particle B) {
         double force = getNormalForce(superposition, A, B);
 
         return versor.scale(force);
     }
 
 
-    public static double getTangencialForceT3(double superposition, double relativeTangencialVelocity) {
-        return -K_TAN * (relativeTangencialVelocity) * dt;
+    public double getTangencialForceT3(double superposition, double relativeTangencialVelocity) {
+        return -Ktan * (relativeTangencialVelocity) * dt;
     }
 
-    public static double getTangencialForceT1(double superposition, double relativeTangencialVelocity, Particle A, Particle B) {
-        return -MU * Math.abs(getNormalForce(superposition, A, B)) * Math.signum(relativeTangencialVelocity);
+    public double getTangencialForceT1(double superposition, double relativeTangencialVelocity, Particle A, Particle B) {
+        return -Mu * Math.abs(getNormalForce(superposition, A, B)) * Math.signum(relativeTangencialVelocity);
     }
 
-    public static Pair getTangencialForce(double superposition, Pair relativeTangencialVelocity, Pair normalVersor, Particle A, Particle B) {
+    public Pair getTangencialForce(double superposition, Pair relativeTangencialVelocity, Pair normalVersor, Particle A, Particle B) {
         Pair tan = new Pair(-normalVersor.getY(), normalVersor.getX());
         A.addAcumVel(B, relativeTangencialVelocity.dot(tan));
         double forceT3 = getTangencialForceT3(superposition, A.getAccumVel(B));
@@ -72,7 +78,7 @@ public class ForcesUtils {
         return tan.scale(force);
     }
 
-    public static Pair getWallForce(double superposition, Pair relativeTangencialVelocity, Pair normalVersor, Particle A, Particle B) {
+    public Pair getWallForce(double superposition, Pair relativeTangencialVelocity, Pair normalVersor, Particle A, Particle B) {
         Pair tan = new Pair(-normalVersor.getY(), normalVersor.getX());
         int index;
         if(normalVersor.equals(FloorNormalVersor)){
