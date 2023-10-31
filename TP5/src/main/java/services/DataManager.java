@@ -97,6 +97,23 @@ public class DataManager {
         }
     }
 
+    public void writeTimeFile(String path, List<Double> times){
+        try {
+            File file = new File(path);
+            FileWriter writer = new FileWriter(file, true);
+
+            StringBuilder data = new StringBuilder();
+            for (Double t : times) {
+                data.append(t + "\n");
+            }
+            writer.write(data.toString());
+
+            writer.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public float getL() {
         return L;

@@ -96,16 +96,34 @@ public class Grid {
                             p.addToForce(ZERO, p.getMass() * config.getG());
 
                             current.forEach(n -> {
+//                                System.out.println("CURRENT");
                                 double diff = p.getPosition().module(n.getPosition());
                                 double sumRad = p.getRadius() + n.getRadius();
 
                                 if (diff < sumRad && !n.equals(p)) {
-
                                     Pair normalVersor = n.getPosition().subtract(p.getPosition()).scale(1.0 / diff);
-                                    p.addToForce(forcesUtils.getNormalForce(sumRad - diff, normalVersor, p, n)); //p.getVelocity().module(n.getVelocity())
+                                    Pair auxVelocity = p.getVelocity().subtract(n.getVelocity());
+                                    double superpositionB = auxVelocity.getX() + auxVelocity.getY();
+                                    p.addToForce(forcesUtils.getNormalForce(sumRad - diff, normalVersor, superpositionB));
 
                                     Pair relativeVelocity = p.getVelocity().subtract(n.getVelocity());
-                                    p.addToForce(forcesUtils.getTangencialForce(sumRad - diff, relativeVelocity, normalVersor, p, n));
+                                    Pair aux = p.getAccumVel(n);
+                                    Pair accum;
+                                    if ( aux == null){
+                                        accum = relativeVelocity;
+                                    } else {
+                                        accum = aux.sum(relativeVelocity);
+                                    }
+                                    p.setAccumRealtiveVelocity(accum,n);
+                                    p.addToForce(forcesUtils.getTangentialForce(sumRad - diff, p.getAccumVel(n), normalVersor, superpositionB));
+
+//                                    ======================
+
+//                                    Pair normalVersor = n.getPosition().subtract(p.getPosition()).scale(1.0 / diff);
+//                                    Pair relativeVelocity = p.getVelocity().subtract(n.getVelocity());
+//
+//                                    p.addToForce(forcesUtils.getNormalForce(sumRad - diff, normalVersor, p, n)); //p.getVelocity().module(n.getVelocity())
+//                                    p.addToForce(forcesUtils.getTangencialForce(sumRad - diff, relativeVelocity, normalVersor, p, n));
                                 }
                                 else {
                                     n.resetAcumVel(p);
@@ -121,20 +139,42 @@ public class Grid {
 
                                         if (superposition > ZERO && !n.equals(p)) {
 
-                                            Pair normalVersor = n.getPosition().subtract(p.getPosition())
-                                                    .scale(1.0 / diff);
+                                            Pair normalVersor = n.getPosition().subtract(p.getPosition()).scale(1.0 / diff);
 
-                                            Pair normalForce = forcesUtils.getNormalForce(superposition, normalVersor, p, n);
+                                            Pair auxVelocity = p.getVelocity().subtract(n.getVelocity());
+                                            double superpositionB = auxVelocity.getX() + auxVelocity.getY();
+                                            Pair normalForce = forcesUtils.getNormalForce(superposition, normalVersor, superpositionB);
 
                                             p.addToForce(normalForce);
                                             n.addToForce(normalForce.scale(-1.0));
 
                                             Pair relativeVelocity = p.getVelocity().subtract(n.getVelocity());
-                                            Pair tangencialForce = forcesUtils.getTangencialForce(superposition, relativeVelocity,
-                                                    normalVersor, p, n);
 
-                                            p.addToForce(tangencialForce);
-                                            n.addToForce(tangencialForce.scale(-1.0));
+                                            Pair tangentialForce = forcesUtils.getTangentialForce(superposition, relativeVelocity, normalVersor, superpositionB);
+
+                                            p.addToForce(tangentialForce);
+                                            n.addToForce(tangentialForce.scale(-1.0));
+
+                                            Pair aux = p.getAccumVel(n);
+                                            Pair accum;
+                                            if ( aux == null){
+                                                accum = relativeVelocity;
+                                            } else {
+                                                accum = aux.sum(relativeVelocity);
+                                            }
+                                            p.setAccumRealtiveVelocity(accum,n);
+                                            n.setAccumRealtiveVelocity(accum.scale(-1.0),p);
+//                                          ------
+
+//                                            Pair normalVersor = n.getPosition().subtract(p.getPosition()).scale(1.0 / diff);
+//                                            Pair normalForce = forcesUtils.getNormalForce(superposition, normalVersor, p, n);
+//                                            p.addToForce(normalForce);
+//                                            n.addToForce(normalForce.scale(-1.0));
+//                                            Pair relativeVelocity = p.getVelocity().subtract(n.getVelocity());
+//                                            Pair tangencialForce = forcesUtils.getTangencialForce(superposition, relativeVelocity,
+//                                                    normalVersor, p, n);
+//                                            p.addToForce(tangencialForce);
+//                                            n.addToForce(tangencialForce.scale(-1.0));
                                         }
                                         else {
                                             p.resetAcumVel(n);
@@ -169,9 +209,13 @@ public class Grid {
     private void floorForce(Particle particle) {
     //    System.out.println("Particle " + particle.getId() + " position: " + particle.getPosition() + " velocity: " + particle.getVelocity() + " acceleration: " + particle.getAcceleration());
         double superposition = particle.getRadius() - (particle.getPosition().getY() - bottom);
-        if (superposition > ZERO)
+        if (superposition > ZERO) {
+            Pair auxVelocity = particle.getVelocity();
+            particle.addAcumVelWall(0, particle.getVelocity());
+            double superpositionB = auxVelocity.getX() + auxVelocity.getY();
             particle.addToForce(
-                    forcesUtils.getWallForce(superposition,  particle.getVelocity(), FloorNormalVersor, particle, null));
+                    forcesUtils.getWallForce(superposition, particle.getVelocity(), FloorNormalVersor, superpositionB));
+        }
         else {
             particle.resetAcummWall(0);
         }
@@ -183,9 +227,13 @@ public class Grid {
 
     private void topForce(Particle p) {
         double superposition = p.getRadius() - (top - p.getPosition().getY());
-        if (superposition > ZERO)
+        if (superposition > ZERO) {
+            Pair auxVelocity = p.getVelocity();
+            p.addAcumVelWall(1, p.getVelocity());
+            double superpositionB = auxVelocity.getX() + auxVelocity.getY();
             p.addToForce(
-                    forcesUtils.getWallForce(superposition, p.getVelocity(), TopNormalVector, p, null));
+                    forcesUtils.getWallForce(superposition, p.getVelocity(), TopNormalVector, superpositionB));
+        }
         else {
             p.resetAcummWall(1);
         }
@@ -197,9 +245,13 @@ public class Grid {
 
     private void leftForce(Particle p) {
         double superposition = p.getRadius() - (p.getPosition().getX() - left);
-        if (superposition > ZERO)
+        if (superposition > ZERO) {
+            Pair auxVelocity = p.getVelocity();
+            p.addAcumVelWall(2, p.getVelocity());
+            double superpositionB = auxVelocity.getX() + auxVelocity.getY();
             p.addToForce(
-                    forcesUtils.getWallForce(superposition, p.getVelocity(), LeftNormalVector, p, null));
+                    forcesUtils.getWallForce(superposition, p.getVelocity(), LeftNormalVector, superpositionB));
+        }
         else {
             p.resetAcummWall(2);
         }
@@ -211,9 +263,13 @@ public class Grid {
 
     private void rightForce(Particle p) {
         double superposition = p.getRadius() - (right - p.getPosition().getX());
-        if (superposition > ZERO)
+        if (superposition > ZERO) {
+            Pair auxVelocity = p.getVelocity();
+            p.addAcumVelWall(3, p.getVelocity());
+            double superpositionB = auxVelocity.getX() + auxVelocity.getY();
             p.addToForce(
-                    forcesUtils.getWallForce(superposition, p.getVelocity(), RightNormalVector, p ,null));
+                    forcesUtils.getWallForce(superposition, p.getVelocity(), RightNormalVector, superpositionB));
+        }
         else{
             p.resetAcummWall(3);
         }

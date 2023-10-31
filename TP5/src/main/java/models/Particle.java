@@ -16,8 +16,8 @@ public class Particle {
     private final int id;
     private boolean reInjected = false;
     private Color color;
-    public Map<Particle, Double> acumVelocity = new HashMap<>();
-    public Double[] wallAcum = {0.0,0.0,0.0,0.0};
+    public Map<Particle, Pair> acumVelocity = new HashMap<>();
+    public Pair[] wallAcum = {Pair.ZERO, Pair.ZERO, Pair.ZERO, Pair.ZERO};
     // BOTOTM, TOP, LEFT, RIGHT
 
     // Beeman information
@@ -45,33 +45,36 @@ public class Particle {
         force.setY(force.getY() + y);
     }
 
-    public double getAccumVel(Particle p){
+    public Pair getAccumVel(Particle p){
         return acumVelocity.get(p);
     }
 
-    public double getAccumVelWall(int index){
+    public Pair getAccumVelWall(int index){
         return wallAcum[index];
     }
 
-    public void addAcumVel(Particle b, double relativeVel){
-        double currentAcumVel = acumVelocity.get(b);
-        this.acumVelocity.put(b, currentAcumVel + relativeVel);
-
-        b.acumVelocity.put(this, currentAcumVel + relativeVel);
+//    public void addAcumVel(Particle b, double relativeVel){
+//        double currentAcumVel = acumVelocity.get(b);
+//        this.acumVelocity.put(b, currentAcumVel + relativeVel);
+//
+//        b.acumVelocity.put(this, currentAcumVel + relativeVel);
+//    }
+    public void setAccumRealtiveVelocity(Pair velocity, Particle particle) {
+        this.acumVelocity.putIfAbsent(particle, velocity);
     }
 
-    public void addAcumVelWall(int index, double relativeVel){
-        double currentAcumVel = this.wallAcum[index];
-        this.wallAcum[index] = currentAcumVel + relativeVel;
+    public void addAcumVelWall(int index, Pair relativeVel){
+        Pair currentAcumVel = this.wallAcum[index];
+        this.wallAcum[index] = currentAcumVel.sum(relativeVel);
     }
 
     public void resetAcumVel(Particle b){
-        this.acumVelocity.put(b, 0.0);
-        b.acumVelocity.put(this, 0.0);
+        this.acumVelocity.put(b, Pair.ZERO);
+        b.acumVelocity.put(this, Pair.ZERO);
     }
 
     public void resetAcummWall(int index){
-        this.wallAcum[index] = 0.0;
+        this.wallAcum[index] = Pair.ZERO;
     }
 
     public Particle(int id, Pair position, Double radius, Double mass, Double dt, Color color, JsonConfigurer config) {

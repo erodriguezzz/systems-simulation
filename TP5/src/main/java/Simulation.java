@@ -17,7 +17,7 @@ import services.JsonConfigurer;
 public class Simulation {
 
     // static double L = 135;
-    static double finalTime = 50;
+    static double finalTime = 1000;
     static double LIMIT_MASS = 0;
     static double LIMIT_RADIUS = 0.3;
 
@@ -55,15 +55,23 @@ public class Simulation {
             beemanIntegrator.run(currentTime);
             if (frame == iterationPerFrame) {
                 System.out.format("Frame: %.4f\n", currentTime);
-                dm.writeDynamicFile(beemanIntegrator.getParticles(),
-                        "../data/output/g=" + config.getG() + "_dt=" + dt + "_Kn="+ config.getKn() +"_w=" + w+"_N=" + N + ".dump",
-                        // "./data/output/Dynamic2_N_" + beemanIntegrator.getParticles().size() + "_dt_"
-                        // + dt + "_v_" + v + ".dump",
-                        currentTime, limits);
+//                dm.writeDynamicFile(beemanIntegrator.getParticles(),
+//                        "../data/output/d=" + D +
+//                                "_w=" + w +
+//                                "_v=" + v +
+//                                ".dump",
+//                        // "./data/output/Dynamic2_N_" + beemanIntegrator.getParticles().size() + "_dt_"
+//                        // + dt + "_v_" + v + ".dump",
+//                        currentTime, limits);
                 frame = 0;
             }
             currentTime = currentTime + dt;
         }
+        dm.writeTimeFile("../data/output/time_d=" + D +
+                        "_w=" + w +
+                        "_v=" + v +
+                        ".dump",
+                beemanIntegrator.getTimes());
         System.out.println("N " + N + " dt " + dt + " version " + v + " finished!");
     }
 
