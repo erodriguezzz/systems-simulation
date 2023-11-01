@@ -25,7 +25,7 @@ x6 = getTimes('../data/output/timeFMLM/time_d=5.0_w=50.0_v=0.dump')
 for x, label, color in zip([x1, x2, x3, x4, x5,x6], ['5', '10', '15', '20', '30', '50'], colors):
 # for x, label, color in zip([x1,x3,x6], ['5',  '15',  '50'], colors):
     count, limits = np.histogram(x, bins=1000)
-
+    print("Q" + label + " = " + str(len(x)/(x[-1]-x[0])))
     accumCount = np.cumsum(count)
 
     plt.step(limits[:-1], accumCount, where='post', label=label + " rad/s", color=color)

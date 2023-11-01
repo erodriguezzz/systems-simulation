@@ -27,6 +27,7 @@ fs = [5, 10, 15, 20, 30, 50]
 # for x, label in zip([x1,x3,x6], ['5',  '15',  '50']):
 for x, label in zip([x1, x2, x3, x4,x5,x6], ['5', '10', '15', '20', '30', '50']):
     Q = (len(x))/(x[-1]-x[0])
+    print("Q" + label + " = " + str(Q))
     Qs.append(Q)
 
     # regresion lineal de los datos

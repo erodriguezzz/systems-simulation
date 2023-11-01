@@ -21,12 +21,15 @@ public class JsonConfigurer {
     private final Double A;
     private final Double G;
 
+    private final Boolean animations;
+
+    private final Boolean graphics;
 
     private final List<Double> dts;
+
     private final List<Double> Ws;
     private final List<Double> Ns;
     private final List<Double> Ds;
-
     public JsonConfigurer(String path) {
         JSONParser parser = new JSONParser();
         try (FileReader fileReader = new FileReader(path)) {
@@ -49,6 +52,8 @@ public class JsonConfigurer {
             this.dts = (List<Double>) json.get("dts");
             this.Ws = (List<Double>) json.get("Ws");
             this.Ns = (List<Double>) json.get("Ns");
+            this.animations = (Boolean) json.get("animations");
+            this.graphics = (Boolean) json.get("graphics");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,5 +119,13 @@ public class JsonConfigurer {
 
     public Double getG() {
         return G;
+    }
+
+    public Boolean getAnimations() {
+        return animations;
+    }
+
+    public Boolean getGraphics() {
+        return graphics;
     }
 }

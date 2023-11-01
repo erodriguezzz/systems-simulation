@@ -16,7 +16,7 @@ def getTimes(path):
 
 x1 = getTimes('../data/output/time_d=3.0_w=20.0_v=0.dump')
 x2 = getTimes('../data/output/time_d=4.0_w=20.0_v=0.dump')
-x3 = getTimes('../data/output/time_d=5.0_w=20.0_v=0.dump')
+x3 = getTimes('../data/output/timeFMLM/time_d=5.0_w=20.0_v=0.dump')
 x4 = getTimes('../data/output/time_d=6.0_w=20.0_v=0.dump')
 
 

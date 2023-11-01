@@ -55,23 +55,28 @@ public class Simulation {
             beemanIntegrator.run(currentTime);
             if (frame == iterationPerFrame) {
                 System.out.format("Frame: %.4f\n", currentTime);
-//                dm.writeDynamicFile(beemanIntegrator.getParticles(),
-//                        "../data/output/d=" + D +
-//                                "_w=" + w +
-//                                "_v=" + v +
-//                                ".dump",
-//                        // "./data/output/Dynamic2_N_" + beemanIntegrator.getParticles().size() + "_dt_"
-//                        // + dt + "_v_" + v + ".dump",
-//                        currentTime, limits);
+                System.out.println("Animations: " + config.getAnimations());
+                if (config.getAnimations()) {
+                    dm.writeDynamicFile(beemanIntegrator.getParticles(),
+                            "../data/output/d=" + D +
+                                    "_w=" + w +
+                                    "_v=" + v +
+                                    ".dump",
+                            // "./data/output/Dynamic2_N_" + beemanIntegrator.getParticles().size() + "_dt_"
+                            // + dt + "_v_" + v + ".dump",
+                            currentTime, limits);
+                }
                 frame = 0;
             }
             currentTime = currentTime + dt;
         }
-        dm.writeTimeFile("../data/output/time_d=" + D +
-                        "_w=" + w +
-                        "_v=" + v +
-                        ".dump",
-                beemanIntegrator.getTimes());
+        if (config.getGraphics()) {
+            dm.writeTimeFile("../data/output/timeFMLM/time_d=" + D +
+                            "_w=" + w +
+                            "_v=" + v +
+                            ".dump",
+                    beemanIntegrator.getTimes());
+        }
         System.out.println("N " + N + " dt " + dt + " version " + v + " finished!");
     }
 
