@@ -122,7 +122,6 @@ public class Particle {
 
     public void reInject() {
         reInjected = true;
-        setColor(Color.RED);
     }
 
     public Double getRadius() {
@@ -219,5 +218,12 @@ public class Particle {
 
     public void setGone(boolean gone) {
         this.gone = gone;
+        if(gone)
+            setColor(getFollowingColor());
+    }
+
+    private Color getFollowingColor() {
+        Color[] colors = Color.getAllColors();
+        return colors[(color.ordinal() % colors.length) + 1 > colors.length - 1  ? 0 : (color.ordinal() % colors.length) + 1];
     }
 }

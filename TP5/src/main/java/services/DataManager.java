@@ -44,7 +44,6 @@ public class DataManager {
                 double radius = dynamicScanner.nextDouble();
                 double mass = dynamicScanner.nextDouble();
 
-                // TODO: why is 1.e-4 hardcoded? why are there multiple constructors in BeemanIntegrator class with different values of dt?
                 particles.add(new Particle(id, new Pair(x, y), (radius), (mass), dt, Color.RED, config));
             }
             staticScanner.close();
@@ -73,7 +72,7 @@ public class DataManager {
                 p.getVelocity().getY() + " 0 " +
                 p.getRadius() + " " + 
                 p.getMass() + 
-                " 255 0 0" +
+                " " + p.getColor().toString() + " " +
                 "\n");
                 lastId = p.getId();
             }
